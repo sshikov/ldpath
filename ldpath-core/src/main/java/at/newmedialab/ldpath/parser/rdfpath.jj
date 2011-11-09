@@ -1,0 +1,603 @@
+options
+{
+  STATIC=false;
+  LOOKAHEAD=2147483647;
+//  DEBUG_PARSER=true;
+//  DEBUG_TOKEN_MANAGER=true;
+//  DEBUG_LOOKAHEAD=true;
+}
+
+PARSER_BEGIN(RdfPathParser)
+package at.newmedialab.lmf.search.rdfpath.parser;
+
+import at.newmedialab.lmf.search.rdfpath.model.fields.*;
+import at.newmedialab.lmf.search.rdfpath.model.functions.*;
+import at.newmedialab.lmf.search.rdfpath.model.programs.*;
+import at.newmedialab.lmf.search.rdfpath.model.selectors.*;
+import at.newmedialab.lmf.search.rdfpath.model.tests.*;
+import at.newmedialab.lmf.search.rdfpath.model.transformers.*;
+import at.newmedialab.lmf.search.api.program.SolrProgramService;
+
+import kiwi.core.util.KiWiContext;
+import kiwi.core.api.triplestore.*;
+import kiwi.core.model.rdf.*;
+import kiwi.core.exception.KiWiException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Collections;
+
+@SuppressWarnings("all")
+public class RdfPathParser {
+
+        /**
+         * A map mapping from namespace prefix to namespace URI
+         */
+        private Map<String,String> namespaces = new HashMap<String,String>();
+
+
+
+        public Program parse() throws ParseException {
+			namespaces.clear();
+			namespaces.putAll(Program.DEFAULT_NAMESPACES);
+			// namespaces.put("rdf","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+			// namespaces.put("rdfs","http://www.w3.org/2000/01/rdf-schema#");
+			// namespaces.put("owl","http://www.w3.org/2002/07/owl#");
+			// namespaces.put("skos","http://www.w3.org/2004/02/skos/core#");
+			// namespaces.put("dc","http://purl.org/dc/elements/1.1/");
+			// namespaces.put("xsd","http://www.w3.org/2001/XMLSchema#");
+			// namespaces.put("lmf","http://www.newmedialab.at/lmf/types/1.0/");
+			// namespaces.put("fn","http://www.newmedialab.at/lmf/functions/1.0/");
+
+		return Program();
+        }
+
+
+
+
+        public static KiWiUriResource resolveResource(String uri) {
+            ResourceService rs = KiWiContext.getInstance(ResourceService.class);
+            return rs.createUriResource(uri);
+        }
+
+
+        public String resolveNamespace(String prefix) throws ParseException {
+            String uri = namespaces.get(prefix);
+            if(uri == null) {
+                throw new ParseException("Namespace "+prefix+" not defined!");
+            }
+            return uri;
+        }
+
+        public static NodeFunction getFunction(String uri) throws ParseException {
+            try {
+                SolrProgramService scs = KiWiContext.getInstance(SolrProgramService.class);
+                return scs.getNodeFunction(uri);
+            } catch(KiWiException ex) {
+                throw new ParseException(ex.getMessage());
+            }
+        }
+
+
+        public static NodeTransformer getTransformer(String uri) throws ParseException {
+            try {
+                SolrProgramService scs = KiWiContext.getInstance(SolrProgramService.class);
+                return scs.getNodeTransformer(uri);
+            } catch(KiWiException ex) {
+                throw new ParseException(ex.getMessage());
+            }
+        }
+}
+PARSER_END(RdfPathParser)
+
+SKIP :
+{
+ 	" "
+|	"\r"
+|	"\t"
+|	"\n"
+}
+
+MORE:
+{
+ "\"" : WithinString
+}
+
+<WithinString> TOKEN:
+{
+  <STRLIT: "\""> : DEFAULT
+}
+
+<WithinString> MORE:
+{
+  <~["\n","\r"]>
+}
+
+
+TOKEN : /* OPERATORS */
+{
+	< AND:  "&"  >  |
+	< OR:   "|"  >  |
+	< IS:   "is" >  |
+  	< TYPE: "^^" >
+}
+
+TOKEN :
+{
+    < URI: ["a"-"z","A"-"Z"](["a"-"z","A"-"Z","0"-"9","+","-","."])* "://"  (["a"-"z","A"-"Z","0"-"9",";","/","?",":","@","&","=","+","$",".","-","_","!","~","*","'","%"])+ ("#" (["a"-"z","A"-"Z","0"-"9",";","/","?",":","@","&","=","+","$",".","-","_","!","~","*","'","%"])*)? | "#" (["a"-"z","A"-"Z","0"-"9",";","/","?",":","@","&","=","+","$",".","-","_","!","~","*","'","%"])+> |
+    < IDENTIFIER: ["a"-"z","A"-"Z","0"-"9","_"](["a"-"z","A"-"Z","0"-"9","_","'","-"])* > |
+    < #URICHAR: ["a"-"z","A"-"Z","0"-"9",";","/","?",":","@","&","=","+","$",".","-","_","!","~","*","'","%"] >
+}
+
+
+
+Program Program() :
+{
+    Program program = new Program();
+    NodeTest filter = null;
+    FieldMapping rule;
+    Token prefix = null;
+    Token uri;
+    NodeSelector boostSelector;
+}
+{
+  (
+    "@prefix" prefix = <IDENTIFIER> ":" "<" uri = <URI> ">" ";" {
+        program.addNamespace(prefix.image, uri.image );
+        namespaces.put(prefix.image,uri.image);
+    }
+  )*
+
+  (
+    "@filter" filter = NodeTest() ";" {
+        program.setFilter(filter);
+    }
+  )?
+
+  (
+    "@boost" boostSelector = Selector() ";" {
+    	NodeTransformer transformer = getTransformer(Program.DOCUMENT_BOOST_TYPE);
+		FieldMapping booster = new FieldMapping("@boost", Program.DOCUMENT_BOOST_TYPE, boostSelector, transformer, null);
+		program.setBooster(booster);  
+    }
+  )?
+
+  (
+    rule = Rule()
+    {
+       program.addMapping(rule);
+    }
+  )*
+  <EOF>
+  {
+    return program;
+  }
+}
+
+FieldMapping Rule() :
+{
+    FieldMapping rule;
+    Token name;
+    String type;
+    NodeSelector selector;
+    NodeTransformer transformer;
+    Map<String, String> conf = null;
+}
+{
+    name = <IDENTIFIER> "=" selector = Selector() "::" type = Uri() ("(" conf = FieldConfig() ")")? ";" {
+        transformer = getTransformer(type);
+        rule = new FieldMapping(name.image,type,selector,transformer, conf);
+        return rule;
+    }
+}
+
+Map<String,String> FieldConfig() : {
+	Map<String, String> conf = new HashMap<String, String>();
+	Token key = null;
+	String val = null;
+	Map<String,String> more = null;
+}
+{
+	( key = <IDENTIFIER> "=" val = ConfVal() ("," more = FieldConfig() )? )? {
+		if (key == null || val == null) return null;
+		conf.put(key.image, val);
+		if (more != null) {
+			conf.putAll(more);
+		}
+		return conf;
+	}
+}
+
+String ConfVal() : {
+	Token str, id;
+}
+{
+	str = <STRLIT> { return str.image.substring(1, str.image.length() -1); }
+|	id = <IDENTIFIER> { return id.image; }
+}
+
+String Uri() : {
+    Token uri, prefix, localName;
+
+}
+{
+    "<" uri = <URI> ">" {
+       return uri.image;
+    }
+|   prefix = <IDENTIFIER> ":" localName = <IDENTIFIER> {
+        return resolveNamespace(prefix.image)+localName.image;
+    }
+}
+
+
+NodeSelector Selector() :
+{
+    NodeSelector result;
+}
+{
+    (
+        result = CompoundSelector()
+    |   result = TestingSelector()
+    |   result = AtomicSelector()
+    )
+    {
+        return result;
+    }
+}
+
+
+NodeSelector CompoundSelector() :
+{
+    NodeSelector result = null;
+}
+{
+    (
+        /* Path Selector */
+        result = PathSelector() |
+
+        /* Intersection Selector */
+        result = IntersectionSelector() |
+
+        /* Union Selector */
+        result = UnionSelector()
+    )
+    {
+        return result;
+    }
+}
+
+
+NodeSelector AtomicOrTestingSelector() :
+{
+    NodeSelector result = null;
+}
+{
+    (
+        /* Testing Selector */
+        result = TestingSelector() |
+
+        /* Atomic Selector */
+        result = AtomicSelector()
+    )
+    {
+        return result;
+    }
+}
+
+NodeSelector AtomicSelector() :
+{
+    NodeSelector result = null;
+}
+{
+    (
+    	/* Self Selector */
+    	result = SelfSelector() |
+    	    
+        /* Property Selector */
+        result = PropertySelector() |
+
+        /* Wildcard Selector */
+        result = WildcardSelector() |
+        
+        /* Reverse Property Selector */
+        result = ReversePropertySelector() |
+
+        /* Function Selector */
+        result = FunctionSelector() |
+
+        /* String Constant Selector */
+        result = StringConstantSelector() |
+        
+        /* Recursive Path Selector */
+        result = RecursivePathSelector() |
+
+        /* Other selector enclosed in braces */
+        result = GroupedSelector()
+
+    )
+    {
+        return result;
+    }
+}
+
+NodeSelector SelfSelector() :
+{
+}
+{
+	"." { return new SelfSelector(); }
+}
+
+NodeSelector GroupedSelector() :
+{
+    NodeSelector result = null;
+}
+{
+    /* Other selector enclosed in braces */
+    "(" result = Selector() ")"
+    {
+        return result;
+    }
+
+}
+
+RecursivePathSelector RecursivePathSelector() :
+{
+	RecursivePathSelector result = null;
+	NodeSelector delegate        = null;
+}
+{
+	"(" delegate = Selector() ")" "+"
+	{
+		result = new RecursivePathSelector(delegate);
+		return result;
+	}
+}
+
+PathSelector PathSelector() :
+{
+    PathSelector result = null;
+    NodeSelector left   = null;
+    NodeSelector right  = null;
+}
+{
+    left = AtomicOrTestingSelector() "/" right = Selector()
+    {
+        result = new PathSelector(left,right);
+        return result;
+    }
+}
+
+IntersectionSelector IntersectionSelector() :
+{
+    IntersectionSelector result = null;
+    NodeSelector left   = null;
+    NodeSelector right  = null;
+}
+{
+    left = AtomicOrTestingSelector() "&" right = Selector()
+    {
+        result = new IntersectionSelector(left,right);
+        return result;
+    }
+}
+
+UnionSelector UnionSelector() :
+{
+    UnionSelector result = null;
+    NodeSelector left   = null;
+    NodeSelector right  = null;
+}
+{
+    left = AtomicOrTestingSelector() "|" right = Selector()
+    {
+        result = new UnionSelector(left,right);
+        return result;
+    }
+}
+
+TestingSelector TestingSelector() :
+{
+    TestingSelector result = null;
+    NodeSelector delegate  = null;
+    NodeTest test = null;
+}
+{
+    delegate = AtomicSelector() "[" test = NodeTest() "]" {
+        result = new TestingSelector(delegate,test);
+        return result;
+    }
+}
+
+ReversePropertySelector ReversePropertySelector() :
+{
+	ReversePropertySelector result = null;
+	KiWiUriResource property;
+    String uri;
+}
+{
+	"^" uri = Uri() {
+        property = resolveResource(uri);
+        result   = new ReversePropertySelector(property);
+        return result;
+	}
+}
+
+PropertySelector PropertySelector() :
+{
+    PropertySelector result = null;
+    KiWiUriResource property;
+    String uri;
+}
+{
+    uri = Uri() {
+        property = resolveResource(uri);
+        result   = new PropertySelector(property);
+        return result;
+    }
+}
+
+WildcardSelector WildcardSelector() :
+{
+    WildcardSelector result = null;
+}
+{
+    "*" {
+        result = new WildcardSelector();
+        return result;
+    }
+}
+
+FunctionSelector FunctionSelector() :
+{
+    FunctionSelector result = null;
+    List<NodeSelector> arguments = new ArrayList<NodeSelector>();
+    NodeSelector argument;
+    String uri;
+    Token fName;
+}
+{
+    "fn:" fName = <IDENTIFIER> "("
+            argument = Selector() { arguments.add(argument); }
+            ( "," argument = Selector() { arguments.add(argument); } )*
+    ")" {
+           uri = namespaces.get("fn") + fName.image;
+           result = new FunctionSelector(getFunction(uri),arguments);
+           return result;
+    }
+}
+
+
+StringConstantSelector StringConstantSelector() :
+{
+    StringConstantSelector result = null;
+    Token literal;
+}
+{
+    literal = <STRLIT> {
+        result = new StringConstantSelector(literal.image.substring(1, literal.image.length()-1));
+        return result;
+    }
+}
+
+
+
+NodeTest NodeTest() :
+{
+    NodeTest result;
+}
+{
+    (
+        result = AndTest()
+    |   result = OrTest()
+    |   result = AtomicNodeTest()
+    )
+    {
+        return result;
+    }
+}
+
+NodeTest AtomicNodeTest() :
+{
+    NodeTest result;
+}
+{
+    (
+        result = LiteralLanguageTest()
+    |   result = LiteralTypeTest()
+    |   result = PathEqualityTest()
+    |   result = PathTest()
+    )
+    {
+        return result;
+    }
+}
+
+
+LiteralLanguageTest LiteralLanguageTest():
+{
+    Token lang;
+}
+{
+    "@" lang = <IDENTIFIER> {
+        return new LiteralLanguageTest(lang.image);
+    }
+}
+
+LiteralTypeTest LiteralTypeTest():
+{
+    String type;
+}
+{
+    "^^" type = Uri() {
+        return new LiteralTypeTest(type);
+    }
+}
+
+AndTest AndTest():
+{
+    NodeTest left, right;
+}
+{
+    left = AtomicNodeTest() "&" right = NodeTest() {
+        return new AndTest(left,right);
+    }
+}
+
+OrTest OrTest():
+{
+    NodeTest left, right;
+}
+{
+    left = AtomicNodeTest() "|" right = NodeTest() {
+        return new OrTest(left,right);
+    }
+}
+
+PathEqualityTest PathEqualityTest():
+{
+    NodeSelector path;
+    KiWiNode node;
+}
+{
+    path = Selector() "is" node = Node() {
+        return new PathEqualityTest(path,node);
+    }
+}
+
+
+KiWiNode Node():
+{
+    String uri, type = null;
+    Token literal, language;
+}
+{
+    uri = Uri() {
+        return resolveResource(uri);
+    }
+|   literal = <STRLIT>  ("^^" type = Uri() )? {
+        return new KiWiStringLiteral(literal.image.substring(1, literal.image.length()-1),null,type);
+    }
+|   literal = <STRLIT>  "@" language = <IDENTIFIER> {
+        return new KiWiStringLiteral(literal.image.substring(1, literal.image.length()-1),new Locale(language.image));
+    }
+}
+
+
+PathTest PathTest():
+{
+    NodeSelector path;
+}
+{
+    (
+        path = PathSelector()
+    |   path = TestingSelector()
+    |   path = AtomicSelector()
+    )
+    {
+        return new PathTest(path);
+    }
+}
+
