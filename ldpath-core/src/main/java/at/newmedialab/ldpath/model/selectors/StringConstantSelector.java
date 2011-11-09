@@ -16,10 +16,8 @@
 
 package at.newmedialab.ldpath.model.selectors;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
-import kiwi.core.model.rdf.KiWiStringLiteral;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,7 +27,7 @@ import java.util.Collections;
  * <p/>
  * User: sschaffe
  */
-public class StringConstantSelector implements NodeSelector {
+public class StringConstantSelector<Node> implements NodeSelector<Node> {
 
 	private String constant;
 
@@ -37,20 +35,26 @@ public class StringConstantSelector implements NodeSelector {
 		this.constant = constant;
 	}
 
-	/**
-	 * Apply the selector to the context node passed as argument and return the collection
-	 * of selected nodes in appropriate order.
-	 *
-	 * @param context the node where to start the selection
-	 * @return the collection of selected nodes
-	 */
-	@Override
-	public Collection<KiWiNode> select(TripleStore tripleStore, KiWiNode context) {
-		return Collections.singleton((KiWiNode)new KiWiStringLiteral(constant));
+    /**
+     * Apply the selector to the context node passed as argument and return the collection
+     * of selected nodes in appropriate order.
+     *
+     * @param context the node where to start the selection
+     * @return the collection of selected nodes
+     */
+    @Override
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+		return Collections.singleton(rdfBackend.createLiteral(constant));
 	}
 
-	@Override
-	public String asRdfPathExpression() {
+    /**
+     * Return the name of the NodeSelector for registration in the selector registry
+     *
+     * @param rdfBackend
+     * @return
+     */
+    @Override
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
 		return String.format("\"%s\"", constant);
 	}
 }

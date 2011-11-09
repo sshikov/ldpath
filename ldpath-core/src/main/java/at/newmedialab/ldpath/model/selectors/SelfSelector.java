@@ -19,32 +19,39 @@
  */
 package at.newmedialab.ldpath.model.selectors;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
 
 import java.util.Collection;
 import java.util.Collections;
 
 /**
+ *
  * @author Jakob Frank <jakob.frank@salzburgresearch.at>
  * 
  */
-public class SelfSelector implements NodeSelector {
+public class SelfSelector<Node> implements NodeSelector<Node> {
 
-    /* (non-Javadoc)
-     * @see at.newmedialab.lmf.search.rdfpath.model.selectors.NodeSelector#select(kiwi.core.api.triplestore.TripleStore, kiwi.core.model.rdf.KiWiNode)
+    /**
+     * Apply the selector to the context node passed as argument and return the collection
+     * of selected nodes in appropriate order.
+     *
+     * @param context the node where to start the selection
+     * @return the collection of selected nodes
      */
     @Override
-    public Collection<KiWiNode> select(TripleStore tripleStore, KiWiNode context) {
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
         return Collections.singleton(context);
     }
 
-    /* (non-Javadoc)
-     * @see at.newmedialab.lmf.search.rdfpath.model.selectors.NodeSelector#asRdfPathExpression()
+    /**
+     * Return the name of the NodeSelector for registration in the selector registry
+     *
+     * @param rdfBackend
+     * @return
      */
     @Override
-    public String asRdfPathExpression() {
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return ".";
     }
 

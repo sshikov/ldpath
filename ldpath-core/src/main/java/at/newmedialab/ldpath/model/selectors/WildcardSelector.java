@@ -16,6 +16,7 @@
 
 package at.newmedialab.ldpath.model.selectors;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
 /**
@@ -23,14 +24,14 @@ import at.newmedialab.ldpath.api.selectors.NodeSelector;
  * <p/>
  * User: sschaffe
  */
-public class WildcardSelector extends PropertySelector implements NodeSelector {
+public class WildcardSelector<Node> extends PropertySelector<Node> implements NodeSelector<Node> {
 
 	public WildcardSelector() {
 		super(null);
 	}
 
-	@Override
-	public String asRdfPathExpression() {
+    @Override
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
 		return "*";
 	}
 }

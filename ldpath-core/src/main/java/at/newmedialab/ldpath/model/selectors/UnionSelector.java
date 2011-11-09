@@ -16,9 +16,8 @@
 
 package at.newmedialab.ldpath.model.selectors;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,33 +28,39 @@ import java.util.Set;
  * <p/>
  * User: sschaffe
  */
-public class UnionSelector implements NodeSelector {
+public class UnionSelector<Node> implements NodeSelector<Node> {
 
-	private NodeSelector left;
-	private NodeSelector right;
+	private NodeSelector<Node> left;
+	private NodeSelector<Node> right;
 
-	public UnionSelector(NodeSelector left, NodeSelector right) {
+	public UnionSelector(NodeSelector<Node> left, NodeSelector<Node> right) {
 		this.left = left;
 		this.right = right;
 	}
 
-	/**
-	 * Apply the selector to the context node passed as argument and return the collection
-	 * of selected nodes in appropriate order.
-	 *
-	 * @param context the node where to start the selection
-	 * @return the collection of selected nodes
-	 */
-	@Override
-	public Collection<KiWiNode> select(TripleStore tripleStore, KiWiNode context) {
-		Set<KiWiNode> result = new HashSet<KiWiNode>();
-		result.addAll(left.select(tripleStore,context));
-		result.addAll(right.select(tripleStore,context));
+    /**
+     * Apply the selector to the context node passed as argument and return the collection
+     * of selected nodes in appropriate order.
+     *
+     * @param context the node where to start the selection
+     * @return the collection of selected nodes
+     */
+    @Override
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+		Set<Node> result = new HashSet<Node>();
+		result.addAll(left.select(rdfBackend,context));
+		result.addAll(right.select(rdfBackend,context));
 		return result;
 	}
 
-	@Override
-	public String asRdfPathExpression() {
-		return String.format("(%s | %s)", left.asRdfPathExpression(), right.asRdfPathExpression());
+    /**
+     * Return the name of the NodeSelector for registration in the selector registry
+     *
+     * @param rdfBackend
+     * @return
+     */
+    @Override
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
+		return String.format("(%s | %s)", left.getPathExpression(rdfBackend), right.getPathExpression(rdfBackend));
 	}
 }

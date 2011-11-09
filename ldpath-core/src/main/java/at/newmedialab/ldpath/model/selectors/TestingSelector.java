@@ -16,12 +16,11 @@
 
 package at.newmedialab.ldpath.model.selectors;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
-import at.newmedialab.lmf.search.rdfpath.model.tests.NodeTest;
+import at.newmedialab.ldpath.api.tests.NodeTest;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,13 +31,13 @@ import java.util.Collections;
  * <p/>
  * User: sschaffe
  */
-public class TestingSelector implements NodeSelector {
+public class TestingSelector<Node> implements NodeSelector<Node> {
 
-    private NodeSelector delegate;
-    private NodeTest test;
+    private NodeSelector<Node> delegate;
+    private NodeTest<Node> test;
 
 
-    public TestingSelector(NodeSelector delegate, NodeTest test) {
+    public TestingSelector(NodeSelector<Node> delegate, NodeTest<Node> test) {
         this.delegate = delegate;
         this.test = test;
     }
@@ -51,19 +50,25 @@ public class TestingSelector implements NodeSelector {
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<KiWiNode> select(final TripleStore tripleStore, final KiWiNode context) {
-        Predicate<KiWiNode> predicate = new Predicate<KiWiNode>() {
+    public Collection<Node> select(final RDFBackend<Node> rdfBackend, Node context) {
+        Predicate<Node> predicate = new Predicate<Node>() {
             @Override
-            public boolean apply(KiWiNode input) {
-                return test.apply(tripleStore, Collections.singletonList(Collections.singleton(input)));
+            public boolean apply(Node input) {
+                return test.apply(rdfBackend, Collections.singletonList(Collections.singleton(input)));
             }
         };
 
-        return Collections2.filter(delegate.select(tripleStore,context),predicate);
+        return Collections2.filter(delegate.select(rdfBackend,context),predicate);
     }
 
+    /**
+     * Return the name of the NodeSelector for registration in the selector registry
+     *
+     * @param rdfBackend
+     * @return
+     */
     @Override
-    public String asRdfPathExpression() {
-        return String.format("%s[%s]", delegate.asRdfPathExpression(), test.asRdfPathExpression());
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
+        return String.format("%s[%s]", delegate.getPathExpression(rdfBackend), test.getPathExpression(rdfBackend));
     }
 }
