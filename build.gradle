@@ -1,0 +1,58 @@
+apply plugin: 'java'
+apply plugin: 'osgi'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'org.linkedin.spec'
+apply plugin: 'org.linkedin.userConfig'
+
+sourceCompatibility = 1.6
+
+group   = spec.group
+version = spec.version
+
+
+repositories {
+    maven {
+        url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+    }
+}
+
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath "org.linkedin:org.linkedin.gradle-plugins:1.5.0"         // userConfig and project-spec
+    }
+}
+
+
+jar {
+    manifest {
+        attributes 	'Implementation-Title': 'LD Path', 'Implementation-Version': version
+    }
+}
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "idea"
+    apply plugin: "osgi"
+
+    group   = spec.group
+    version = spec.version
+
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+
+    ideaModule {
+        javaVersion = "1.6"
+    }
+
+}
+
+
