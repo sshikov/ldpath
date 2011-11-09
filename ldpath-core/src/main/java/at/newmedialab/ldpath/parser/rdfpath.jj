@@ -10,10 +10,13 @@ options
 PARSER_BEGIN(RdfPathParser)
 package at.newmedialab.ldpath.parser;
 
-import at.newmedialab.ldpath.api.fields.*;
+import at.newmedialab.ldpath.model.Constants;
+
+import at.newmedialab.ldpath.api.backend.*;
 import at.newmedialab.ldpath.api.functions.*;
 import at.newmedialab.ldpath.api.selectors.*;
 import at.newmedialab.ldpath.api.tests.*;
+import at.newmedialab.ldpath.api.transformers.*;
 
 
 import at.newmedialab.ldpath.model.fields.*;
@@ -31,37 +34,55 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Collections;
 
+import java.io.Reader;
+import java.io.InputStream;
+
+import java.net.URI;
+
 @SuppressWarnings("all")
-public class RdfPathParser {
+public class RdfPathParser<Node> {
 
         /**
          * A map mapping from namespace prefix to namespace URI
          */
         private Map<String,String> namespaces = new HashMap<String,String>();
 
+        private RDFBackend<Node> backend;
 
+
+        public RdfPathParser(RDFBackend<Node> backend, Reader in) {
+            this(in);
+            this.backend = backend;
+
+            initialise();
+        }
+
+        public RdfPathParser(RDFBackend<Node> backend, InputStream in) {
+            this(in);
+            this.backend = backend;
+
+            initialise();
+        }
+
+        public RdfPathParser(RDFBackend<Node> backend, InputStream in, String encoding) {
+            this(in,encoding);
+            this.backend = backend;
+
+            initialise();
+        }
 
         public Program parse() throws ParseException {
 			namespaces.clear();
 			namespaces.putAll(Program.DEFAULT_NAMESPACES);
-			// namespaces.put("rdf","http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-			// namespaces.put("rdfs","http://www.w3.org/2000/01/rdf-schema#");
-			// namespaces.put("owl","http://www.w3.org/2002/07/owl#");
-			// namespaces.put("skos","http://www.w3.org/2004/02/skos/core#");
-			// namespaces.put("dc","http://purl.org/dc/elements/1.1/");
-			// namespaces.put("xsd","http://www.w3.org/2001/XMLSchema#");
-			// namespaces.put("lmf","http://www.newmedialab.at/lmf/types/1.0/");
-			// namespaces.put("fn","http://www.newmedialab.at/lmf/functions/1.0/");
 
-		return Program();
+		    return Program();
         }
 
 
 
 
-        public static KiWiUriResource resolveResource(String uri) {
-            ResourceService rs = KiWiContext.getInstance(ResourceService.class);
-            return rs.createUriResource(uri);
+        public Node resolveResource(String uri) {
+            return backend.createURI(uri);
         }
 
 
@@ -73,24 +94,84 @@ public class RdfPathParser {
             return uri;
         }
 
-        public static NodeFunction getFunction(String uri) throws ParseException {
-            try {
-                SolrProgramService scs = KiWiContext.getInstance(SolrProgramService.class);
-                return scs.getNodeFunction(uri);
-            } catch(KiWiException ex) {
-                throw new ParseException(ex.getMessage());
+
+        public SelectorFunction<Node> getFunction(String uri) throws ParseException {
+            if(xsdNodeFunctionMap.get(uri) != null) {
+               return xsdNodeFunctionMap.get(uri);
+            } else {
+                throw new ParseException("function with URI "+uri+"does not exist");
             }
         }
 
 
-        public static NodeTransformer getTransformer(String uri) throws ParseException {
-            try {
-                SolrProgramService scs = KiWiContext.getInstance(SolrProgramService.class);
-                return scs.getNodeTransformer(uri);
-            } catch(KiWiException ex) {
-                throw new ParseException(ex.getMessage());
+        public NodeTransformer<?,Node> getTransformer(String uri) throws ParseException {
+            if(xsdNodeTransformerMap.get(uri) != null) {
+                return xsdNodeTransformerMap.get(uri);
+            } else {
+                throw new ParseException("transformer with URI "+uri+"does not exist");
             }
         }
+
+
+        private void initialise() {
+            initTransformerMappings();
+            initFunctionMappings();
+        }
+
+
+
+
+        /**
+         * A map mapping from XSD types to node transformers.
+         */
+        private Map<String, NodeTransformer<?,Node>> xsdNodeTransformerMap;
+        private void initTransformerMappings() {
+            Map<String, NodeTransformer<?,Node>> transformerMap = new HashMap<String, NodeTransformer<?,Node>>();
+
+            transformerMap.put(Constants.NS_XSD + "decimal", new LongTransformer());
+            transformerMap.put(Constants.NS_XSD + "integer", new IntTransformer());
+            transformerMap.put(Constants.NS_XSD + "long", new LongTransformer());
+            transformerMap.put(Constants.NS_XSD + "short", new IntTransformer());
+            transformerMap.put(Constants.NS_XSD + "double", new DoubleTransformer());
+            transformerMap.put(Constants.NS_XSD + "float", new FloatTransformer());
+            transformerMap.put(Constants.NS_XSD + "dateTime", new DateTimeTransformer());
+            transformerMap.put(Constants.NS_XSD + "date", new DateTransformer());
+            transformerMap.put(Constants.NS_XSD + "time", new TimeTransformer());
+            transformerMap.put(Constants.NS_XSD + "boolean", new BooleanTransformer());
+            transformerMap.put(Constants.NS_XSD + "anyURI", new StringTransformer());
+            transformerMap.put(Constants.NS_XSD + "string", new StringTransformer());
+
+            transformerMap.put(Constants.NS_LMF_TYPES + "text", new StringTransformer());
+            transformerMap.put(Constants.NS_LMF_TYPES + "text_en", new StringTransformer());
+            transformerMap.put(Constants.NS_LMF_TYPES + "text_de", new StringTransformer());
+            transformerMap.put(Constants.NS_LMF_TYPES + "text_es", new StringTransformer());
+            transformerMap.put(Constants.NS_LMF_TYPES + "text_fr", new StringTransformer());
+            transformerMap.put(Constants.NS_LMF_TYPES + "text_it", new StringTransformer());
+            transformerMap.put(Constants.NS_LMF_TYPES + "text_cz", new StringTransformer());
+
+
+            xsdNodeTransformerMap = Collections.unmodifiableMap(transformerMap);
+        }
+
+
+        private Map<String, SelectorFunction<Node>> xsdNodeFunctionMap;
+        private void initFunctionMappings() {
+            Map<String, SelectorFunction<Node>> functionMap = new HashMap<String, SelectorFunction<Node>>();
+
+            registerFunction(functionMap, new ConcatenateFunction());
+            registerFunction(functionMap, new FirstFunction());
+            registerFunction(functionMap, new LastFunction());
+            registerFunction(functionMap, new XPathFunction());
+            registerFunction(functionMap, new RemoveXmlTagsFunction());
+            registerFunction(functionMap, new CleanHtmlFunction());
+
+            xsdNodeFunctionMap = Collections.unmodifiableMap(functionMap);
+        }
+
+        private void registerFunction(Map<String, SelectorFunction<Node>> register, final SelectorFunction<Node> function) {
+            register.put(Constants.NS_LMF_FUNCS + function.getPathExpression(backend), function);
+        }
+
 }
 PARSER_END(RdfPathParser)
 
@@ -137,12 +218,12 @@ TOKEN :
 
 Program Program() :
 {
-    Program program = new Program();
-    NodeTest filter = null;
-    FieldMapping rule;
+    Program<Node> program = new Program();
+    NodeTest<Node> filter = null;
+    FieldMapping<?,Node> rule;
     Token prefix = null;
     Token uri;
-    NodeSelector boostSelector;
+    NodeSelector<Node> boostSelector;
 }
 {
   (
@@ -180,11 +261,11 @@ Program Program() :
 
 FieldMapping Rule() :
 {
-    FieldMapping rule;
+    FieldMapping<?,Node> rule;
     Token name;
     String type;
-    NodeSelector selector;
-    NodeTransformer transformer;
+    NodeSelector<Node> selector;
+    NodeTransformer<?,Node> transformer;
     Map<String, String> conf = null;
 }
 {
@@ -415,7 +496,7 @@ TestingSelector TestingSelector() :
 ReversePropertySelector ReversePropertySelector() :
 {
 	ReversePropertySelector result = null;
-	KiWiUriResource property;
+	Node property;
     String uri;
 }
 {
@@ -429,7 +510,7 @@ ReversePropertySelector ReversePropertySelector() :
 PropertySelector PropertySelector() :
 {
     PropertySelector result = null;
-    KiWiUriResource property;
+    Node property;
     String uri;
 }
 {
@@ -560,7 +641,7 @@ OrTest OrTest():
 PathEqualityTest PathEqualityTest():
 {
     NodeSelector path;
-    KiWiNode node;
+    Node node;
 }
 {
     path = Selector() "is" node = Node() {
@@ -569,7 +650,7 @@ PathEqualityTest PathEqualityTest():
 }
 
 
-KiWiNode Node():
+Node Node():
 {
     String uri, type = null;
     Token literal, language;
@@ -579,10 +660,14 @@ KiWiNode Node():
         return resolveResource(uri);
     }
 |   literal = <STRLIT>  ("^^" type = Uri() )? {
-        return new KiWiStringLiteral(literal.image.substring(1, literal.image.length()-1),null,type);
+        try {
+            return backend.createLiteral(literal.image.substring(1, literal.image.length()-1),null,new URI(type));
+        } catch(java.net.URISyntaxException ex) {
+            throw new ParseException("could not parse type URI "+type+": "+ex.getMessage());
+	    }
     }
 |   literal = <STRLIT>  "@" language = <IDENTIFIER> {
-        return new KiWiStringLiteral(literal.image.substring(1, literal.image.length()-1),new Locale(language.image));
+        return backend.createLiteral(literal.image.substring(1, literal.image.length()-1),new Locale(language.image),null);
     }
 }
 

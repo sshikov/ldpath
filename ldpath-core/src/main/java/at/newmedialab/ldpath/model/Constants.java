@@ -19,4 +19,9 @@ public class Constants {
     public static final String NS_DC           = "http://purl.org/dc/elements/1.1/";
     public static final String NS_SKOS         = "http://www.w3.org/2004/02/skos/core#";
 
+
+    // LMF Namespaces
+    public static final String NS_LMF_TYPES    = "http://www.newmedialab.at/lmf/types/1.0/";
+    public static final String NS_LMF_FUNCS    = "http://www.newmedialab.at/lmf/functions/1.0/";
+
 }

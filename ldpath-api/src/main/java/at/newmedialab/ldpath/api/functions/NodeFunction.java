@@ -16,6 +16,7 @@
 
 package at.newmedialab.ldpath.api.functions;
 
+import at.newmedialab.ldpath.api.LDPathConstruct;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ import java.util.Collection;
  * <p/>
  * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public interface NodeFunction<T,Node> {
+public interface NodeFunction<T,Node> extends LDPathConstruct<Node> {
 
     /**
      * Apply the function to the list of nodes passed as arguments and return the result as type T.
@@ -40,11 +41,4 @@ public interface NodeFunction<T,Node> {
      */
     public T apply(RDFBackend<Node> backend, Collection<Node>... args) throws IllegalArgumentException;
 
-    /**
-     * Return the representation of the NodeFunction or NodeSelector in the RDF Path Language
-     * 
-     * @return
-     * @param backend
-     */
-    public String getPathExpression(RDFBackend<Node> backend);
 }

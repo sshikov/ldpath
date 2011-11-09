@@ -62,6 +62,12 @@ public interface RDFBackend<Node> {
      */
     public Node createLiteral(String content);
 
+    /**
+     * Create a literal node with the content passed as argument
+     * @param content  string content to represent inside the literal
+     * @return a literal node in using the model used by this backend
+     */
+    public Node createLiteral(String content, Locale language, URI type);
 
     /**
      * Create a URI mode with the URI passed as argument

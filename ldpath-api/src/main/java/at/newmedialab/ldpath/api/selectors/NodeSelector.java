@@ -16,6 +16,7 @@
 
 package at.newmedialab.ldpath.api.selectors;
 
+import at.newmedialab.ldpath.api.LDPathConstruct;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 
 import java.util.Collection;
@@ -25,7 +26,7 @@ import java.util.Collection;
  * <p/>
  * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public interface NodeSelector<Node> {
+public interface NodeSelector<Node> extends LDPathConstruct<Node> {
 
 	/**
 	 * Apply the selector to the context node passed as argument and return the collection
@@ -36,12 +37,5 @@ public interface NodeSelector<Node> {
 	 */
 	public Collection<Node> select(RDFBackend<Node> backend, Node context);
 
-    /**
-     * Return the name of the NodeSelector for registration in the selector registry
-     *
-     * @return
-     * @param backend
-     */
-    public String getPathExpression(RDFBackend<Node> backend);
 
 }

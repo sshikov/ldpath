@@ -2,4 +2,6 @@ include 'ldpath-api'
 include 'ldpath-cli'
 include 'ldpath-core'
 include 'ldpath-backend-sesame'
+//include 'ldpath-backend-sparql'
+include 'ldpath-backend-linkeddata'
 

@@ -18,3 +18,10 @@ dependencies {
     compile "org.openrdf.sesame:sesame-model:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-repository-api:${spec.versions.sesame}"
 }
+
+project(':') {
+    dependencies {
+        runtime project('ldpath-backend-sesame')
+        testCompile project('ldpath-backend-sesame')
+    }
+}

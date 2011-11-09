@@ -16,8 +16,10 @@
 
 package at.newmedialab.ldpath.model.programs;
 
-import at.newmedialab.lmf.search.rdfpath.model.fields.FieldMapping;
-import at.newmedialab.lmf.search.rdfpath.model.tests.NodeTest;
+import at.newmedialab.ldpath.api.LDPathConstruct;
+import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.api.tests.NodeTest;
+import at.newmedialab.ldpath.model.fields.FieldMapping;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -29,7 +31,7 @@ import java.util.regex.Pattern;
  * <p/>
  * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class Program {
+public class Program<Node> implements LDPathConstruct<Node> {
 
     public static final Map<String, String> DEFAULT_NAMESPACES;
     static {
@@ -56,36 +58,36 @@ public class Program {
      * An (optional) filter to use for checking which resources should be
      * indexed.
      */
-    private NodeTest filter;
+    private NodeTest<Node> filter;
 
     /**
      * An (optional) selector to resolve a document boost factor.
      */
-    private FieldMapping<Float> booster;
+    private FieldMapping<Float,Node> booster;
 
     /**
      * The field mappings contained in this program.
      */
-    private Set<FieldMapping<?>> fields;
+    private Set<FieldMapping<?,Node>> fields;
 
     public Program() {
         namespaces = new HashMap<String, String>();
-        fields = new HashSet<FieldMapping<?>>();
+        fields = new HashSet<FieldMapping<?,Node>>();
     }
 
     public void addNamespace(String prefix, String uri) {
         namespaces.put(prefix, uri);
     }
 
-    public void addMapping(FieldMapping<?> mapping) {
+    public void addMapping(FieldMapping<?,Node> mapping) {
         fields.add(mapping);
     }
 
-    public Set<FieldMapping<?>> getFields() {
+    public Set<FieldMapping<?,Node>> getFields() {
         return fields;
     }
 
-    public void setFields(Set<FieldMapping<?>> fields) {
+    public void setFields(Set<FieldMapping<?,Node>> fields) {
         this.fields = fields;
     }
 
@@ -97,11 +99,11 @@ public class Program {
         this.filter = filter;
     }
 
-    public FieldMapping<Float> getBooster() {
+    public FieldMapping<Float,Node> getBooster() {
         return booster;
     }
 
-    public void setBooster(FieldMapping<Float> boost) {
+    public void setBooster(FieldMapping<Float,Node> boost) {
         this.booster = boost;
     }
 
@@ -113,21 +115,21 @@ public class Program {
         this.namespaces = namespaces;
     }
 
-    public String asRdfPathExpression() {
+    public String getPathExpression(RDFBackend<Node> backend) {
         StringBuilder sb = new StringBuilder();
         // Filter (?)
         if (filter != null) {
-            sb.append(String.format("@filter %s ;%n", filter.asRdfPathExpression()));
+            sb.append(String.format("@filter %s ;%n", filter.getPathExpression(backend)));
         }
 
         // Booster (?)
         if (booster != null) {
-            sb.append(String.format("@boost %s ;%n", booster.getSelector().asRdfPathExpression()));
+            sb.append(String.format("@boost %s ;%n", booster.getSelector().getPathExpression(backend)));
         }
 
         // Field-Definitions
-        for (FieldMapping<?> field : fields) {
-            sb.append(String.format("  %s%n", field.asRdfPathExpression()));
+        for (FieldMapping<?,Node> field : fields) {
+            sb.append(String.format("  %s%n", field.getPathExpression(backend)));
         }
         String progWithoutNamespace = sb.toString();
 
