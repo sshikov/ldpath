@@ -1,0 +1,13 @@
+syntax: glob
+.gradle
+build
+*.iml
+ParseException.java
+RdfPathParser.java
+RdfPathParserConstants.java
+RdfPathParserTokenManager.java
+SimpleCharStream.java
+Token.java
+TokenMgrError.java
+LDPath.ipr
+LDPath.iws
