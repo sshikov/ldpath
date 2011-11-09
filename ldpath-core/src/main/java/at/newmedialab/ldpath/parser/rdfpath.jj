@@ -8,20 +8,21 @@ options
 }
 
 PARSER_BEGIN(RdfPathParser)
-package at.newmedialab.lmf.search.rdfpath.parser;
+package at.newmedialab.ldpath.parser;
 
-import at.newmedialab.lmf.search.rdfpath.model.fields.*;
-import at.newmedialab.lmf.search.rdfpath.model.functions.*;
-import at.newmedialab.lmf.search.rdfpath.model.programs.*;
-import at.newmedialab.lmf.search.rdfpath.model.selectors.*;
-import at.newmedialab.lmf.search.rdfpath.model.tests.*;
-import at.newmedialab.lmf.search.rdfpath.model.transformers.*;
-import at.newmedialab.lmf.search.api.program.SolrProgramService;
+import at.newmedialab.ldpath.api.fields.*;
+import at.newmedialab.ldpath.api.functions.*;
+import at.newmedialab.ldpath.api.selectors.*;
+import at.newmedialab.ldpath.api.tests.*;
 
-import kiwi.core.util.KiWiContext;
-import kiwi.core.api.triplestore.*;
-import kiwi.core.model.rdf.*;
-import kiwi.core.exception.KiWiException;
+
+import at.newmedialab.ldpath.model.fields.*;
+import at.newmedialab.ldpath.model.functions.*;
+import at.newmedialab.ldpath.model.programs.*;
+import at.newmedialab.ldpath.model.selectors.*;
+import at.newmedialab.ldpath.model.tests.*;
+import at.newmedialab.ldpath.model.transformers.*;
+
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,43 +1,61 @@
+/*
+ * Copyright (c) 2011 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package at.newmedialab.ldpath.model.selectors;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
-import kiwi.core.model.rdf.KiWiTriple;
-import kiwi.core.model.rdf.KiWiUriResource;
+import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public class ReversePropertySelector implements NodeSelector {
+/**
+ * Perform a reverse navigation step over the property wrapped by this selector
+ *
+ * @param <Node>
+ */
+public class ReversePropertySelector<Node> implements NodeSelector<Node> {
 
-	private final KiWiUriResource property;
+	private final Node property;
 
-	public ReversePropertySelector(KiWiUriResource property) {
+	public ReversePropertySelector(Node property) {
 		this.property = property;
 	}
 
-	@Override
-	public Collection<KiWiNode> select(TripleStore tripleStore, KiWiNode context) {
-		if (context.isUriResource() || context.isAnonymousResource()) {
-			final Function<KiWiTriple, KiWiNode> getSubjectFkt = new Function<KiWiTriple, KiWiNode>() {
-				@Override
-				public KiWiNode apply(KiWiTriple input) {
-					return input.getSubject();
-				}
-			};
 
-			return Collections2.transform(tripleStore.listTriples(null, property, context, null, true), getSubjectFkt);
+    /**
+     * Apply the selector to the context node passed as argument and return the collection
+     * of selected nodes in appropriate order.
+     *
+     * @param context the node where to start the selection
+     * @return the collection of selected nodes
+     */
+    @Override
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+        if(rdfBackend.isURI(context) || rdfBackend.isBlank(context)) {
+			return rdfBackend.listSubjects(property, context);
 		} else {
 			return Collections.emptyList();
 		}
 	}
 
 	@Override
-	public String asRdfPathExpression() {
+	public String getPathExpression(RDFBackend<Node> backend) {
 		if (property != null) {
-			return String.format("^<%s>", property.getUri());
+			return String.format("^<%s>", backend.stringValue(property));
 		} else {
 			return "^*";
 		}

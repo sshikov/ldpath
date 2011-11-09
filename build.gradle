@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'osgi'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'org.linkedin.spec'
@@ -10,6 +9,14 @@ sourceCompatibility = 1.6
 group   = spec.group
 version = spec.version
 
+configurations {
+    // we do logging over SLF4J, exclude all other logging libraries
+    all*.exclude module: "commons-logging"
+    all*.exclude module: "log4j"
+    all*.exclude module: "ant"
+    all*.exclude group: "maven-plugins"
+    all*.exclude group: "jdom" // old version
+}
 
 repositories {
     maven {
@@ -29,16 +36,10 @@ buildscript {
 }
 
 
-jar {
-    manifest {
-        attributes 	'Implementation-Title': 'LD Path', 'Implementation-Version': version
-    }
-}
 
 allprojects {
     apply plugin: "java"
     apply plugin: "idea"
-    apply plugin: "osgi"
 
     group   = spec.group
     version = spec.version
@@ -51,6 +52,16 @@ allprojects {
 
     ideaModule {
         javaVersion = "1.6"
+    }
+
+    dependencies {
+        /* Logging (SLF4J) */
+        compile "org.slf4j:slf4j-api:${spec.versions.slf4j}"
+        runtime "org.slf4j:slf4j-ext:${spec.versions.slf4j}"
+        runtime "org.slf4j:jcl-over-slf4j:${spec.versions.slf4j}"
+        runtime "org.slf4j:log4j-over-slf4j:${spec.versions.slf4j}"
+
+        runtime "ch.qos.logback:logback-classic:${spec.versions.logback}"
     }
 
 }

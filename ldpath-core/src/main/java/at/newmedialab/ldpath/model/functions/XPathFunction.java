@@ -1,36 +1,68 @@
+/*
+ * Copyright (c) 2011 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package at.newmedialab.ldpath.model.functions;
 
-import at.newmedialab.lmf.search.rdfpath.model.transformers.StringTransformer;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
-import kiwi.core.model.rdf.KiWiStringLiteral;
-import nu.xom.*;
+import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.api.functions.SelectorFunction;
+import at.newmedialab.ldpath.model.transformers.StringTransformer;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Text;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
+import sun.security.pkcs.ParsingException;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 
-public class XPathFunction implements SelectorFunction {
+public class XPathFunction<Node> implements SelectorFunction<Node> {
 
     private static StringTransformer transformer = new StringTransformer();
 
+
+    /**
+     * Apply the function to the list of nodes passed as arguments and return the result as type T.
+     * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
+     * or the number of arguments is not correct.
+     *
+     * @param args a nested list of KiWiNodes
+     * @return
+     */
     @Override
-    public Collection<? extends KiWiNode> apply(TripleStore tripleStore, List<? extends Collection<KiWiNode>> args) throws IllegalArgumentException {
-        if (args.size() < 1) { throw new IllegalArgumentException("XPath expression is required as first argument."); }
+    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+        if (args.length < 1) { throw new IllegalArgumentException("XPath expression is required as first argument."); }
         Set<String> xpaths = new HashSet<String>();
-        for (KiWiNode xpath : args.get(0)) {
+        for (Node xpath : args[0]) {
             try {
-                xpaths.add(transformer.transform(xpath, null));
+                xpaths.add(transformer.transform(rdfBackend,xpath));
             } catch (IllegalArgumentException iae) {
                 throw new IllegalArgumentException("First argument must not contain anything else than String-Literals!");
             }
         }
 
-        Set<KiWiStringLiteral> result = new HashSet<KiWiStringLiteral>();
-        for (int i = 1; i < args.size(); i++) {
-            for (KiWiNode n : args.get(i)) {
+        List<Node> result = new ArrayList<Node>();
+        for (int i = 1; i < args.length; i++) {
+            for (Node n : args[i]) {
                 try {
-                    for (String r : doFilter(transformer.transform(n, tripleStore), xpaths)) {
-                        result.add(new KiWiStringLiteral(r));
+                    for (String r : doFilter(transformer.transform(rdfBackend,n), xpaths)) {
+                        result.add(rdfBackend.createLiteral(r));
                     }
                 } catch (ParsingException e) {
                     // Ignoring ParsingeException -- not all Nodes transform
@@ -44,27 +76,36 @@ public class XPathFunction implements SelectorFunction {
         return result;
     }
 
-    private LinkedList<String> doFilter(String in, Set<String> xpaths) throws ValidityException, ParsingException, IOException {
+    private LinkedList<String> doFilter(String in, Set<String> xpaths) throws IOException {
         LinkedList<String> result = new LinkedList<String>();
-        Document doc = new Builder(false).build(in, null);
+        try {
+            Document doc = new SAXBuilder(false).build(new StringReader(in));
+            XMLOutputter out = new XMLOutputter();
 
-        for (String xp : xpaths) {
-            try {
-                final Nodes nodes = doc.query(xp);
-                for (int i = 0; i < nodes.size(); i++) {
-                    result.add(nodes.get(i).toXML());
+            for (String xp : xpaths) {
+                List nodes = XPath.selectNodes(doc,xp);
+                for (Object node : nodes) {
+                    if(node instanceof Element)
+                        result.add(out.outputString((Element) node));
+                    else if(node instanceof Text)
+                        result.add(out.outputString((Text) node));
                 }
-            } catch (XPathException xpe) {
-                throw new IllegalArgumentException("Invalid XPath Expression: '" + xp + "'", xpe);
             }
+            return result;
+        } catch (JDOMException xpe) {
+            throw new IllegalArgumentException("error while processing xpath expressions: '" + xpaths + "'", xpe);
         }
-        return result;
     }
 
 
+    /**
+     * Return the name of the NodeFunction for registration in the function registry
+     *
+     * @return
+     * @param backend
+     */
     @Override
-    public String asRdfPathExpression() {
+    public String getPathExpression(RDFBackend<Node> backend) {
         return "xpath";
     }
-
 }
