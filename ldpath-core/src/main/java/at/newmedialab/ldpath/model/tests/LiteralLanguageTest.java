@@ -16,10 +16,8 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
 
 import java.util.Collection;
 import java.util.List;
@@ -30,9 +28,9 @@ import java.util.Locale;
  * is null, only allows literal nodes without language definition.
  *
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class LiteralLanguageTest implements NodeTest {
+public class LiteralLanguageTest<Node> implements NodeTest<Node> {
 
     private String lang;
 
@@ -46,27 +44,24 @@ public class LiteralLanguageTest implements NodeTest {
      * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
      * or the number of arguments is not correct.
      *
-     * @param nodes a list of KiWiNodes
+     * @param args a nested list of KiWiNodes
      * @return
      */
     @Override
-    public Boolean apply(TripleStore tripleStore, List<? extends Collection<KiWiNode>> args) throws IllegalArgumentException {
-        if (args.size() != 1) { throw new IllegalArgumentException("language test only takes one parameter"); }
-        Collection<? extends KiWiNode> nodes = args.get(0);
+    public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+        if (args.length != 1) { throw new IllegalArgumentException("language test only takes one parameter"); }
+        List<Node> nodes = at.newmedialab.ldpath.util.Collections.concat(args);
         if (nodes.size() != 1) {
             throw new IllegalArgumentException("language test can only be applied to a single node");
         }
 
-        KiWiNode node = nodes.toArray(new KiWiNode[1])[0];
+        Node node = nodes.get(0);
 
-        if(node.isLiteral()) {
-            KiWiLiteral l = (KiWiLiteral)node;
-
-
+        if(rdfBackend.isLiteral(node)) {
             if(lang != null && !lang.toLowerCase().equals("none")) {
-                return new Locale(lang).equals(l.getLanguage());
+                return new Locale(lang).equals(rdfBackend.getLiteralLanguage(node));
             } else {
-                return l.getLanguage() == null;
+                return rdfBackend.getLiteralLanguage(node) == null;
             }
         } else {
             return false;
@@ -74,8 +69,14 @@ public class LiteralLanguageTest implements NodeTest {
 
     }
 
+    /**
+     * Return the name of the NodeFunction for registration in the function registry
+     *
+     * @param rdfBackend
+     * @return
+     */
     @Override
-    public String asRdfPathExpression() {
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return "@" + lang;
     }
 }

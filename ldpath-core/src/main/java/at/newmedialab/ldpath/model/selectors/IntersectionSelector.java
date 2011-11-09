@@ -26,7 +26,7 @@ import java.util.Collection;
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class IntersectionSelector<Node> implements NodeSelector<Node> {
 

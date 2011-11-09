@@ -22,7 +22,7 @@ import at.newmedialab.ldpath.api.selectors.NodeSelector;
 /**
  * A property selector that will match with any property
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class WildcardSelector<Node> extends PropertySelector<Node> implements NodeSelector<Node> {
 

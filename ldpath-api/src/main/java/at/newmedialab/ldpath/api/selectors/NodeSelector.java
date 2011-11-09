@@ -23,7 +23,7 @@ import java.util.Collection;
 /**
  * A node selector takes as argument a KiWiNode and returns a collection of selected
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public interface NodeSelector<Node> {
 

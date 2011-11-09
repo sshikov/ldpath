@@ -16,18 +16,15 @@
 
 package at.newmedialab.ldpath.model.transformers;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiDoubleLiteral;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
 
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class FloatTransformer implements NodeTransformer<Float> {
+public class FloatTransformer<Node> implements NodeTransformer<Float,Node> {
 
     /**
      * Transform the KiWiNode node into the datatype T. In case the node cannot be transformed to
@@ -38,11 +35,9 @@ public class FloatTransformer implements NodeTransformer<Float> {
      * @return
      */
     @Override
-    public Float transform(KiWiNode node, TripleStore tripleStore) throws IllegalArgumentException {
-        if(node.isLiteral() && node instanceof KiWiDoubleLiteral) {
-            return ((KiWiDoubleLiteral)node).getDoubleContent().floatValue();
-        } else if(node.isLiteral()) {
-            return Float.parseFloat(((KiWiLiteral)node).getContent());
+    public Float transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
+        if(rdfBackend.isLiteral(node)) {
+            return Double.valueOf(rdfBackend.doubleValue(node)).floatValue();
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to float");
         }

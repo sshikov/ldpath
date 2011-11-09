@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Traverse a path by following several edges in the RDF graph. Each step is separated by a "/".
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class PathSelector<Node> implements NodeSelector<Node> {
 

@@ -29,7 +29,7 @@ import java.util.Collections;
  * A node selector that wraps a node test around the selection and delegates the selection to another selector.
  * The result set will be filtered based on the node test.
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class TestingSelector<Node> implements NodeSelector<Node> {
 
@@ -54,7 +54,7 @@ public class TestingSelector<Node> implements NodeSelector<Node> {
         Predicate<Node> predicate = new Predicate<Node>() {
             @Override
             public boolean apply(Node input) {
-                return test.apply(rdfBackend, Collections.singletonList(Collections.singleton(input)));
+                return test.apply(rdfBackend, Collections.singleton(input));
             }
         };
 

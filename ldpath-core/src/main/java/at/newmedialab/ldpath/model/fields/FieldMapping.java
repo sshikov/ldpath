@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * A field mapping maps a field name to a node selection and transforms it into the appropriate type.
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class FieldMapping<T> {
 

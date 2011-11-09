@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class FunctionSelector<Node> implements NodeSelector<Node> {
 

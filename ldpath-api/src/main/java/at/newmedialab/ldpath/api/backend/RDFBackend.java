@@ -1,6 +1,8 @@
 package at.newmedialab.ldpath.api.backend;
 
+import java.net.URI;
 import java.util.Collection;
+import java.util.Locale;
 
 /**
  * A generic API for RDF models and triple stores; provides the testing and navigation functions needed for LDPath.
@@ -32,6 +34,26 @@ public interface RDFBackend<Node> {
      */
     public boolean isBlank(Node n);
 
+    /**
+     * Return the language of the literal node passed as argument.
+     *
+     * @param n the literal node for which to return the language
+     * @return a Locale representing the language of the literal, or null if the literal node has no language
+     * @throws IllegalArgumentException in case the node is no literal
+     */
+    public Locale getLiteralLanguage(Node n);
+
+
+    /**
+     * Return the URI of the type of the literal node passed as argument.
+     *
+     * @param n the literal node for which to return the typer
+     * @return a URI representing the type of the literal content, or null if the literal is untyped
+     * @throws IllegalArgumentException in case the node is no literal
+     */
+    public URI getLiteralType(Node n);
+
+
 
     /**
      * Create a literal node with the content passed as argument
@@ -56,6 +78,33 @@ public interface RDFBackend<Node> {
      * @return
      */
     public String stringValue(Node node);
+
+    /**
+     * Return the double value of a literal node. Depending on the backend implementing this method,
+     * the value can be retrieved directly or must be parsed from the string representation. The method can throw
+     * a NumberFormatException, indicating that the value cannot be represented as double, and an
+     * IllegalArgumentException, indicating that the passed node is not a literal
+     *
+     * @param node the literal node for which to return the double value
+     * @return double value of the literal node
+     * @throws NumberFormatException in case the literal cannot be represented as double value
+     * @throws IllegalArgumentException in case the node passed as argument is not a literal
+     */
+    public double doubleValue(Node node);
+
+
+    /**
+     * Return the long value of a literal node. Depending on the backend implementing this method,
+     * the value can be retrieved directly or must be parsed from the string representation. The method can throw
+     * a NumberFormatException, indicating that the value cannot be represented as long, and an
+     * IllegalArgumentException, indicating that the passed node is not a literal
+     *
+     * @param node the literal node for which to return the long value
+     * @return long value of the literal node
+     * @throws NumberFormatException in case the literal cannot be represented as long value
+     * @throws IllegalArgumentException in case the node passed as argument is not a literal
+     */
+    public long longValue(Node node);
 
     /**
      * List the objects of triples in the triple store underlying this backend that have the subject and

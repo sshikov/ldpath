@@ -16,17 +16,16 @@
 
 package at.newmedialab.ldpath.model.transformers;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
 
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class BooleanTransformer implements NodeTransformer<Boolean> {
+public class BooleanTransformer<Node> implements NodeTransformer<Boolean,Node> {
+
 
     /**
      * Transform the KiWiNode node into the datatype T. In case the node cannot be transformed to
@@ -37,9 +36,9 @@ public class BooleanTransformer implements NodeTransformer<Boolean> {
      * @return
      */
     @Override
-    public Boolean transform(KiWiNode node, TripleStore tripleStore) throws IllegalArgumentException {
-        if(node.isLiteral()) {
-            return Boolean.parseBoolean(((KiWiLiteral)node).getContent());
+    public Boolean transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
+        if(rdfBackend.isLiteral(node)) {
+            return Boolean.parseBoolean(rdfBackend.stringValue(node));
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to boolean");
         }

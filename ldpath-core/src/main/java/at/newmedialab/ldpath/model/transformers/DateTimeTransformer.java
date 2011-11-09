@@ -16,20 +16,18 @@
 
 package at.newmedialab.ldpath.model.transformers;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
-import kiwi.core.util.KiWiFormatUtils;
+import at.newmedialab.ldpath.util.FormatUtils;
 
 import java.util.Date;
 
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class DateTimeTransformer implements NodeTransformer<Date> {
+public class DateTimeTransformer<Node> implements NodeTransformer<Date,Node> {
 
     /**
      * Transform the KiWiNode node into the datatype T. In case the node cannot be transformed to
@@ -40,13 +38,13 @@ public class DateTimeTransformer implements NodeTransformer<Date> {
      * @return
      */
     @Override
-    public Date transform(KiWiNode node, TripleStore tripleStore) throws IllegalArgumentException {
-        if(node.isLiteral()) {
-            Date result = KiWiFormatUtils.parseDate( ((KiWiLiteral)node).getContent() );
+    public Date transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
+        if(rdfBackend.isLiteral(node)) {
+            Date result = FormatUtils.parseDate(rdfBackend.stringValue(node));
             if(result != null) {
                 return result;
             } else {
-                throw new IllegalArgumentException("could not parse date string '"+((KiWiLiteral)node).getContent()+"', it is not in ISO8601 format");
+                throw new IllegalArgumentException("could not parse date string '"+rdfBackend.stringValue(node)+"', it is not in ISO8601 format");
             }
 
         } else {

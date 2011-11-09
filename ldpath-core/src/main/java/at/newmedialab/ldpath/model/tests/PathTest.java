@@ -16,10 +16,9 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-import at.newmedialab.lmf.search.rdfpath.model.selectors.NodeSelector;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,13 +27,13 @@ import java.util.List;
  * Tests whether the path given as argument for the constructor yields at least one node when evaluated
  * from the context node to which the test is applied.
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class PathTest implements NodeTest {
+public class PathTest<Node> implements NodeTest<Node> {
 
-    private NodeSelector path;
+    private NodeSelector<Node> path;
 
-    public PathTest(NodeSelector path) {
+    public PathTest(NodeSelector<Node> path) {
         this.path = path;
     }
 
@@ -43,21 +42,21 @@ public class PathTest implements NodeTest {
      * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
      * or the number of arguments is not correct.
      *
-     * @param nodes a list of KiWiNodes
+     * @param args a nested list of KiWiNodes
      * @return
      */
     @Override
-    public Boolean apply(TripleStore tripleStore, List<? extends Collection<KiWiNode>> args) throws IllegalArgumentException {
-        if (args.size() != 1) { throw new IllegalArgumentException("path test only takes one parameter"); }
-        Collection<? extends KiWiNode> nodes = args.get(0);
+    public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+        if (args.length != 1) { throw new IllegalArgumentException("path test only takes one parameter"); }
+        List<Node> nodes = at.newmedialab.ldpath.util.Collections.concat(args);
         if (nodes.size() != 1) {
             throw new IllegalArgumentException("path test can only be applied to a single node");
         }
 
-        KiWiNode node = nodes.toArray(new KiWiNode[1])[0];
+        Node node = nodes.get(0);
 
-        if (node.isAnonymousResource() || node.isUriResource()) {
-            Collection<KiWiNode> testResult = path.select(tripleStore, node);
+        if (rdfBackend.isURI(node) || rdfBackend.isBlank(node)) {
+            Collection<Node> testResult = path.select(rdfBackend, node);
             return testResult.size() > 0;
         } else {
             return false;
@@ -65,8 +64,14 @@ public class PathTest implements NodeTest {
 
     }
 
+    /**
+     * Return the representation of the NodeFunction or NodeSelector in the RDF Path Language
+     *
+     * @param rdfBackend
+     * @return
+     */
     @Override
-    public String asRdfPathExpression() {
-        return path.asRdfPathExpression();
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
+        return path.getPathExpression(rdfBackend);
     }
 }

@@ -24,7 +24,7 @@ import at.newmedialab.ldpath.api.backend.RDFBackend;
  * respective XML Schema datatypes.
  *
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public interface NodeTransformer<T,Node> {
 

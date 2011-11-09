@@ -16,18 +16,17 @@
 
 package at.newmedialab.ldpath.model.transformers;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiIntLiteral;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
 
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class IntTransformer implements NodeTransformer<Integer> {
+public class IntTransformer<Node> implements NodeTransformer<Integer,Node> {
+
+
     /**
      * Transform the KiWiNode node into the datatype T. In case the node cannot be transformed to
      * the respective datatype, throws an IllegalArgumentException that needs to be caught by the class
@@ -37,11 +36,9 @@ public class IntTransformer implements NodeTransformer<Integer> {
      * @return
      */
     @Override
-    public Integer transform(KiWiNode node, TripleStore tripleStore) throws IllegalArgumentException {
-        if(node.isLiteral() && node instanceof KiWiIntLiteral) {
-            return ((KiWiIntLiteral)node).getIntContent().intValue();
-        } else if(node.isLiteral()) {
-            return Integer.parseInt(((KiWiLiteral)node).getContent());
+    public Integer transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
+        if(rdfBackend.isLiteral(node)) {
+            return Long.valueOf(rdfBackend.longValue(node)).intValue();
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to integer");
         }

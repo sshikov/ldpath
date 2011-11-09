@@ -16,18 +16,15 @@
 
 package at.newmedialab.ldpath.model.transformers;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiIntLiteral;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
 
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class LongTransformer implements NodeTransformer<Long> {
+public class LongTransformer<Node> implements NodeTransformer<Long,Node> {
 
     /**
      * Transform the KiWiNode node into the datatype T. In case the node cannot be transformed to
@@ -38,11 +35,9 @@ public class LongTransformer implements NodeTransformer<Long> {
      * @return
      */
     @Override
-    public Long transform(KiWiNode node, TripleStore tripleStore) throws IllegalArgumentException {
-        if(node.isLiteral() && node instanceof KiWiIntLiteral) {
-            return ((KiWiIntLiteral)node).getIntContent();
-        } else if(node.isLiteral()) {
-            return Long.parseLong(((KiWiLiteral)node).getContent());
+    public Long transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
+        if(rdfBackend.isLiteral(node)) {
+            return rdfBackend.longValue(node);
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to long");
         }

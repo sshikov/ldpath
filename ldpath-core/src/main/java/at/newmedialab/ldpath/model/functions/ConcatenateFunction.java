@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * A node function concatenating a list of nodes interpreted as strings.
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class ConcatenateFunction<Node> implements SelectorFunction<Node> {
 

@@ -21,7 +21,7 @@ import at.newmedialab.ldpath.api.functions.NodeFunction;
 /**
  * Node tests take a node as argument and return a boolean if the node matches the test.
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public interface NodeTest<Node> extends NodeFunction<Boolean,Node> {
 

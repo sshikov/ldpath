@@ -16,18 +16,15 @@
 
 package at.newmedialab.ldpath.model.transformers;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiDoubleLiteral;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
 
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class DoubleTransformer implements NodeTransformer<Double> {
+public class DoubleTransformer<Node> implements NodeTransformer<Double,Node> {
 
     /**
      * Transform the KiWiNode node into the datatype T. In case the node cannot be transformed to
@@ -38,11 +35,9 @@ public class DoubleTransformer implements NodeTransformer<Double> {
      * @return
      */
     @Override
-    public Double transform(KiWiNode node, TripleStore tripleStore) throws IllegalArgumentException {
-        if(node.isLiteral() && node instanceof KiWiDoubleLiteral) {
-            return ((KiWiDoubleLiteral)node).getDoubleContent();
-        } else if(node.isLiteral()) {
-            return Double.parseDouble(((KiWiLiteral)node).getContent());
+    public Double transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
+        if(rdfBackend.isLiteral(node)) {
+            return rdfBackend.doubleValue(node);
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to double");
         }

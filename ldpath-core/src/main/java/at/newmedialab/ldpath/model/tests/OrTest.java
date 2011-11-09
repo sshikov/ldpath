@@ -16,24 +16,22 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Tests the disjunction of two tests.
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class OrTest implements NodeTest {
+public class OrTest<Node> implements NodeTest<Node> {
 
-    private NodeTest left;
-    private NodeTest right;
+    private NodeTest<Node> left;
+    private NodeTest<Node> right;
 
-    public OrTest(NodeTest left, NodeTest right) {
+    public OrTest(NodeTest<Node> left, NodeTest<Node> right) {
         this.left = left;
         this.right = right;
     }
@@ -43,16 +41,22 @@ public class OrTest implements NodeTest {
      * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
      * or the number of arguments is not correct.
      *
-     * @param nodes a list of KiWiNodes
+     * @param args a nested list of KiWiNodes
      * @return
      */
     @Override
-    public Boolean apply(TripleStore tripleStore, List<? extends Collection<KiWiNode>> nodes) throws IllegalArgumentException {
-        return left.apply(tripleStore, nodes) || right.apply(tripleStore, nodes);
+    public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+        return left.apply(rdfBackend, args) || right.apply(rdfBackend, args);
     }
 
+    /**
+     * Return the name of the NodeFunction for registration in the function registry
+     *
+     * @param rdfBackend
+     * @return
+     */
     @Override
-    public String asRdfPathExpression() {
-        return String.format("%s | %s", left.asRdfPathExpression(), right.asRdfPathExpression());
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
+        return String.format("%s | %s", left.getPathExpression(rdfBackend), right.getPathExpression(rdfBackend));
     }
 }

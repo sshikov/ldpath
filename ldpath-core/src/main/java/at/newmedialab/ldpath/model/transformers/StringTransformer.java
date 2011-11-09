@@ -22,7 +22,7 @@ import at.newmedialab.ldpath.api.transformers.NodeTransformer;
 /**
  * Add file description here!
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class StringTransformer<Node> implements NodeTransformer<String,Node> {
 

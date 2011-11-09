@@ -16,11 +16,9 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-import at.newmedialab.lmf.search.rdfpath.model.selectors.NodeSelector;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiNode;
-import kiwi.core.model.rdf.KiWiUriResource;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,15 +33,15 @@ import java.util.List;
  * rdf:type is skos:Concept
  *
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class PathEqualityTest implements NodeTest {
+public class PathEqualityTest<Node> implements NodeTest<Node> {
 
-    private NodeSelector path;
-    private KiWiNode node;
+    private NodeSelector<Node> path;
+    private Node node;
 
 
-    public PathEqualityTest(NodeSelector path, KiWiNode node) {
+    public PathEqualityTest(NodeSelector<Node> path, Node node) {
         this.node = node;
         this.path = path;
     }
@@ -53,25 +51,34 @@ public class PathEqualityTest implements NodeTest {
      * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
      * or the number of arguments is not correct.
      *
-     * @param nodes a list of KiWiNodes
+     * @param args a nested list of KiWiNodes
      * @return
      */
     @Override
-    public Boolean apply(TripleStore tripleStore, List<? extends Collection<KiWiNode>> args) throws IllegalArgumentException {
-        if (args.size() != 1) { throw new IllegalArgumentException("path equality test only takes one parameter"); }
-        Collection<? extends KiWiNode> nodes = args.get(0);
+    public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+        if (args.length != 1) { throw new IllegalArgumentException("path equality test only takes one parameter"); }
+        List<Node> nodes = at.newmedialab.ldpath.util.Collections.concat(args);
         if (nodes.size() != 1) {
             throw new IllegalArgumentException("path equality test can only be applied to a single node");
         }
 
-        KiWiNode candidate = nodes.iterator().next();
-        return path.select(tripleStore, candidate).contains(node);
+        Node candidate = nodes.iterator().next();
+        return path.select(rdfBackend, candidate).contains(node);
     }
 
+    /**
+     * Return the representation of the NodeFunction or NodeSelector in the RDF Path Language
+     *
+     * @param rdfBackend
+     * @return
+     */
     @Override
-    public String asRdfPathExpression() {
-        if (node.isUriResource()) { return String.format("%s is <%s>", path.asRdfPathExpression(), ((KiWiUriResource) node).getUri()); }
-        // TODO Can this happen?
-        return String.format("%s is %s", path.asRdfPathExpression(), node);
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
+        if (rdfBackend.isURI(node)) {
+            return String.format("%s is <%s>", path.getPathExpression(rdfBackend), rdfBackend.stringValue(node));
+        } else {
+            // TODO Can this happen?
+            return String.format("%s is %s", path.getPathExpression(rdfBackend), rdfBackend.stringValue(node));
+        }
     }
 }

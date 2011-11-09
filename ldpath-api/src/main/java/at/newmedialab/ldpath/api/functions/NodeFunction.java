@@ -26,7 +26,7 @@ import java.util.Collection;
  * @param <T> the return type of the function
  * @param <Node> the node type of the function
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public interface NodeFunction<T,Node> {
 
@@ -41,7 +41,7 @@ public interface NodeFunction<T,Node> {
     public T apply(RDFBackend<Node> backend, Collection<Node>... args) throws IllegalArgumentException;
 
     /**
-     * Return the name of the NodeFunction for registration in the function registry
+     * Return the representation of the NodeFunction or NodeSelector in the RDF Path Language
      * 
      * @return
      * @param backend

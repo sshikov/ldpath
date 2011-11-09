@@ -26,7 +26,7 @@ import java.util.Collections;
  * A path definition selecting the value of a property. Either a URI enclosed in <> or a namespace prefix and a
  * local name separated by ":"
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class PropertySelector<Node> implements NodeSelector<Node> {
 

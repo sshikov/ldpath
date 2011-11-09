@@ -16,20 +16,25 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-import kiwi.core.api.triplestore.TripleStore;
-import kiwi.core.model.rdf.KiWiLiteral;
-import kiwi.core.model.rdf.KiWiNode;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
- * Add file description here!
+ * Literal type tests allow to select only literals of a specified type, e.g. to ensure that only decimal values are
+ * retrieved:
  * <p/>
- * User: sschaffe
+ * <code>
+ * ^^TYPE
+ * </code>
+ * <p/>
+ * where TYPE is the XML Schema type to select.
+ * <p/>
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class LiteralTypeTest implements NodeTest {
+public class LiteralTypeTest<Node> implements NodeTest<Node> {
 
     private String typeUri;
 
@@ -42,26 +47,25 @@ public class LiteralTypeTest implements NodeTest {
      * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
      * or the number of arguments is not correct.
      *
-     * @param nodes a list of KiWiNodes
+     * @param args a nested list of KiWiNodes
      * @return
      */
     @Override
-    public Boolean apply(TripleStore tripleStore, List<? extends Collection<KiWiNode>> args) throws IllegalArgumentException {
-        if (args.size() != 1) { throw new IllegalArgumentException("literal type test only takes one parameter"); }
-        Collection<? extends KiWiNode> nodes = args.get(0);
+    public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+        if (args.length != 1) { throw new IllegalArgumentException("literal type test only takes one parameter"); }
+        List<Node> nodes = at.newmedialab.ldpath.util.Collections.concat(args);
         if (nodes.size() != 1) {
             throw new IllegalArgumentException("literal type test can only be applied to a single node");
         }
 
-        KiWiNode node = nodes.toArray(new KiWiNode[1])[0];
+        Node node = nodes.get(0);
 
-        if(node.isLiteral()) {
-            KiWiLiteral l = (KiWiLiteral)node;
+        if(rdfBackend.isLiteral(node)) {
 
             if(typeUri != null) {
-                return typeUri.equals(l.getType());
+                return typeUri.equals(rdfBackend.getLiteralType(node).toString());
             } else {
-                return typeUri == l.getType();
+                return null == rdfBackend.getLiteralType(node).toString();
             }
         } else {
             return false;
@@ -69,8 +73,14 @@ public class LiteralTypeTest implements NodeTest {
 
     }
 
+    /**
+     * Return the name of the NodeFunction for registration in the function registry
+     *
+     * @param rdfBackend
+     * @return
+     */
     @Override
-    public String asRdfPathExpression() {
+    public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return "^^" + typeUri;
     }
 }

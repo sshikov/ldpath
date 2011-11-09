@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Builds the union of two node selectors. Will eliminate duplicates.
  * <p/>
- * User: sschaffe
+ * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
 public class UnionSelector<Node> implements NodeSelector<Node> {
 
