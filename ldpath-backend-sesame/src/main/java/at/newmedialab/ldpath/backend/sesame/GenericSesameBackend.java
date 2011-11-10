@@ -278,7 +278,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
         try {
             RepositoryConnection connection = repository.getConnection();
 
-            RepositoryResult<Statement> qResult = connection.getStatements(null, (org.openrdf.model.URI)property, object, true, null);
+            RepositoryResult<Statement> qResult = connection.getStatements(null, (org.openrdf.model.URI)property, object, true, (Resource)null);
             Set<Value> result = new HashSet<Value>();
             while(qResult.hasNext()) {
                 Statement stmt = qResult.next();

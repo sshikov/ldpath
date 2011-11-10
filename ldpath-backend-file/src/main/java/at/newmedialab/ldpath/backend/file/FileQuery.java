@@ -2,6 +2,7 @@ package at.newmedialab.ldpath.backend.file;
 
 import at.newmedialab.ldpath.LDPath;
 import at.newmedialab.ldpath.exception.LDPathParseException;
+import ch.qos.logback.classic.Level;
 import org.apache.commons.cli.*;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Value;
@@ -32,6 +33,33 @@ public class FileQuery {
         CommandLineParser parser = new PosixParser();
         try {
             CommandLine cmd = parser.parse( options, args);
+
+            Level logLevel = Level.WARN;
+
+            if(cmd.hasOption("loglevel")) {
+                String logLevelName = cmd.getOptionValue("loglevel");
+                if("DEBUG".equals(logLevelName.toUpperCase())) {
+                    logLevel = Level.DEBUG;
+                } else if("INFO".equals(logLevelName.toUpperCase())) {
+                    logLevel = Level.INFO;
+                } else if("WARN".equals(logLevelName.toUpperCase())) {
+                    logLevel = Level.WARN;
+                } else if("ERROR".equals(logLevelName.toUpperCase())) {
+                    logLevel = Level.ERROR;
+                } else {
+                    log.error("unsupported log level: {}",logLevelName);
+                }
+            }
+
+            if(logLevel != null) {
+                for(String logname : new String [] {"at","org","net","com"}) {
+
+                    ch.qos.logback.classic.Logger logger =
+                            (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logname);
+                    logger.setLevel(logLevel);
+                }
+            }
+
 
             String format = null;
             if(cmd.hasOption("format")) {
@@ -131,6 +159,9 @@ public class FileQuery {
         Option context = OptionBuilder.withArgName("uri").hasArg().withDescription("URI of the context node to start from").create("context");
         context.setRequired(true);
         result.addOption(context);
+
+        Option loglevel = OptionBuilder.withArgName("level").hasArg().withDescription("set the log level; default is 'warn'").create("loglevel");
+        result.addOption(loglevel);
 
         return result;
     }
