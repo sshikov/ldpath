@@ -126,7 +126,7 @@ public class LDCache {
 
             // 3. check whether the expiry time of the cache entry has passed; if no, returns immediately
             if(entry != null && entry.getExpiryDate().after(new Date())) {
-                log.debug("not refreshing resource {}, as the cached entry is not yet expired",resource);
+                log.info("not refreshing resource {}, as the cached entry is not yet expired",resource);
                 return;
             }
 
@@ -171,7 +171,7 @@ public class LDCache {
                         newEntry.setUpdateCount((long)1);
                     }
 
-                    cacheProvider.getMetadataRepository().put(resource.stringValue(),entry);
+                    cacheProvider.getMetadataRepository().put(resource.stringValue(),newEntry);
 
                 }
 

@@ -16,6 +16,8 @@
 
 
 
+
+
 apply plugin:com.smokejumperit.gradle.OneJarPlugin
 
 
@@ -56,6 +58,7 @@ dependencies {
 
     compile "org.openrdf.sesame:sesame-sail-api:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-sail-memory:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-sail-nativerdf:${spec.versions.sesame}"
 
     compile "org.openrdf.sesame:sesame-rio-api:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-rio-rdfxml:${spec.versions.sesame}"
@@ -64,6 +67,9 @@ dependencies {
     compile "org.openrdf.sesame:sesame-rio-n3:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-rio-ntriples:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-rio-trig:${spec.versions.sesame}"
+
+    // persistent cache
+    compile 'org.fusesource.jdbm:jdbm:2.0.1'
 }
 
 project(':') {

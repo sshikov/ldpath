@@ -17,6 +17,7 @@
 package at.newmedialab.ldpath.backend.linkeddata;
 
 import at.newmedialab.ldpath.LDPath;
+import at.newmedialab.ldpath.backend.sesame.GenericSesameBackend;
 import at.newmedialab.ldpath.exception.LDPathParseException;
 import ch.qos.logback.classic.Level;
 import org.apache.commons.cli.*;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -80,7 +82,12 @@ public class LDQuery {
                 format = cmd.getOptionValue("format");
             }
 
-            LDMemoryBackend backend = new LDMemoryBackend();
+            GenericSesameBackend backend;
+            if(cmd.hasOption("store")) {
+                backend = new LDPersistentBackend(new File(cmd.getOptionValue("store")));
+            } else {
+                backend = new LDMemoryBackend();
+            }
 
             Resource context = null;
             if(cmd.hasOption("context")) {
@@ -119,6 +126,10 @@ public class LDQuery {
                 }
             }
 
+            if(backend instanceof LDPersistentBackend) {
+                ((LDPersistentBackend) backend).shutdown();
+            }
+
 
         } catch (ParseException e) {
             System.err.println("invalid arguments");
@@ -129,6 +140,10 @@ public class LDQuery {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             System.err.println("file or program could not be found");
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("LDQuery", options, true);
+        } catch (IOException e) {
+            System.err.println("could not access cache data directory");
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("LDQuery", options, true);
         }
@@ -153,6 +168,10 @@ public class LDQuery {
 
         Option loglevel = OptionBuilder.withArgName("level").hasArg().withDescription("set the log level; default is 'warn'").create("loglevel");
         result.addOption(loglevel);
+
+        Option store = OptionBuilder.withArgName("dir").hasArg().withDescription("cache the retrieved data in this directory").create("store");
+        result.addOption(store);
+
 
         return result;
     }

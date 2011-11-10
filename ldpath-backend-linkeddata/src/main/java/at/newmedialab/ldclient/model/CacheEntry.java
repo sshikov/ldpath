@@ -18,6 +18,7 @@ package at.newmedialab.ldclient.model;
 
 import org.openrdf.model.URI;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -26,9 +27,7 @@ import java.util.Date;
  * <p/>
  * User: sschaffe
  */
-public class CacheEntry {
-
-    private Long id;
+public class CacheEntry implements Serializable {
 
     /**
      * The URI resource managed by this cache entry.
@@ -55,14 +54,6 @@ public class CacheEntry {
 
 
     public CacheEntry() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public URI getResource() {
