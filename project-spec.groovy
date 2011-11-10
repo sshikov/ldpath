@@ -15,5 +15,7 @@ spec = [
                 jdom:       '1.1.2',
                 htmlcleaner:'2.2',
 
+                cli:        '1.2',              // Apache Commons CLI
+
         ]
 ]

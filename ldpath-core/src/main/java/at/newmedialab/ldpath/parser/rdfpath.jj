@@ -71,13 +71,22 @@ public class RdfPathParser<Node> {
             initialise();
         }
 
-        public Program parse() throws ParseException {
+        public Program<Node> parseProgram() throws ParseException {
 			namespaces.clear();
 			namespaces.putAll(Program.DEFAULT_NAMESPACES);
 
 		    return Program();
         }
 
+        public NodeSelector<Node> parseSelector(Map<String,String> ctxNamespaces) throws ParseException {
+			namespaces.clear();
+			namespaces.putAll(Program.DEFAULT_NAMESPACES);
+			if(ctxNamespaces != null) {
+			    namespaces.putAll(ctxNamespaces);
+			}
+
+		    return Selector();
+        }
 
 
 

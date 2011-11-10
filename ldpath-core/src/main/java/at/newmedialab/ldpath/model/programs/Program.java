@@ -40,6 +40,7 @@ public class Program<Node> implements LDPathConstruct<Node> {
         defNS.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
         defNS.put("owl", "http://www.w3.org/2002/07/owl#");
         defNS.put("skos", "http://www.w3.org/2004/02/skos/core#");
+        defNS.put("foaf", "http://xmlns.com/foaf/0.1/");
         defNS.put("dc", "http://purl.org/dc/elements/1.1/");
         defNS.put("xsd", "http://www.w3.org/2001/XMLSchema#");
         defNS.put("lmf", "http://www.newmedialab.at/lmf/types/1.0/");

@@ -4,4 +4,5 @@ include 'ldpath-core'
 include 'ldpath-backend-sesame'
 //include 'ldpath-backend-sparql'
 include 'ldpath-backend-linkeddata'
+include 'ldpath-backend-file'
 
