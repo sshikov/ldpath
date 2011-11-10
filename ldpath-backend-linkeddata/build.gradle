@@ -14,11 +14,49 @@
  * limitations under the License.
  */
 
+
+
+apply plugin:com.smokejumperit.gradle.OneJarPlugin
+
+
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath 'com.smokejumperit:gradle-plugins:0.8.2'
+    }
+}
+
 dependencies {
-    compile "org.openrdf.sesame:sesame-model:${spec.versions.sesame}"
-    compile "org.openrdf.sesame:sesame-repository-api:${spec.versions.sesame}"
-    compile "org.openrdf.sesame:sesame-repository-event:${spec.versions.sesame}"
+
+    compile project(":ldpath-api")
+    compile project(":ldpath-core")
+    compile project(":ldpath-backend-sesame")
+
+    compile "commons-io:commons-io:${spec.versions.io}"
+    compile "commons-cli:commons-cli:${spec.versions.cli}"
+
+    /* Apache Commons Configuration (used for storing KiWi configuration) */
+    compile ("commons-configuration:commons-configuration:${spec.versions.config}") {
+        exclude module: "commons-beanutils"
+        exclude module: "commons-logging"
+    }
+
+    compile "ch.qos.logback:logback-classic:${spec.versions.logback}"
+
+    compile ("org.apache.httpcomponents:httpclient:${spec.versions.httpclient}") {
+        exclude module: "commons-logging"     // covered by SLF4J
+    }
+
     compile "org.openrdf.sesame:sesame-repository-sail:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-repository-event:${spec.versions.sesame}"
+
+    compile "org.openrdf.sesame:sesame-sail-api:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-sail-memory:${spec.versions.sesame}"
+
     compile "org.openrdf.sesame:sesame-rio-api:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-rio-rdfxml:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-rio-trix:${spec.versions.sesame}"
@@ -26,8 +64,6 @@ dependencies {
     compile "org.openrdf.sesame:sesame-rio-n3:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-rio-ntriples:${spec.versions.sesame}"
     compile "org.openrdf.sesame:sesame-rio-trig:${spec.versions.sesame}"
-    compile "org.openrdf.sesame:sesame-sail-api:${spec.versions.sesame}"
-    compile "org.openrdf.sesame:sesame-sail-memory:${spec.versions.sesame}"
 }
 
 project(':') {
@@ -36,3 +72,10 @@ project(':') {
         testCompile project('ldpath-backend-linkeddata')
     }
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'at.newmedialab.ldpath.backend.linkeddata.LDQuery'
+    }
+}
+
