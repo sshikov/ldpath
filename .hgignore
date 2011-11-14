@@ -12,3 +12,7 @@ TokenMgrError.java
 LDPath.ipr
 LDPath.iws
 userConfig.properties
+syntax: regexp
+.project
+.classpath
+.settings

@@ -1,6 +1,3 @@
-include 'ldpath-api'
-include 'ldpath-core'
-include 'ldpath-backend-sesame'
 /*
  * Copyright (c) 2011 Salzburg Research.
  *
@@ -17,6 +14,9 @@ include 'ldpath-backend-sesame'
  * limitations under the License.
  */
 
+include 'ldpath-api'
+include 'ldpath-core'
+include 'ldpath-backend-sesame'
 //include 'ldpath-backend-sparql'
 include 'ldpath-backend-linkeddata'
 include 'ldpath-backend-file'
