@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab',
-        version: '1.0',
+        version: '0.9',
 
         projectName: 'LDPath',
 
