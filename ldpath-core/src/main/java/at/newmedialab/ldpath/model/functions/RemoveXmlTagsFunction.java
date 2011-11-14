@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
 
-    private static StringTransformer transformer = new StringTransformer();
+    private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
     private static Pattern XML_TAG = Pattern.compile("<(\"[^\"]*\"|'[^']*'|[^>])*>", Pattern.MULTILINE);
 

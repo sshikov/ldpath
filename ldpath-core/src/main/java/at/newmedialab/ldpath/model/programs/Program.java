@@ -92,11 +92,11 @@ public class Program<Node> implements LDPathConstruct<Node> {
         this.fields = fields;
     }
 
-    public NodeTest getFilter() {
+    public NodeTest<Node> getFilter() {
         return filter;
     }
 
-    public void setFilter(NodeTest filter) {
+    public void setFilter(NodeTest<Node> filter) {
         this.filter = filter;
     }
 

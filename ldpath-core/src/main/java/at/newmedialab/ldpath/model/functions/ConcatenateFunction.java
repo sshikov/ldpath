@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class ConcatenateFunction<Node> implements SelectorFunction<Node> {
 
-    private static StringTransformer transformer = new StringTransformer();
+    private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
     /**
      * Apply the function to the list of nodes passed as arguments and return the result as type T.

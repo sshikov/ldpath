@@ -34,7 +34,7 @@ import java.util.*;
 
 public class XPathFunction<Node> implements SelectorFunction<Node> {
 
-    private static StringTransformer transformer = new StringTransformer();
+    private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
 
     /**
@@ -83,7 +83,7 @@ public class XPathFunction<Node> implements SelectorFunction<Node> {
             XMLOutputter out = new XMLOutputter();
 
             for (String xp : xpaths) {
-                List nodes = XPath.selectNodes(doc,xp);
+                List<?> nodes = XPath.selectNodes(doc,xp);
                 for (Object node : nodes) {
                     if(node instanceof Element)
                         result.add(out.outputString((Element) node));

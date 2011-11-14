@@ -41,7 +41,7 @@ public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
 
     private HtmlCleaner cleaner;
 
-    private static StringTransformer transformer = new StringTransformer();
+    private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
     private Logger log = LoggerFactory.getLogger(CleanHtmlFunction.class);
 

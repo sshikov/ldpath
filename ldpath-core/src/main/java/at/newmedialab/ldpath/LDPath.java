@@ -77,15 +77,15 @@ public class LDPath<Node> {
      * @return
      * @throws LDPathParseException
      */
-    public Map<String,Collection<Object>> programQuery(Node context, Reader program) throws LDPathParseException {
+    public Map<String,Collection<?>> programQuery(Node context, Reader program) throws LDPathParseException {
         RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,program);
 
         try {
             Program<Node> p = parser.parseProgram();
 
-            Map<String,Collection<Object>> result = new HashMap<String, Collection<Object>>();
+            Map<String,Collection<?>> result = new HashMap<String, Collection<?>>();
 
-            for(FieldMapping mapping : p.getFields()) {
+            for(FieldMapping<?,Node> mapping : p.getFields()) {
                 result.put(mapping.getFieldName(),mapping.getValues(backend,context));
             }
 

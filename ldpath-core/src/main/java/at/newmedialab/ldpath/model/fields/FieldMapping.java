@@ -62,6 +62,7 @@ public class FieldMapping<T,Node> implements LDPathConstruct<Node> {
     }
 
     public FieldMapping(String fieldName, String fieldType, NodeSelector<Node> selector, NodeTransformer<T,Node> transformer, Map<String, String> fieldConfig) {
+    	this();
         this.fieldName = fieldName;
         this.fieldType = fieldType;
         this.selector = selector;

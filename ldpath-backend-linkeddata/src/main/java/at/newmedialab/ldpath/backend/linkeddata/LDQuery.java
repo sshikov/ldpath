@@ -106,7 +106,7 @@ public class LDQuery {
                 } else if(cmd.hasOption("program")) {
                     File file = new File(cmd.getOptionValue("program"));
 
-                    Map<String,Collection<Object>> result = ldpath.programQuery(context,new FileReader(file));
+                    Map<String,Collection<?>> result = ldpath.programQuery(context,new FileReader(file));
 
                     for(String field : result.keySet()) {
                         StringBuilder line = new StringBuilder();
