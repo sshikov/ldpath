@@ -11,3 +11,4 @@ Token.java
 TokenMgrError.java
 LDPath.ipr
 LDPath.iws
+userConfig.properties
