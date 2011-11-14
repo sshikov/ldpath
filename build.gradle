@@ -117,7 +117,16 @@ allprojects {
     ideaModule {
         javaVersion = "1.6"
     }
-
+	
+	eclipse {
+		classpath {
+			defaultOutputDir = file('build')
+			
+			downloadSources = true
+			downloadJavadoc = false
+		}
+	}
+	
     dependencies {
         /* Logging (SLF4J) */
         compile "org.slf4j:slf4j-api:${spec.versions.slf4j}"
