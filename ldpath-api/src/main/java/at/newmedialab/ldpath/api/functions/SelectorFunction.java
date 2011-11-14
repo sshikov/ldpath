@@ -22,7 +22,7 @@ import java.util.Collection;
  * Intermediate Interface for {@link NodeFunction}s used in the
  * FunctionSelector
  * 
- * @author jfrank
+ * @author Jakob Frank <jakob.frank@salzburgresearch.at>
  * 
  */
 public interface SelectorFunction<Node> extends NodeFunction<Collection<Node>,Node> {
