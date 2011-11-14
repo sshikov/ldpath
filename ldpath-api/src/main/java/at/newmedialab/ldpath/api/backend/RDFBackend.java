@@ -117,7 +117,7 @@ public interface RDFBackend<Node> {
      * property given as argument.
      *
      * @param subject  the subject of the triples to look for
-     * @param property the property of the triples to look for
+     * @param property the property of the triples to look for, <code>null</code> is interpreted as wildcard
      * @return all objects of triples with matching subject and property
      */
     public Collection<Node> listObjects(Node subject, Node property);
@@ -128,8 +128,8 @@ public interface RDFBackend<Node> {
      * property given as argument.
      *
      * @param object  the object of the triples to look for
-     * @param property the property of the triples to look for
-     * @return all dubjects of triples with matching object and property
+     * @param property the property of the triples to look for, <code>null</code> is interpreted as wildcard
+     * @return all subjects of triples with matching object and property
      * @throws UnsupportedOperationException in case reverse selection is not supported (e.g. when querying Linked Data)
      */
     public Collection<Node> listSubjects(Node property, Node object);
