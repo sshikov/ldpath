@@ -17,8 +17,10 @@
 package at.newmedialab.ldclient.api;
 
 import at.newmedialab.ldclient.model.CacheEntry;
+import at.newmedialab.ldclient.model.Endpoint;
 import org.openrdf.repository.Repository;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -47,4 +49,25 @@ public interface LDCacheProvider {
      * @return a map for storing caching metadata
      */
     public Map<String,CacheEntry> getMetadataRepository();
+
+    /**
+     * Register a new Linked Data endpoint with this cache provider.
+     *
+     * @param endpoint
+     */
+    public void registerEndpoint(Endpoint endpoint);
+
+
+    /**
+     * List all endpoints currently registered with the Linked Data cache provider.
+     * @return a collection of endpoints
+     */
+    public Collection<Endpoint> listEndpoints();
+
+    /**
+     * Unregister the Linked Data endpoint given as argument.
+     *
+     * @param endpoint the endpoint to unregister
+     */
+    public void unregisterEndpoint(Endpoint endpoint);
 }

@@ -206,4 +206,8 @@ public class LDCache {
         return cacheProvider.getMetadataRepository().get(resource.stringValue());
     }
 
+    public LDEndpoints getEndpointService() {
+        return endpointService;
+    }
+
 }

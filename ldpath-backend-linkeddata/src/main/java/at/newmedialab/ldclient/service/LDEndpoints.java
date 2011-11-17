@@ -36,27 +36,9 @@ public class LDEndpoints {
     private List<Endpoint> endpoints;
 
 
-    private static Endpoint[] blacklist = new Endpoint[] {
-        new Endpoint("Wikipedia", Endpoint.EndpointType.NONE,"http://wikipedia.org","","",(long)86400),
-        new Endpoint("Wikipedia EN", Endpoint.EndpointType.NONE,"http://en.wikipedia.org","","",(long)86400),
-        new Endpoint("HolyGoat", Endpoint.EndpointType.NONE,"http://www.holygoat.co.uk","","",(long)86400),
-        new Endpoint("KiWi Project", Endpoint.EndpointType.NONE,"http://www.kiwi-project.eu/","","",(long)86400)
-    };
-
-
 
     public LDEndpoints() {
         endpoints = new LinkedList<Endpoint>();
-
-
-        // load all endpoints into memory
-
-        // ensure that some typical non-LD sites are blacklisted
-        for(Endpoint e : blacklist) {
-            if(!endpoints.contains(e)) {
-                addEndpoint(e);
-            }
-        }
     }
 
 
