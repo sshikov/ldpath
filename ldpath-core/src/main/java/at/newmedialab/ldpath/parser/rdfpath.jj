@@ -127,7 +127,12 @@ public class RdfPathParser<Node> {
             initFunctionMappings();
         }
 
-
+        /**
+         * Register the function passed as argument in this parser's function map.
+         */
+        public void registerFunction(SelectorFunction<Node> function) {
+            registerFunction(xsdNodeFunctionMap,function);
+        }
 
 
         /**
@@ -174,7 +179,7 @@ public class RdfPathParser<Node> {
             registerFunction(functionMap, new RemoveXmlTagsFunction());
             registerFunction(functionMap, new CleanHtmlFunction());
 
-            xsdNodeFunctionMap = Collections.unmodifiableMap(functionMap);
+            xsdNodeFunctionMap = functionMap;
         }
 
         private void registerFunction(Map<String, SelectorFunction<Node>> register, final SelectorFunction<Node> function) {

@@ -1,6 +1,23 @@
+/*
+ * Copyright (c) 2011 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package at.newmedialab.ldpath;
 
 import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import at.newmedialab.ldpath.exception.LDPathParseException;
 import at.newmedialab.ldpath.model.fields.FieldMapping;
@@ -12,6 +29,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -23,12 +41,15 @@ public class LDPath<Node> {
 
     private RDFBackend<Node> backend;
 
+    private HashSet<SelectorFunction<Node>> functions;
+
     /**
      * Initialise a new LDPath instance for querying the backend passed as argument.
      * @param backend
      */
     public LDPath(RDFBackend<Node> backend) {
-        this.backend = backend;
+        this.backend   = backend;
+        this.functions = new HashSet<SelectorFunction<Node>>();
     }
 
     /**
@@ -54,8 +75,10 @@ public class LDPath<Node> {
      * @throws LDPathParseException when the path passed as argument is not valid
      */
     public Collection<Node> pathQuery(Node context, String path, Map<String, String> namespaces) throws LDPathParseException {
-
         RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,new StringReader(path));
+        for(SelectorFunction<Node> function : functions) {
+            parser.registerFunction(function);
+        }
 
         try {
             NodeSelector<Node> selector = parser.parseSelector(namespaces);
@@ -79,6 +102,9 @@ public class LDPath<Node> {
      */
     public Map<String,Collection<?>> programQuery(Node context, Reader program) throws LDPathParseException {
         RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,program);
+        for(SelectorFunction<Node> function : functions) {
+            parser.registerFunction(function);
+        }
 
         try {
             Program<Node> p = parser.parseProgram();
@@ -94,5 +120,10 @@ public class LDPath<Node> {
         } catch (ParseException e) {
             throw new LDPathParseException("error while parsing path expression",e);
         }
+    }
+
+
+    public void registerFunction(SelectorFunction<Node> function) {
+        functions.add(function);
     }
 }
