@@ -18,15 +18,17 @@
 
 
 
+
+
 spec = [
         name: 'ldpath',
-        group: 'at.newmedialab',
+        group: 'at.newmedialab.ldpath',
         version: '0.9.1',
 
         projectName: 'LDPath',
 
         versions: [
-                sesame:     '2.6.0',            // RDF API
+                sesame:     '2.6.1',            // RDF API
 
                 slf4j:      '1.6.4',            // logging interface
                 logback:    '1.0.0',            // logging backend

@@ -133,6 +133,29 @@ public class LDPath<Node> {
     }
 
     /**
+     * Parse a program passed as argument and return it for further use.
+     *
+     * @param program a reader containing the program in LDPath syntax
+     * @return the parsed program
+     * @throws LDPathParseException
+     */
+    public Program<Node> parseProgram(Reader program) throws LDPathParseException {
+        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,program);
+        for(SelectorFunction<Node> function : functions) {
+            parser.registerFunction(function);
+        }
+        for(String typeUri : transformers.keySet()) {
+            parser.registerTransformer(typeUri, transformers.get(typeUri));
+        }
+
+        try {
+            return parser.parseProgram();
+        } catch (ParseException e) {
+            throw new LDPathParseException("error while parsing path program",e);
+        }
+    }
+
+    /**
      * Register a selector function to be used in LDPath. Use this method in your own
      * projects to register custom selector functions.
      * @param function

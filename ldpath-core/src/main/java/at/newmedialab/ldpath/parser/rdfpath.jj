@@ -162,15 +162,6 @@ public class RdfPathParser<Node> {
             transformerMap.put(Constants.NS_XSD + "anyURI", new StringTransformer());
             transformerMap.put(Constants.NS_XSD + "string", new StringTransformer());
 
-            transformerMap.put(Constants.NS_LMF_TYPES + "text", new StringTransformer());
-            transformerMap.put(Constants.NS_LMF_TYPES + "text_en", new StringTransformer());
-            transformerMap.put(Constants.NS_LMF_TYPES + "text_de", new StringTransformer());
-            transformerMap.put(Constants.NS_LMF_TYPES + "text_es", new StringTransformer());
-            transformerMap.put(Constants.NS_LMF_TYPES + "text_fr", new StringTransformer());
-            transformerMap.put(Constants.NS_LMF_TYPES + "text_it", new StringTransformer());
-            transformerMap.put(Constants.NS_LMF_TYPES + "text_cz", new StringTransformer());
-
-
             xsdNodeTransformerMap = transformerMap;
         }
 
