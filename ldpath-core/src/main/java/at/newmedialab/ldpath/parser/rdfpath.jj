@@ -134,6 +134,13 @@ public class RdfPathParser<Node> {
             registerFunction(xsdNodeFunctionMap,function);
         }
 
+        /**
+         * Register the result transformer passed as argument for the given type uri.
+         */
+        public void registerTransformer(String typeUri, NodeTransformer<?,Node> transformer) {
+            xsdNodeTransformerMap.put(typeUri,transformer);
+        }
+
 
         /**
          * A map mapping from XSD types to node transformers.
@@ -164,7 +171,7 @@ public class RdfPathParser<Node> {
             transformerMap.put(Constants.NS_LMF_TYPES + "text_cz", new StringTransformer());
 
 
-            xsdNodeTransformerMap = Collections.unmodifiableMap(transformerMap);
+            xsdNodeTransformerMap = transformerMap;
         }
 
 

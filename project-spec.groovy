@@ -16,10 +16,12 @@
 
 
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab',
-        version: '0.9',
+        version: '0.9.1',
 
         projectName: 'LDPath',
 

@@ -19,6 +19,7 @@ package at.newmedialab.ldpath;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
+import at.newmedialab.ldpath.api.transformers.NodeTransformer;
 import at.newmedialab.ldpath.exception.LDPathParseException;
 import at.newmedialab.ldpath.model.fields.FieldMapping;
 import at.newmedialab.ldpath.model.programs.Program;
@@ -43,13 +44,16 @@ public class LDPath<Node> {
 
     private HashSet<SelectorFunction<Node>> functions;
 
+    private HashMap<String,NodeTransformer<?,Node>> transformers;
+
     /**
      * Initialise a new LDPath instance for querying the backend passed as argument.
      * @param backend
      */
     public LDPath(RDFBackend<Node> backend) {
-        this.backend   = backend;
-        this.functions = new HashSet<SelectorFunction<Node>>();
+        this.backend      = backend;
+        this.functions    = new HashSet<SelectorFunction<Node>>();
+        this.transformers = new HashMap<String, NodeTransformer<?, Node>>();
     }
 
     /**
@@ -79,6 +83,9 @@ public class LDPath<Node> {
         for(SelectorFunction<Node> function : functions) {
             parser.registerFunction(function);
         }
+        for(String typeUri : transformers.keySet()) {
+            parser.registerTransformer(typeUri,transformers.get(typeUri));
+        }
 
         try {
             NodeSelector<Node> selector = parser.parseSelector(namespaces);
@@ -105,6 +112,9 @@ public class LDPath<Node> {
         for(SelectorFunction<Node> function : functions) {
             parser.registerFunction(function);
         }
+        for(String typeUri : transformers.keySet()) {
+            parser.registerTransformer(typeUri, transformers.get(typeUri));
+        }
 
         try {
             Program<Node> p = parser.parseProgram();
@@ -122,8 +132,23 @@ public class LDPath<Node> {
         }
     }
 
-
+    /**
+     * Register a selector function to be used in LDPath. Use this method in your own
+     * projects to register custom selector functions.
+     * @param function
+     */
     public void registerFunction(SelectorFunction<Node> function) {
         functions.add(function);
+    }
+
+    /**
+     * Register a result transformer for a type URI. Use this method in your own projects
+     * to register custom result transformers.
+     *
+     * @param typeUri a URI identifying the type for which to use this transformer; can be specified in path programs
+     * @param transformer instance of a node transformer
+     */
+    public void registerTransformer(String typeUri, NodeTransformer<?,Node> transformer) {
+        transformers.put(typeUri,transformer);
     }
 }
