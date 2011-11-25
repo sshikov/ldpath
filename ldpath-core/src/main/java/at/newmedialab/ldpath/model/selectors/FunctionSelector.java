@@ -54,7 +54,7 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
             Collection<Node> param = selector.select(rdfBackend, context);
             args.add(param);
         }
-        return function.apply(rdfBackend, (Collection<Node>[])args.toArray());
+        return function.apply(rdfBackend, args.toArray(new Collection[0]));
     }
 
     /**
