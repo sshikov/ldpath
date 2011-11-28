@@ -36,7 +36,34 @@ configurations {
     all*.exclude group: "junit" // old version
 }
 
+
+idea {
+    project {
+        jdkName = '1.6'
+        languageLevel = '1.6'
+    }
+}
+
+eclipse {
+    project {
+        name = "${spec.projectName} ${spec.version}"
+    }
+    jdt {
+        sourceCompatibility=1.6
+        targetCompatibility=1.6
+    }
+    classpath {
+        defaultOutputDir = file('build')
+
+        downloadSources = true
+        downloadJavadoc = false
+    }
+}
+
+
 repositories {
+    // uncomment to use local maven cache
+    // mavenLocal()
     maven {
         url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
     }
@@ -109,15 +136,21 @@ allprojects {
     version = spec.version
 
     repositories {
+        // uncomment to use local maven cache
+        // mavenLocal()
         maven {
             url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
         }
     }
 
-    ideaModule {
-        javaVersion = "1.6"
+    idea {
+        module {
+            jdkName = '1.6'
+            downloadJavadoc = true
+            downloadSources = true
+        }
     }
-	
+
 	eclipse {
 		classpath {
 			defaultOutputDir = file('build')
@@ -125,6 +158,10 @@ allprojects {
 			downloadSources = true
 			downloadJavadoc = false
 		}
+        jdt {
+            sourceCompatibility=1.6
+            targetCompatibility=1.6
+        }
 	}
 	
     dependencies {
