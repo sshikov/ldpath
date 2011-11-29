@@ -99,6 +99,48 @@ public class LDPath<Node> {
     }
 
     /**
+     * Execute a single path query starting from the given context node and return a collection of nodes resulting
+     * from the selection. Default namespaces (rdf, rdfs, skos, dc, foaf) are added automatically, further namespaces
+     * need to be passed as arguments.
+     * <p/>
+     * Paths need to conform to the RdfPath Selector syntax described at
+     * <a href="http://code.google.com/p/kiwi/wiki/RdfPathLanguage#Path_Selectors">the wiki</a>.
+     * For example, the following selection would select the names of all friends:
+     * <p/>
+     * <code>
+     * foaf:knows / foaf:name
+     * </code>
+     * <p/>
+     * Note that since this method returns a collection of nodes, no transformations can be used.
+     *
+     * @param context the context node where to start the path query
+     * @param path  the LDPath path specification
+     * @param namespaces an optional map mapping namespace prefixes to URIs (used for lookups of prefixes used in the path);
+     *                   can be null
+     * @return a collection of nodes
+     * @throws LDPathParseException when the path passed as argument is not valid
+     */
+    public <T> Collection<T> pathTransform(Node context, String path, Map<String, String> namespaces) throws LDPathParseException {
+        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,new StringReader(path));
+        for(SelectorFunction<Node> function : functions) {
+            parser.registerFunction(function);
+        }
+        for(String typeUri : transformers.keySet()) {
+            parser.registerTransformer(typeUri,transformers.get(typeUri));
+        }
+
+        try {
+            FieldMapping<T,Node> mapping = parser.parseRule(namespaces);
+
+            return mapping.getValues(backend, context);
+
+        } catch (ParseException e) {
+            throw new LDPathParseException("error while parsing path expression",e);
+        }
+
+    }
+
+    /**
      * Evaluate a path program passed as argument starting from the given context node and return a mapping for
      * each field in the program to the selected values.
      *
