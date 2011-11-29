@@ -88,6 +88,15 @@ public class RdfPathParser<Node> {
 		    return Selector();
         }
 
+        public <T> FieldMapping<T,Node> parseRule(Map<String,String> ctxNamespaces) throws ParseException {
+			namespaces.clear();
+			namespaces.putAll(Program.DEFAULT_NAMESPACES);
+			if(ctxNamespaces != null) {
+			    namespaces.putAll(ctxNamespaces);
+			}
+
+		    return UnnamedRule();
+        }
 
 
         public Node resolveResource(String uri) {
@@ -287,6 +296,22 @@ FieldMapping Rule() :
         return rule;
     }
 }
+
+FieldMapping UnnamedRule() :
+{
+    FieldMapping<?,Node> rule;
+    String type;
+    NodeSelector<Node> selector;
+    NodeTransformer<?,Node> transformer;
+}
+{
+    selector = Selector() "::" type = Uri()  {
+        transformer = getTransformer(type);
+        rule = new FieldMapping("unnamed",type,selector,transformer, null);
+        return rule;
+    }
+}
+
 
 Map<String,String> FieldConfig() : {
 	Map<String, String> conf = new HashMap<String, String>();
