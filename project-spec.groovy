@@ -20,6 +20,8 @@
 
 
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
@@ -38,9 +40,9 @@ spec = [
                 htmlcleaner:'2.2',
 
                 cli:        '1.2',              // Apache Commons CLI
-                io:         '2.0.1',            // Apache Commons IO
+                io:         '2.1',              // Apache Commons IO
                 httpclient: '4.1.2',            // Apache Commons HTTP Client
-                config:     '1.6',              // Apache Commons Configuration
+                config:     '1.7',              // Apache Commons Configuration
 
         ]
 ]
