@@ -11,7 +11,7 @@
         </p>
 
         <ul>
-            <@ldpath path="rdf:type">
+            <@ldpath path="fn:sort(rdf:type)">
                 <#if evalLDPath("rdfs:label[@en] :: xsd:string")??>
                     <li><@ldpath path="rdfs:label[@en] :: xsd:string"/></li>
                 </#if>
