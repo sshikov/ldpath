@@ -16,19 +16,20 @@
 
 package at.newmedialab.ldpath.template.engine;
 
-import at.newmedialab.ldpath.LDPath;
-import at.newmedialab.ldpath.exception.LDPathParseException;
+import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.template.model.freemarker.TemplateNodeModel;
 import freemarker.cache.TemplateLoader;
-import freemarker.core.Environment;
-import freemarker.template.*;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.Writer;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Add file description here!
@@ -39,24 +40,15 @@ public class TemplateEngine<Node> {
 
     private Configuration freemarker;
 
-    private LDPath<Node> ldPath;
+    private RDFBackend<Node> backend;
 
-    private Node context;
+    public TemplateEngine(RDFBackend<Node> backend) {
 
-    private Map<String,String> namespaces;
-
-    public TemplateEngine(Node context, LDPath<Node> ldPath) {
-        this.context = context;
-        this.ldPath  = ldPath;
-
-        this.namespaces = new HashMap<String, String>();
+        this.backend = backend;
 
         freemarker = new Configuration();
         freemarker.setObjectWrapper(new DefaultObjectWrapper());
 
-        Map root = new HashMap();
-        root.put("namespaces", new NamespaceDirective());
-        root.put("ldpath",new LDPathMethod());
 
     }
 
@@ -72,83 +64,65 @@ public class TemplateEngine<Node> {
     }
 
 
-    /**
-     * A class that implements a "namespace" directive for configuring namespaces in this engine. Usage:
-     * <@namespaces foaf="http://xmlns.com/foaf/0.1/" sioc="http://rdfs.org/sioc/ns#">
-     */
-    private class NamespaceDirective implements TemplateDirectiveModel {
-        /**
-         * Parse key-value pairs passed as parameters to this directive
-         *
-         * @param env      the current processing environment. Note that you can access
-         *                 the output {@link java.io.Writer Writer} by {@link freemarker.core.Environment#getOut()}.
-         * @param params   the parameters (if any) passed to the directive as a
-         *                 map of key/value pairs where the keys are {@link String}-s and the
-         *                 values are {@link freemarker.template.TemplateModel} instances. This is never
-         *                 <code>null</code>. If you need to convert the template models to POJOs,
-         *                 you can use the utility methods in the {@link freemarker.template.utility.DeepUnwrap} class.
-         * @param loopVars an array that corresponds to the "loop variables", in
-         *                 the order as they appear in the directive call. ("Loop variables" are out-parameters
-         *                 that are available to the nested body of the directive; see in the Manual.)
-         *                 You set the loop variables by writing this array. The length of the array gives the
-         *                 number of loop-variables that the caller has specified.
-         *                 Never <code>null</code>, but can be a zero-length array.
-         * @param body     an object that can be used to render the nested content (body) of
-         *                 the directive call. If the directive call has no nested content (i.e., it is like
-         *                 [@myDirective /] or [@myDirective][/@myDirective]), then this will be
-         *                 <code>null</code>.
-         * @throws freemarker.template.TemplateException
-         *
-         * @throws java.io.IOException
-         */
-        @Override
-        public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-            Iterator paramIter = params.entrySet().iterator();
-            while (paramIter.hasNext()) {
-                Map.Entry ent = (Map.Entry) paramIter.next();
+    public void setDirectoryForTemplateLoading(File dir) throws IOException {
+        freemarker.setDirectoryForTemplateLoading(dir);
+    }
 
-                String paramName = (String) ent.getKey();
-                TemplateModel paramValue = (TemplateModel) ent.getValue();
+    public void setServletContextForTemplateLoading(Object sctxt, String path) {
+        freemarker.setServletContextForTemplateLoading(sctxt, path);
+    }
 
-                if(paramValue instanceof TemplateScalarModel) {
-                    String uri = ((TemplateScalarModel)paramValue).getAsString();
-
-                    try {
-                        URI test = new URI(uri);
-                        namespaces.put(paramName,test.toString());
-                    } catch (URISyntaxException e) {
-                        throw new TemplateModelException("invalid namespace URI '"+uri+"'",e);
-                    }
-                }
-            }
-        }
+    public void setClassForTemplateLoading(Class clazz, String pathPrefix) {
+        freemarker.setClassForTemplateLoading(clazz, pathPrefix);
     }
 
 
-    private class LDPathMethod implements TemplateMethodModel {
-        /**
-         * Execute a LDPath expression.
-         *
-         * @param arguments a <tt>List</tt> of <tt>String</tt> objects
-         *                  containing the values of the arguments passed to the method.
-         * @return the return value of the method, or null. If the returned value
-         *         does not implement {@link freemarker.template.TemplateModel}, it will be automatically
-         *         wrapped using the {@link freemarker.core.Environment#getObjectWrapper() environment
-         *         object wrapper}.
-         */
-        @Override
-        public Object exec(List arguments) throws TemplateModelException {
-            if(arguments.size() != 1) {
-                throw new TemplateModelException("wrong number of arguments for method call");
-            }
+    /**
+     * Process the template with the given name forn the given context node and write the result to the given
+     * output writer. The way the template is retrieved depends on the template loader, which can be set using the
+     * setTemplateLoader() method.
+     *
+     * @param context the  initial context node to apply this template to
+     * @param templateName the name of the template
+     * @param out          where to write the results
+     * @throws IOException
+     * @throws TemplateException
+     */
+    public void processFileTemplate(Node context, String templateName, Writer out) throws IOException, TemplateException {
+        processTemplate(context,freemarker.getTemplate(templateName),null,out);
+    }
 
-            String path = (String)arguments.get(0);
+    /**
+     * Process the template with the given name forn the given context node and write the result to the given
+     * output writer. The initial environment is passed over to the invocation of the template. The way the template
+     * is retrieved depends on the template loader, which can be set using the setTemplateLoader() method.
+     *
+     * @param context the  initial context node to apply this template to
+     * @param templateName the name of the template
+     * @param initialEnv   an initial root environment for processing the template
+     * @param out          where to write the results
+     * @throws IOException
+     * @throws TemplateException
+     */
+    public void processFileTemplate(Node context, String templateName, Map initialEnv,  Writer out) throws IOException, TemplateException {
+        processTemplate(context,freemarker.getTemplate(templateName),initialEnv,out);
+    }
 
-            try {
-                return ldPath.pathTransform(context,path,namespaces);
-            } catch (LDPathParseException e) {
-                throw new TemplateModelException("could not parse path expression '"+path+"'",e);
+
+    private void processTemplate(Node context, Template template, Map initialEnv, Writer out) throws IOException, TemplateException {
+        Map root = new HashMap();
+
+        if(initialEnv != null) {
+            for(Map.Entry entry : (Set<Map.Entry>) initialEnv.entrySet()) {
+                root.put(entry.getKey(), entry.getValue());
             }
         }
+
+        root.put("namespaces", new NamespaceDirective());
+        root.put("evalPath",new LDPathMethod(backend));
+        root.put("ldpath",new LDPathDirective(backend));
+        root.put("context",new TemplateNodeModel(context,backend));
+
+        template.process(root,out);
     }
 }
