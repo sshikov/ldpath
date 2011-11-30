@@ -29,6 +29,7 @@ import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModelException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +119,12 @@ public class LDPathMethod<Node> implements TemplateMethodModel {
         }
 
         try {
-            return ldpath.pathTransform(context.getNode(),path,namespaces);
+            Collection result = ldpath.pathTransform(context.getNode(),path,namespaces);
+            if(result.size() > 0) {
+                return result;
+            } else {
+                return null;
+            }
         } catch (LDPathParseException e) {
             throw new TemplateModelException("could not parse path expression '"+path+"'",e);
         }
