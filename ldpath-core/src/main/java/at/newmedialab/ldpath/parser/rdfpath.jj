@@ -185,6 +185,7 @@ public class RdfPathParser<Node> {
             registerFunction(functionMap, new XPathFunction());
             registerFunction(functionMap, new RemoveXmlTagsFunction());
             registerFunction(functionMap, new CleanHtmlFunction());
+            registerFunction(functionMap, new SortFunction());
 
             xsdNodeFunctionMap = functionMap;
         }
