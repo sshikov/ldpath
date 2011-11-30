@@ -120,7 +120,7 @@ public class TemplateEngine<Node> {
         }
 
         root.put("namespace", new NamespaceDirective());
-        root.put("evalPath",new LDPathMethod(backend));
+        root.put("evalLDPath",new LDPathMethod(backend));
         root.put("ldpath",new LDPathDirective(backend));
 
         TemplateStackModel contexts = new TemplateStackModel();
