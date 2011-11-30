@@ -21,6 +21,7 @@ import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.exception.LDPathParseException;
 import at.newmedialab.ldpath.model.Constants;
 import at.newmedialab.ldpath.template.model.freemarker.TemplateNodeModel;
+import at.newmedialab.ldpath.template.model.freemarker.TemplateStackModel;
 import at.newmedialab.ldpath.template.model.freemarker.TemplateWrapperModel;
 import at.newmedialab.ldpath.template.model.transformers.*;
 import at.newmedialab.ldpath.template.util.FormatUtil;
@@ -114,15 +115,17 @@ public class LDPathDirective<Node> implements TemplateDirectiveModel {
      */
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-        TemplateNodeModel<Node> context = (TemplateNodeModel<Node>)env.getVariable("context");
-        if(context == null) {
-            throw new TemplateException("error; no context node available",env);
+        TemplateStackModel contextStack = (TemplateStackModel)env.getVariable("context");
+        if(contextStack == null || contextStack.empty()) {
+            throw new TemplateModelException("error; no context node available");
         }
+        TemplateNodeModel<Node> context = (TemplateNodeModel<Node>)contextStack.peek();
 
-        String path = (String)params.get("path");
-        if(path == null) {
+        SimpleScalar pathScalar = (SimpleScalar)params.get("path");
+        if(pathScalar == null) {
             throw new TemplateException("the directive has been called without a path parameter",env);
         }
+        String path = pathScalar.getAsString();
 
         TemplateWrapperModel<Map<String,String>> namespacesWrapped = (TemplateWrapperModel<Map<String,String>>)env.getGlobalVariable("namespaces");
 
@@ -178,13 +181,15 @@ public class LDPathDirective<Node> implements TemplateDirectiveModel {
         } else {
             try {
                 for(Node node : ldpath.pathQuery(context.getNode(),path,namespaces)) {
-                    env.setLocalVariable("context", new TemplateNodeModel<Node>(node,backend));
+                    contextStack.push(new TemplateNodeModel<Node>(node, backend));
 
                     if(loopVars.length > 0) {
                         loopVars[0] = new TemplateNodeModel<Node>(node,backend);
                     }
 
                     body.render(env.getOut());
+
+                    contextStack.pop();
                 }
             } catch(LDPathParseException ex) {
                 throw new TemplateException("invalid path for ldpath directive: "+path,ex,env);

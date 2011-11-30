@@ -18,6 +18,7 @@ package at.newmedialab.ldpath.template.engine;
 
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.template.model.freemarker.TemplateNodeModel;
+import at.newmedialab.ldpath.template.model.freemarker.TemplateStackModel;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -118,10 +119,13 @@ public class TemplateEngine<Node> {
             }
         }
 
-        root.put("namespaces", new NamespaceDirective());
+        root.put("namespace", new NamespaceDirective());
         root.put("evalPath",new LDPathMethod(backend));
         root.put("ldpath",new LDPathDirective(backend));
-        root.put("context",new TemplateNodeModel(context,backend));
+
+        TemplateStackModel contexts = new TemplateStackModel();
+        contexts.push(new TemplateNodeModel(context,backend));
+        root.put("context",contexts);
 
         template.process(root,out);
     }
