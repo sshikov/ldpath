@@ -21,6 +21,7 @@ import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.exception.LDPathParseException;
 import at.newmedialab.ldpath.model.Constants;
 import at.newmedialab.ldpath.template.model.freemarker.TemplateNodeModel;
+import at.newmedialab.ldpath.template.model.freemarker.TemplateStackModel;
 import at.newmedialab.ldpath.template.model.freemarker.TemplateWrapperModel;
 import at.newmedialab.ldpath.template.model.transformers.*;
 import freemarker.core.Environment;
@@ -84,10 +85,12 @@ public class LDPathMethod<Node> implements TemplateMethodModel {
     public Object exec(List arguments) throws TemplateModelException {
         Environment env = Environment.getCurrentEnvironment();
 
-        TemplateNodeModel<Node> context = (TemplateNodeModel<Node>)env.getVariable("context");
-        if(context == null) {
+
+        TemplateStackModel contextStack = (TemplateStackModel)env.getVariable("context");
+        if(contextStack == null || contextStack.empty()) {
             throw new TemplateModelException("error; no context node available");
         }
+        TemplateNodeModel<Node> context = (TemplateNodeModel<Node>)contextStack.peek();
 
         String path;
         if(arguments.size() != 1) {

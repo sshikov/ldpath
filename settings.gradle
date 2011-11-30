@@ -16,6 +16,8 @@
 
 
 
+
+
 include 'ldpath-api'
 include 'ldpath-core'
 include 'ldpath-backend-sesame'
@@ -24,4 +26,5 @@ include 'ldpath-backend-linkeddata'
 include 'ldpath-backend-file'
 
 include 'ldpath-template'
+include 'ldpath-template-linkeddata'
 
