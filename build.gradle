@@ -1,0 +1,181 @@
+/*
+ * Copyright (c) 2011 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'org.linkedin.spec'
+apply plugin: 'org.linkedin.userConfig'
+
+sourceCompatibility = 1.6
+
+group   = spec.group
+version = spec.version
+
+configurations {
+    // we do logging over SLF4J, exclude all other logging libraries
+    all*.exclude module: "commons-logging"
+    all*.exclude module: "log4j"
+    all*.exclude module: "ant"
+    all*.exclude group: "maven-plugins"
+    all*.exclude group: "jdom" // old version
+    all*.exclude group: "junit" // old version
+}
+
+
+idea {
+    project {
+        jdkName = '1.6'
+        languageLevel = '1.6'
+    }
+}
+
+eclipse {
+    project {
+        name = "${spec.projectName} ${spec.version}"
+    }
+    jdt {
+        sourceCompatibility=1.6
+        targetCompatibility=1.6
+    }
+    classpath {
+        defaultOutputDir = file('build')
+
+        downloadSources = true
+        downloadJavadoc = false
+    }
+}
+
+
+repositories {
+    // uncomment to use local maven cache
+    // mavenLocal()
+    maven {
+        url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+    }
+}
+
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath "org.linkedin:org.linkedin.gradle-plugins:1.5.0"         // userConfig and project-spec
+    }
+}
+
+subprojects {
+    apply plugin: "maven"
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "http://devel.kiwi-project.eu:8080/nexus/content/repositories/releases/") {
+                        authentication(userName: userConfig.maven.nexusUser, password: userConfig.maven.nexusPass)
+                }
+                snapshotRepository(url: "http://devel.kiwi-project.eu:8080/nexus/content/repositories/snapshots/") {
+                        authentication(userName: userConfig.maven.nexusUser, password: userConfig.maven.nexusPass)
+                }
+
+//                pom.project {
+//                    packaging 'jar'
+//                    url 'http://code.google.com/p/ldpath'
+//
+//                    licenses {
+//                      license {
+//                        name 'Apache License'
+//                        comments """
+//                            /*
+//                             * Copyright (c) 2011 Salzburg Research.
+//                             *
+//                             * Licensed under the Apache License, Version 2.0 (the "License");
+//                             * you may not use this file except in compliance with the License.
+//                             * You may obtain a copy of the License at
+//                             *
+//                             *     http://www.apache.org/licenses/LICENSE-2.0
+//                             *
+//                             * Unless required by applicable law or agreed to in writing, software
+//                             * distributed under the License is distributed on an "AS IS" BASIS,
+//                             * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//                             * See the License for the specific language governing permissions and
+//                             * limitations under the License.
+//                             */
+//                        """
+//                        distribution 'repo'
+//                      }
+//                    }
+//
+//                }
+            }
+        }
+    }
+}
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "groovy"
+    apply plugin: "idea"
+    apply plugin: "eclipse"
+
+    group   = spec.group
+    version = spec.version
+
+    repositories {
+        // uncomment to use local maven cache
+        // mavenLocal()
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+
+    idea {
+        module {
+            jdkName = '1.6'
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
+	eclipse {
+		classpath {
+			defaultOutputDir = file('build')
+			
+			downloadSources = true
+			downloadJavadoc = false
+		}
+        jdt {
+            sourceCompatibility=1.6
+            targetCompatibility=1.6
+        }
+	}
+	
+    dependencies {
+        /* Logging (SLF4J) */
+        compile "org.slf4j:slf4j-api:${spec.versions.slf4j}"
+        runtime "org.slf4j:slf4j-ext:${spec.versions.slf4j}"
+        runtime "org.slf4j:jcl-over-slf4j:${spec.versions.slf4j}"
+        runtime "org.slf4j:log4j-over-slf4j:${spec.versions.slf4j}"
+
+        runtime "ch.qos.logback:logback-classic:${spec.versions.logback}"
+    }
+
+
+
+}
+

@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2011 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
+/*
+apply plugin:com.smokejumperit.gradle.compiler.JavaccPlugin
+apply plugin:com.smokejumperit.gradle.compiler.JJTreePlugin
+
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+  dependencies {
+        classpath "com.google.guava:guava:10.0.1"
+        classpath 'com.smokejumperit.gradle.compiler:javacc:0.0.3'
+  }
+}
+*/
+
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath 'net.java.dev.javacc:javacc:5.0'
+    }
+}
+
+
+dependencies {
+    compile project(':ldpath-api')
+
+    compile ("com.google.guava:guava:${spec.versions.guava}") {
+        exclude group: "com.google.code.findbugs"
+    }
+    compile ("net.sourceforge.htmlcleaner:htmlcleaner:${spec.versions.htmlcleaner}") {
+        exclude module: 'ant'
+        exclude group: "jdom"
+        exclude group: "dom4j"
+        exclude group: "xom"
+    }
+    compile ("org.jdom:jdom:${spec.versions.jdom}") {
+        exclude group: "jdom"
+        exclude group: "dom4j"
+        exclude group: "xom"
+    }
+}
+
+// custom tasks for creating source/javadoc jars
+task sourcesJar(type: Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn:javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+
+
+
+jar {
+    manifest {
+        attributes 	'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
+    }
+}
+
+
+project(':') {
+    dependencies {
+        runtime project('ldpath-core')
+        testCompile project('ldpath-core')
+    }
+}
+
+task compileJavaCC << {
+    basePath = sourceSets.main.java.srcDirs.each { dir ->
+        println dir
+        String[] args = ["-STATIC=false","-OUTPUT_DIRECTORY:$dir/at/newmedialab/ldpath/parser","$dir/at/newmedialab/ldpath/parser/rdfpath.jj"]
+        org.javacc.parser.Main.mainProgram(args)
+    }
+}
+compileJava.dependsOn compileJavaCC
+
+
