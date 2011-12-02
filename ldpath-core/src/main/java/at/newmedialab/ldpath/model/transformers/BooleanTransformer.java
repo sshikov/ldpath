@@ -38,7 +38,7 @@ public class BooleanTransformer<Node> implements NodeTransformer<Boolean,Node> {
     @Override
     public Boolean transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
         if(rdfBackend.isLiteral(node)) {
-            return Boolean.parseBoolean(rdfBackend.stringValue(node));
+            return rdfBackend.booleanValue(node);
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to boolean");
         }

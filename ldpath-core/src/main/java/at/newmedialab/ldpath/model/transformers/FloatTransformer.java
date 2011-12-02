@@ -37,7 +37,7 @@ public class FloatTransformer<Node> implements NodeTransformer<Float,Node> {
     @Override
     public Float transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
         if(rdfBackend.isLiteral(node)) {
-            return Double.valueOf(rdfBackend.doubleValue(node)).floatValue();
+            return rdfBackend.floatValue(node);
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to float");
         }
