@@ -17,6 +17,7 @@
 package at.newmedialab.ldpath.backend.sesame;
 
 import at.newmedialab.ldpath.api.backend.RDFBackend;
+
 import org.openrdf.model.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -25,12 +26,18 @@ import org.openrdf.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * Generic implementation of a Sesame backend for LDPath. A Sesame repository is passed as argument to the
@@ -113,14 +120,15 @@ public class GenericSesameBackend implements RDFBackend<Value> {
      */
     @Override
     public Locale getLiteralLanguage(Value n) {
-        if(isLiteral(n)) {
+        try {
             if(((Literal)n).getLanguage() != null) {
                 return new Locale( ((Literal)n).getLanguage() );
             } else {
                 return null;
             }
-        } else {
-            throw new IllegalArgumentException("Value "+n.stringValue()+" is not a literal");
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+n.stringValue()+" is not a literal" +
+                    "but of type "+debugType(n));
         }
     }
 
@@ -133,7 +141,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
      */
     @Override
     public URI getLiteralType(Value n) {
-        if(isLiteral(n)) {
+        try {
             if(((Literal)n).getDatatype() != null) {
                 try {
                     return new URI(((Literal)n).getDatatype().stringValue());
@@ -144,8 +152,9 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             } else {
                 return null;
             }
-        } else {
-            throw new IllegalArgumentException("Value "+n.stringValue()+" is not a literal");
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+n.stringValue()+" is not a literal" +
+                    "but of type "+debugType(n));
         }
     }
 
@@ -201,44 +210,94 @@ public class GenericSesameBackend implements RDFBackend<Value> {
     public String stringValue(Value value) {
         return value.stringValue();
     }
-
-    /**
-     * Return the double value of a literal node. Depending on the backend implementing this method,
-     * the value can be retrieved directly or must be parsed from the string representation. The method can throw
-     * a NumberFormatException, indicating that the value cannot be represented as double, and an
-     * IllegalArgumentException, indicating that the passed node is not a literal
-     *
-     * @param value the literal node for which to return the double value
-     * @return double value of the literal node
-     * @throws NumberFormatException    in case the literal cannot be represented as double value
-     * @throws IllegalArgumentException in case the node passed as argument is not a literal
-     */
     @Override
-    public double doubleValue(Value value) {
-        if(isLiteral(value)) {
-            return ((Literal)value).doubleValue();
-        } else {
-            throw new IllegalArgumentException("Value "+value.stringValue()+" is not a literal");
+    public BigDecimal decimalValue(Value node) {
+        try {
+            return ((Literal)node).decimalValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
         }
     }
-
-    /**
-     * Return the long value of a literal node. Depending on the backend implementing this method,
-     * the value can be retrieved directly or must be parsed from the string representation. The method can throw
-     * a NumberFormatException, indicating that the value cannot be represented as long, and an
-     * IllegalArgumentException, indicating that the passed node is not a literal
-     *
-     * @param value the literal node for which to return the long value
-     * @return long value of the literal node
-     * @throws NumberFormatException    in case the literal cannot be represented as long value
-     * @throws IllegalArgumentException in case the node passed as argument is not a literal
-     */
     @Override
-    public long longValue(Value value) {
-        if(isLiteral(value)) {
-            return ((Literal)value).longValue();
-        } else {
-            throw new IllegalArgumentException("Value "+value.stringValue()+" is not a literal");
+    public BigInteger integerValue(Value node) {
+        try {
+            return ((Literal)node).integerValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
+        }
+    }
+    @Override
+    public Boolean booleanValue(Value node) {
+        try {
+            return ((Literal)node).booleanValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
+        }
+    }
+    @Override
+    public Date dateTimeValue(Value node) {
+        try {
+            XMLGregorianCalendar cal = ((Literal)node).calendarValue();
+            //TODO: check if we need to deal with timezone and Local here
+            return cal.toGregorianCalendar().getTime();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
+        }
+    }
+    @Override
+    public Date dateValue(Value node) {
+        try {
+            XMLGregorianCalendar cal = ((Literal)node).calendarValue();
+            return new GregorianCalendar(cal.getYear(), cal.getMonth(), cal.getDay()).getTime();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
+        }
+    }
+    @Override
+    public Date timeValue(Value node) {
+        //TODO: Unless someone knwos how to create a Date that only has the time
+        //      from a XMLGregorianCalendar
+        return dateTimeValue(node);
+    }
+    @Override
+    public Long longValue(Value node) {
+        try {
+            return ((Literal)node).longValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
+        }
+    }
+    @Override
+    public Double doubleValue(Value node) {
+        try {
+            return ((Literal)node).doubleValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
+        }
+    }
+    @Override
+    public Float floatValue(Value node) {
+        try {
+            return ((Literal)node).floatValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
+        }
+    }
+    @Override
+    public Integer intValue(Value node) {
+        try {
+            return ((Literal)node).intValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
+                "but of type "+debugType(node));
         }
     }
 
@@ -252,9 +311,10 @@ public class GenericSesameBackend implements RDFBackend<Value> {
      */
     @Override
     public Collection<Value> listObjects(Value subject, Value property) {
-        if(!isURI(property) || !(isURI(subject) || isBlank(subject))) {
-            throw new IllegalArgumentException("Subject needs to be a URI or blank node, property a URI node");
-        }
+        //This checks for ClassCastException now
+//        if(!isURI(property) || !(isURI(subject) || isBlank(subject))) {
+//            throw new IllegalArgumentException("Subject needs to be a URI or blank node, property a URI node");
+//        }
 
         try {
             RepositoryConnection connection = repository.getConnection();
@@ -272,24 +332,29 @@ public class GenericSesameBackend implements RDFBackend<Value> {
 
         } catch (RepositoryException e) {
             throw new RuntimeException("error while querying Sesame repository!",e);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(String.format(
+                "Subject needs to be a URI or blank node, property a URI node " +
+                "(types: [subject: %s, property: %s])",
+                debugType(subject),debugType(property)),e);
         }
 
     }
-
     /**
      * List the subjects of triples in the triple store underlying this backend that have the object and
      * property given as argument.
      *
      * @param object   the object of the triples to look for
      * @param property the property of the triples to look for
-     * @return all dubjects of triples with matching object and property
+     * @return all subjects of triples with matching object and property
      * @throws UnsupportedOperationException in case reverse selection is not supported (e.g. when querying Linked Data)
      */
     @Override
     public Collection<Value> listSubjects(Value property, Value object) {
-        if(!isURI(property)) {
-            throw new IllegalArgumentException("Property needs to be a URI node");
-        }
+        //this checks now for ClassCastException
+//        if(!isURI(property)) {
+//            throw new IllegalArgumentException("Property needs to be a URI node");
+//        }
 
         try {
             RepositoryConnection connection = repository.getConnection();
@@ -307,7 +372,24 @@ public class GenericSesameBackend implements RDFBackend<Value> {
 
         } catch (RepositoryException e) {
             throw new RuntimeException("error while querying Sesame repository!",e);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(String.format(
+                "Property needs to be a URI node (property type: ",
+                isURI(property)?"URI":isBlank(property)?"bNode":"literal"),e);
         }
 
     }
+    
+    /**
+     * Prints the type (URI,bNode,literal) by inspecting the parsed {@link Value}
+     * to improve error messages and other loggings. In case of literals 
+     * also the {@link #getLiteralType(Value) literal type} is printed
+     * @param value the value or <code>null</code> 
+     * @return the type as string.
+     */
+    private String debugType(Value value){
+        return value == null ? "null":isURI(value)?"URI":isBlank(value)?"bNode":
+            "literal ("+getLiteralType(value)+")";
+    }
+
 }
