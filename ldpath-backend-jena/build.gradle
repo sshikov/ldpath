@@ -20,14 +20,9 @@
 
 dependencies {
     compile project(":ldpath-api")
+    compile project(":ldpath-core")
 
-    compile "org.openrdf.sesame:sesame-model:${spec.versions.sesame}"
-    compile "org.openrdf.sesame:sesame-repository-api:${spec.versions.sesame}"
-
-    compile ("com.google.guava:guava:${spec.versions.guava}") {
-        exclude group: "com.google.code.findbugs"
-    }
-
+    compile "com.hp.hpl.jena:jena:${spec.versions.jena}"
 }
 
 // custom tasks for creating source/javadoc jars
