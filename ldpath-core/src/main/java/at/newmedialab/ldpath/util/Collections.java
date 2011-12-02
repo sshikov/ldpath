@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Collections {
 
-
+    
     public static <T> List<T> concat(Collection<T>... lists) {
         List<T> result = new ArrayList<T>();
         for(Collection<T> list : lists) {

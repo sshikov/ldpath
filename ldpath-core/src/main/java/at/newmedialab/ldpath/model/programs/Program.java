@@ -65,7 +65,7 @@ public class Program<Node> implements LDPathConstruct<Node> {
      * An (optional) selector to resolve a document boost factor.
      */
     private FieldMapping<Float,Node> booster;
-
+    
     /**
      * The field mappings contained in this program.
      */
@@ -115,6 +115,19 @@ public class Program<Node> implements LDPathConstruct<Node> {
     public void setNamespaces(Map<String, String> namespaces) {
         this.namespaces = namespaces;
     }
+    /**
+     * Executes this Program on the parsed {@link RDFBackend backend}. 
+     * @param context The context of the execution
+     * @return The result
+     */
+    public Map<String,Collection<?>> execute(RDFBackend<Node> backend, Node context) {
+        Map<String,Collection<?>> result = new HashMap<String, Collection<?>>();
+
+        for(FieldMapping<?,Node> mapping : getFields()) {
+            result.put(mapping.getFieldName(),mapping.getValues(backend,context));
+        }
+        return result;
+    }
 
     public String getPathExpression(RDFBackend<Node> backend) {
         StringBuilder sb = new StringBuilder();
@@ -159,4 +172,5 @@ public class Program<Node> implements LDPathConstruct<Node> {
 
         return prefixes.append(progWithoutNamespace).toString();
     }
+
 }

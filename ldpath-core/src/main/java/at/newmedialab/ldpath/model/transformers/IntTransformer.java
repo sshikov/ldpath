@@ -38,7 +38,7 @@ public class IntTransformer<Node> implements NodeTransformer<Integer,Node> {
     @Override
     public Integer transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
         if(rdfBackend.isLiteral(node)) {
-            return Long.valueOf(rdfBackend.longValue(node)).intValue();
+            return rdfBackend.intValue(node);
         } else {
             throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to integer");
         }
