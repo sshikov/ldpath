@@ -16,7 +16,18 @@
 
 
 
+apply plugin:com.smokejumperit.gradle.OneJarPlugin
 
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath 'com.smokejumperit:gradle-plugins:0.8.2'
+    }
+}
 
 dependencies {
     compile project(":ldpath-backend-linkeddata")
@@ -47,5 +58,11 @@ project(':') {
     dependencies {
         runtime project('ldpath-template-linkeddata')
         testCompile project('ldpath-template-linkeddata')
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'at.newmedialab.ldpath.template.LDTemplate'
     }
 }
