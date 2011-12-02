@@ -18,7 +18,6 @@ package at.newmedialab.ldpath.model.transformers;
 
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
-import at.newmedialab.ldpath.util.FormatUtils;
 
 import java.util.Date;
 
@@ -40,13 +39,7 @@ public class DateTimeTransformer<Node> implements NodeTransformer<Date,Node> {
     @Override
     public Date transform(RDFBackend<Node> rdfBackend, Node node) throws IllegalArgumentException {
         if(rdfBackend.isLiteral(node)) {
-            Date result = FormatUtils.parseDate(rdfBackend.stringValue(node));
-            if(result != null) {
-                return result;
-            } else {
-                throw new IllegalArgumentException("could not parse date string '"+rdfBackend.stringValue(node)+"', it is not in ISO8601 format");
-            }
-
+            return rdfBackend.dateTimeValue(node);
         } else {
             throw new IllegalArgumentException("could not parse node, because it is not a literal");
         }
