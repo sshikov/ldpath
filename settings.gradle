@@ -18,9 +18,12 @@
 
 
 
+
+
 include 'ldpath-api'
 include 'ldpath-core'
 include 'ldpath-backend-sesame'
+include 'ldpath-backend-jena'
 //include 'ldpath-backend-sparql'
 include 'ldpath-backend-linkeddata'
 include 'ldpath-backend-file'

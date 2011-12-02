@@ -17,7 +17,9 @@
 package at.newmedialab.ldpath.backend.sesame;
 
 import at.newmedialab.ldpath.api.backend.RDFBackend;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import org.openrdf.model.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -26,18 +28,12 @@ import org.openrdf.repository.RepositoryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.*;
 
 /**
  * Generic implementation of a Sesame backend for LDPath. A Sesame repository is passed as argument to the
@@ -216,7 +212,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return ((Literal)node).decimalValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -225,7 +221,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return ((Literal)node).integerValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -234,7 +230,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return ((Literal)node).booleanValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -245,7 +241,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return cal.toGregorianCalendar().getTime();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -255,7 +251,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return new GregorianCalendar(cal.getYear(), cal.getMonth(), cal.getDay()).getTime();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -270,7 +266,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return ((Literal)node).longValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -279,7 +275,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return ((Literal)node).doubleValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -288,7 +284,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return ((Literal)node).floatValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
     @Override
@@ -297,7 +293,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
             return ((Literal)node).intValue();
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Value "+node.stringValue()+" is not a literal" +
-                "but of type "+debugType(node));
+                    "but of type "+debugType(node));
         }
     }
 
@@ -318,25 +314,59 @@ public class GenericSesameBackend implements RDFBackend<Value> {
 
         try {
             RepositoryConnection connection = repository.getConnection();
+            final RepositoryResult<Statement> qResult = connection.getStatements((Resource) subject, (org.openrdf.model.URI) property, null, true);
 
-            RepositoryResult<Statement> qResult = connection.getStatements((Resource)subject, (org.openrdf.model.URI)property, null, true);
-            Set<Value> result = new HashSet<Value>();
-            while(qResult.hasNext()) {
-                Statement stmt = qResult.next();
-                result.add(stmt.getObject());
+            try {
+                return ImmutableSet.copyOf(
+                        Iterators.transform(
+                                new Iterator<Statement>() {
+                                    @Override
+                                    public boolean hasNext() {
+                                        try {
+                                            return qResult.hasNext();
+                                        } catch (RepositoryException e) {
+                                            throw new RuntimeException("error while querying Sesame repository!",e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public Statement next() {
+                                        try {
+                                            return qResult.next();
+                                        } catch (RepositoryException e) {
+                                            throw new RuntimeException("error while querying Sesame repository!",e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void remove() {
+                                        try {
+                                            qResult.remove();
+                                        } catch (RepositoryException e) {
+                                            throw new RuntimeException("error while querying Sesame repository!",e);
+                                        }
+                                    }
+                                },
+                                new Function<Statement, Value>() {
+                                    @Override
+                                    public Value apply(Statement input) {
+                                        return input.getObject();
+                                    }
+                                }
+                        )
+                );
+            } finally {
+                qResult.close();
+                connection.close();
             }
-            qResult.close();
-            connection.close();
-
-            return result;
 
         } catch (RepositoryException e) {
             throw new RuntimeException("error while querying Sesame repository!",e);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException(String.format(
-                "Subject needs to be a URI or blank node, property a URI node " +
-                "(types: [subject: %s, property: %s])",
-                debugType(subject),debugType(property)),e);
+                    "Subject needs to be a URI or blank node, property a URI node " +
+                            "(types: [subject: %s, property: %s])",
+                    debugType(subject),debugType(property)),e);
         }
 
     }
@@ -359,27 +389,60 @@ public class GenericSesameBackend implements RDFBackend<Value> {
         try {
             RepositoryConnection connection = repository.getConnection();
 
-            RepositoryResult<Statement> qResult = connection.getStatements(null, (org.openrdf.model.URI)property, object, true);
-            Set<Value> result = new HashSet<Value>();
-            while(qResult.hasNext()) {
-                Statement stmt = qResult.next();
-                result.add(stmt.getSubject());
+            final RepositoryResult<Statement> qResult = connection.getStatements(null, (org.openrdf.model.URI)property, object, true);
+            try {
+                return ImmutableSet.copyOf(
+                        Iterators.transform(
+                                new Iterator<Statement>() {
+                                    @Override
+                                    public boolean hasNext() {
+                                        try {
+                                            return qResult.hasNext();
+                                        } catch (RepositoryException e) {
+                                            throw new RuntimeException("error while querying Sesame repository!",e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public Statement next() {
+                                        try {
+                                            return qResult.next();
+                                        } catch (RepositoryException e) {
+                                            throw new RuntimeException("error while querying Sesame repository!",e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void remove() {
+                                        try {
+                                            qResult.remove();
+                                        } catch (RepositoryException e) {
+                                            throw new RuntimeException("error while querying Sesame repository!",e);
+                                        }
+                                    }
+                                },
+                                new Function<Statement, Value>() {
+                                    @Override
+                                    public Value apply(Statement input) {
+                                        return input.getSubject();
+                                    }
+                                }
+                        )
+                );
+            } finally {
+                qResult.close();
+                connection.close();
             }
-            qResult.close();
-            connection.close();
-
-            return result;
-
         } catch (RepositoryException e) {
             throw new RuntimeException("error while querying Sesame repository!",e);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException(String.format(
-                "Property needs to be a URI node (property type: ",
-                isURI(property)?"URI":isBlank(property)?"bNode":"literal"),e);
+                    "Property needs to be a URI node (property type: ",
+                    isURI(property)?"URI":isBlank(property)?"bNode":"literal"),e);
         }
 
     }
-    
+
     /**
      * Prints the type (URI,bNode,literal) by inspecting the parsed {@link Value}
      * to improve error messages and other loggings. In case of literals 
@@ -389,7 +452,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
      */
     private String debugType(Value value){
         return value == null ? "null":isURI(value)?"URI":isBlank(value)?"bNode":
-            "literal ("+getLiteralType(value)+")";
+                "literal ("+getLiteralType(value)+")";
     }
 
 }
