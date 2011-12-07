@@ -26,7 +26,6 @@ import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
-import sun.security.pkcs.ParsingException;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -64,7 +63,7 @@ public class XPathFunction<Node> implements SelectorFunction<Node> {
                     for (String r : doFilter(transformer.transform(rdfBackend,n), xpaths)) {
                         result.add(rdfBackend.createLiteral(r));
                     }
-                } catch (ParsingException e) {
+                //} catch (ParsingException e) {
                     // Ignoring ParsingeException -- not all Nodes transform
                     // into valid XML and those are silently ignored.
                 } catch (IOException e) {
