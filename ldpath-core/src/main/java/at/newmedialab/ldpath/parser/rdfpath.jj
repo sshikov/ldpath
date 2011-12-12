@@ -158,10 +158,12 @@ public class RdfPathParser<Node> {
         private void initTransformerMappings() {
             Map<String, NodeTransformer<?,Node>> transformerMap = new HashMap<String, NodeTransformer<?,Node>>();
 
-            transformerMap.put(Constants.NS_XSD + "decimal", new LongTransformer());
-            transformerMap.put(Constants.NS_XSD + "integer", new IntTransformer());
+            transformerMap.put(Constants.NS_XSD + "decimal", new BigDecimalTransformer());
+            transformerMap.put(Constants.NS_XSD + "integer", new BigIntegerTransformer());
             transformerMap.put(Constants.NS_XSD + "long", new LongTransformer());
-            transformerMap.put(Constants.NS_XSD + "short", new IntTransformer());
+            transformerMap.put(Constants.NS_XSD + "int", new IntTransformer());
+            transformerMap.put(Constants.NS_XSD + "short", new ShortTransformer());
+            transformerMap.put(Constants.NS_XSD + "byte", new ByteTransformer());
             transformerMap.put(Constants.NS_XSD + "double", new DoubleTransformer());
             transformerMap.put(Constants.NS_XSD + "float", new FloatTransformer());
             transformerMap.put(Constants.NS_XSD + "dateTime", new DateTimeTransformer());
@@ -170,6 +172,7 @@ public class RdfPathParser<Node> {
             transformerMap.put(Constants.NS_XSD + "boolean", new BooleanTransformer());
             transformerMap.put(Constants.NS_XSD + "anyURI", new StringTransformer());
             transformerMap.put(Constants.NS_XSD + "string", new StringTransformer());
+            transformerMap.put(Constants.NS_XSD + "duration", new DurationTransformer());
 
             xsdNodeTransformerMap = transformerMap;
         }
