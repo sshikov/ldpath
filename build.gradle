@@ -16,6 +16,8 @@
 
 
 
+
+
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'org.linkedin.spec'
@@ -173,6 +175,8 @@ allprojects {
         runtime "org.slf4j:log4j-over-slf4j:${spec.versions.slf4j}"
 
         runtime "ch.qos.logback:logback-classic:${spec.versions.logback}"
+
+        testCompile "junit:junit:${spec.versions.junit}"
     }
 
 

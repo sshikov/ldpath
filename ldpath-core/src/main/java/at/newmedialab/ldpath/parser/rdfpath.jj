@@ -50,6 +50,9 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("all")
 public class RdfPathParser<Node> {
 
+        private enum Mode { RULE, SELECTOR, PROGRAM };
+
+
         private static final Logger log = LoggerFactory.getLogger(RdfPathParser.class);
 
         /**
@@ -61,6 +64,7 @@ public class RdfPathParser<Node> {
 
         private Configuration config;
 
+        private Mode mode = Mode.PROGRAM;
 
         public RdfPathParser(RDFBackend<Node> backend, Reader in) {
             this(backend,null,in);
@@ -114,6 +118,8 @@ public class RdfPathParser<Node> {
 			namespaces.clear();
 			namespaces.putAll(config.getNamespaces());
 
+            mode = Mode.PROGRAM;
+
 		    return Program();
         }
 
@@ -124,6 +130,8 @@ public class RdfPathParser<Node> {
 			    namespaces.putAll(ctxNamespaces);
 			}
 
+			mode = Mode.SELECTOR;
+
 		    return Selector();
         }
 
@@ -133,6 +141,8 @@ public class RdfPathParser<Node> {
 			if(ctxNamespaces != null) {
 			    namespaces.putAll(ctxNamespaces);
 			}
+
+			mode = Mode.RULE;
 
 		    return Rule();
         }
@@ -320,6 +330,9 @@ FieldMapping Rule() :
         } else {
             transformer = new IdentityTransformer();
         }
+        if(mode != Mode.PROGRAM) {
+            throw new ParseException("cannot use field names when parsing single paths");
+        }
         rule = new FieldMapping(name.image,type,selector,transformer, conf);
         return rule;
     }
@@ -329,20 +342,31 @@ FieldMapping Rule() :
         } else {
             transformer = new IdentityTransformer();
         }
+        if(mode != Mode.PROGRAM) {
+            throw new ParseException("cannot use field names when parsing single paths");
+        }
         rule = new FieldMapping(uri,type,selector,transformer, conf);
         return rule;
     }
-|   selector = Selector() ("::" type = Uri())? ("(" conf = FieldConfig() ")")? ";" {
+|   selector = Selector() ("::" type = Uri())? ("(" conf = FieldConfig() ")")? (";")? {
         if(type != null) {
             transformer = getTransformer(type);
         } else {
             transformer = new IdentityTransformer();
         }
+        if(mode != Mode.PROGRAM && conf != null) {
+            throw new ParseException("cannot use configuration parameters when parsing single paths");
+        }
         try {
             rule = new FieldMapping(selector.getName(backend),type,selector,transformer, conf);
         } catch(UnsupportedOperationException ex) {
-            rule = new FieldMapping("unnamed",type,selector,transformer, conf);
-            log.warn("warning while parsing {}: {}", rule.getPathExpression(backend),ex.getMessage());
+            if(mode == Mode.PROGRAM) {
+                rule = new FieldMapping("unnamed",type,selector,transformer, conf);
+                log.error("error while parsing {}: {}", rule.getPathExpression(backend),ex.getMessage());
+                throw new ParseException("error while parsing "+rule.getPathExpression(backend)+": "+ex.getMessage());
+            } else {
+                rule = new FieldMapping("unnamed",type,selector,transformer, conf);
+            }
         }
         return rule;
     }
