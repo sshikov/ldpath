@@ -19,16 +19,24 @@ package at.newmedialab.ldpath.model.transformers;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
 
-import java.math.BigDecimal;
+/**
+ * A very simple transformer that only returns the node itself. Used in case no transformer is given in a
+ * field mapping.
+ * <p/>
+ * Author: Sebastian Schaffert
+ */
+public class IdentityTransformer<Node> implements NodeTransformer<Node,Node> {
 
-public class BigDecimalTransformer<Node> implements NodeTransformer<BigDecimal,Node> {
-
+    /**
+     * Transform the KiWiNode node into the datatype T. In case the node cannot be transformed to
+     * the respective datatype, throws an IllegalArgumentException that needs to be caught by the class
+     * carrying out the transformation.
+     *
+     * @param node
+     * @return
+     */
     @Override
-    public BigDecimal transform(RDFBackend<Node> backend, Node node) throws IllegalArgumentException {
-        if(backend.isLiteral(node)) {
-            return backend.decimalValue(node);
-        } else {
-            throw new IllegalArgumentException("cannot transform node of type "+node.getClass().getCanonicalName()+" to BigDecimal");
-        }
+    public Node transform(RDFBackend<Node> nodeRDFBackend, Node node) throws IllegalArgumentException {
+        return node;
     }
 }

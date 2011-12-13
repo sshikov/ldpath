@@ -34,4 +34,6 @@ public class WildcardSelector<Node> extends PropertySelector<Node> implements No
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
 		return "*";
 	}
+
+
 }

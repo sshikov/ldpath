@@ -55,4 +55,13 @@ public class SelfSelector<Node> implements NodeSelector<Node> {
         return ".";
     }
 
+    /**
+     * Return a name for this selector to be used as the name for the whole path if not explicitly
+     * specified. In complex selector expressions, this is typically delegated to the first
+     * occurrence of an atomic selector.
+     */
+    @Override
+    public String getName(RDFBackend<Node> nodeRDFBackend) {
+        throw new UnsupportedOperationException("cannot use self selections in unnamed field definitions because the name is ambiguous");
+    }
 }

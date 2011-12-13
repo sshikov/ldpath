@@ -77,4 +77,14 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
         }
         return format.append(")").toString();
     }
+
+    /**
+     * Return a name for this selector to be used as the name for the whole path if not explicitly
+     * specified. In complex selector expressions, this is typically delegated to the first
+     * occurrence of an atomic selector.
+     */
+    @Override
+    public String getName(RDFBackend<Node> nodeRDFBackend) {
+        throw new UnsupportedOperationException("cannot use functions in unnamed field definitions because the name is ambiguous");
+    }
 }

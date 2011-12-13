@@ -38,4 +38,14 @@ public interface NodeSelector<Node> extends LDPathConstruct<Node> {
 	public Collection<Node> select(RDFBackend<Node> backend, Node context);
 
 
+    /**
+     * Return a name for this selector to be used as the name for the whole path if not explicitly
+     * specified. In complex selector expressions, this is typically delegated to the first
+     * occurrence of an atomic selector.
+     * <p/>
+     * Implementations can throw UnsupportedOperationException in case returning a name is not reasonable or ambiguous.
+     *
+     * @throws UnsupportedOperationException in case returning a name is not reasonable
+     */
+    public String getName(RDFBackend<Node> backend);
 }

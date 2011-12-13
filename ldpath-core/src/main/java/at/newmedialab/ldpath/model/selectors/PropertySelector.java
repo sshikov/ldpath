@@ -61,4 +61,19 @@ public class PropertySelector<Node> implements NodeSelector<Node> {
 			return "*";
 		}
 	}
+
+
+    /**
+     * Return a name for this selector to be used as the name for the whole path if not explicitly
+     * specified. In complex selector expressions, this is typically delegated to the first
+     * occurrence of an atomic selector.
+     */
+    @Override
+    public String getName(RDFBackend<Node> backend) {
+        if(property != null) {
+            return backend.stringValue(property);
+        } else {
+            throw new UnsupportedOperationException("cannot use wildcards in unnamed field definitions because the name is undefined");
+        }
+    }
 }

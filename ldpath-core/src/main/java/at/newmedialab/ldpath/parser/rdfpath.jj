@@ -1,6 +1,10 @@
 options
 {
   STATIC=false;
+//  LOOKAHEAD=5;
+  CACHE_TOKENS=true;
+//  FORCE_LA_CHECK=true;
+//  CHOICE_AMBIGUITY_CHECK=5;
   LOOKAHEAD=2147483647;
 //  DEBUG_PARSER=true;
 //  DEBUG_TOKEN_MANAGER=true;
@@ -39,8 +43,14 @@ import java.io.InputStream;
 
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @SuppressWarnings("all")
 public class RdfPathParser<Node> {
+
+        private static final Logger log = LoggerFactory.getLogger(RdfPathParser.class);
 
         /**
          * A map mapping from namespace prefix to namespace URI
@@ -49,38 +59,67 @@ public class RdfPathParser<Node> {
 
         private RDFBackend<Node> backend;
 
+        private Configuration config;
+
 
         public RdfPathParser(RDFBackend<Node> backend, Reader in) {
+            this(backend,null,in);
+        }
+
+        public RdfPathParser(RDFBackend<Node> backend, Configuration config, Reader in) {
             this(in);
             this.backend = backend;
+            if(config == null) {
+                this.config = new DefaultConfiguration();
+            } else {
+                this.config = config;
+            }
 
             initialise();
         }
 
         public RdfPathParser(RDFBackend<Node> backend, InputStream in) {
+            this(backend,null,in);
+        }
+
+        public RdfPathParser(RDFBackend<Node> backend, Configuration config, InputStream in) {
             this(in);
             this.backend = backend;
+            if(config == null) {
+                this.config = new DefaultConfiguration();
+            } else {
+                this.config = config;
+            }
 
             initialise();
         }
 
         public RdfPathParser(RDFBackend<Node> backend, InputStream in, String encoding) {
+            this(backend,null,in,encoding);
+        }
+
+        public RdfPathParser(RDFBackend<Node> backend, Configuration config, InputStream in, String encoding) {
             this(in,encoding);
             this.backend = backend;
+            if(config == null) {
+                this.config = new DefaultConfiguration();
+            } else {
+                this.config = config;
+            }
 
             initialise();
         }
 
         public Program<Node> parseProgram() throws ParseException {
 			namespaces.clear();
-			namespaces.putAll(Program.DEFAULT_NAMESPACES);
+			namespaces.putAll(config.getNamespaces());
 
 		    return Program();
         }
 
         public NodeSelector<Node> parseSelector(Map<String,String> ctxNamespaces) throws ParseException {
 			namespaces.clear();
-			namespaces.putAll(Program.DEFAULT_NAMESPACES);
+			namespaces.putAll(config.getNamespaces());
 			if(ctxNamespaces != null) {
 			    namespaces.putAll(ctxNamespaces);
 			}
@@ -90,12 +129,12 @@ public class RdfPathParser<Node> {
 
         public <T> FieldMapping<T,Node> parseRule(Map<String,String> ctxNamespaces) throws ParseException {
 			namespaces.clear();
-			namespaces.putAll(Program.DEFAULT_NAMESPACES);
+			namespaces.putAll(config.getNamespaces());
 			if(ctxNamespaces != null) {
 			    namespaces.putAll(ctxNamespaces);
 			}
 
-		    return UnnamedRule();
+		    return Rule();
         }
 
 
@@ -158,21 +197,7 @@ public class RdfPathParser<Node> {
         private void initTransformerMappings() {
             Map<String, NodeTransformer<?,Node>> transformerMap = new HashMap<String, NodeTransformer<?,Node>>();
 
-            transformerMap.put(Constants.NS_XSD + "decimal", new BigDecimalTransformer());
-            transformerMap.put(Constants.NS_XSD + "integer", new BigIntegerTransformer());
-            transformerMap.put(Constants.NS_XSD + "long", new LongTransformer());
-            transformerMap.put(Constants.NS_XSD + "int", new IntTransformer());
-            transformerMap.put(Constants.NS_XSD + "short", new ShortTransformer());
-            transformerMap.put(Constants.NS_XSD + "byte", new ByteTransformer());
-            transformerMap.put(Constants.NS_XSD + "double", new DoubleTransformer());
-            transformerMap.put(Constants.NS_XSD + "float", new FloatTransformer());
-            transformerMap.put(Constants.NS_XSD + "dateTime", new DateTimeTransformer());
-            transformerMap.put(Constants.NS_XSD + "date", new DateTransformer());
-            transformerMap.put(Constants.NS_XSD + "time", new TimeTransformer());
-            transformerMap.put(Constants.NS_XSD + "boolean", new BooleanTransformer());
-            transformerMap.put(Constants.NS_XSD + "anyURI", new StringTransformer());
-            transformerMap.put(Constants.NS_XSD + "string", new StringTransformer());
-            transformerMap.put(Constants.NS_XSD + "duration", new DurationTransformer());
+            transformerMap.putAll(config.getTransformers());
 
             xsdNodeTransformerMap = transformerMap;
         }
@@ -182,13 +207,7 @@ public class RdfPathParser<Node> {
         private void initFunctionMappings() {
             Map<String, SelectorFunction<Node>> functionMap = new HashMap<String, SelectorFunction<Node>>();
 
-            registerFunction(functionMap, new ConcatenateFunction());
-            registerFunction(functionMap, new FirstFunction());
-            registerFunction(functionMap, new LastFunction());
-            registerFunction(functionMap, new XPathFunction());
-            registerFunction(functionMap, new RemoveXmlTagsFunction());
-            registerFunction(functionMap, new CleanHtmlFunction());
-            registerFunction(functionMap, new SortFunction());
+            functionMap.putAll(config.getFunctions());
 
             xsdNodeFunctionMap = functionMap;
         }
@@ -288,30 +307,43 @@ FieldMapping Rule() :
 {
     FieldMapping<?,Node> rule;
     Token name;
-    String type;
+    String uri;
+    String type = null;
     NodeSelector<Node> selector;
     NodeTransformer<?,Node> transformer;
     Map<String, String> conf = null;
 }
 {
-    name = <IDENTIFIER> "=" selector = Selector() "::" type = Uri() ("(" conf = FieldConfig() ")")? ";" {
-        transformer = getTransformer(type);
+    name = <IDENTIFIER> "=" selector = Selector() ("::" type = Uri())? ("(" conf = FieldConfig() ")")? ";" {
+        if(type != null) {
+            transformer = getTransformer(type);
+        } else {
+            transformer = new IdentityTransformer();
+        }
         rule = new FieldMapping(name.image,type,selector,transformer, conf);
         return rule;
     }
-}
-
-FieldMapping UnnamedRule() :
-{
-    FieldMapping<?,Node> rule;
-    String type;
-    NodeSelector<Node> selector;
-    NodeTransformer<?,Node> transformer;
-}
-{
-    selector = Selector() "::" type = Uri()  {
-        transformer = getTransformer(type);
-        rule = new FieldMapping("unnamed",type,selector,transformer, null);
+|   uri = Uri() "=" selector = Selector() ("::" type = Uri())? ("(" conf = FieldConfig() ")")? ";" {
+        if(type != null) {
+            transformer = getTransformer(type);
+        } else {
+            transformer = new IdentityTransformer();
+        }
+        rule = new FieldMapping(uri,type,selector,transformer, conf);
+        return rule;
+    }
+|   selector = Selector() ("::" type = Uri())? ("(" conf = FieldConfig() ")")? ";" {
+        if(type != null) {
+            transformer = getTransformer(type);
+        } else {
+            transformer = new IdentityTransformer();
+        }
+        try {
+            rule = new FieldMapping(selector.getName(backend),type,selector,transformer, conf);
+        } catch(UnsupportedOperationException ex) {
+            rule = new FieldMapping("unnamed",type,selector,transformer, conf);
+            log.warn("warning while parsing {}: {}", rule.getPathExpression(backend),ex.getMessage());
+        }
         return rule;
     }
 }
