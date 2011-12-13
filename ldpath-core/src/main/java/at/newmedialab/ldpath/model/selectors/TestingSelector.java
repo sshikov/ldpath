@@ -71,4 +71,14 @@ public class TestingSelector<Node> implements NodeSelector<Node> {
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return String.format("%s[%s]", delegate.getPathExpression(rdfBackend), test.getPathExpression(rdfBackend));
     }
+
+    /**
+     * Return a name for this selector to be used as the name for the whole path if not explicitly
+     * specified. In complex selector expressions, this is typically delegated to the first
+     * occurrence of an atomic selector.
+     */
+    @Override
+    public String getName(RDFBackend<Node> nodeRDFBackend) {
+        return delegate.getName(nodeRDFBackend);
+    }
 }

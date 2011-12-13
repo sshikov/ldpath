@@ -63,4 +63,14 @@ public class UnionSelector<Node> implements NodeSelector<Node> {
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
 		return String.format("(%s | %s)", left.getPathExpression(rdfBackend), right.getPathExpression(rdfBackend));
 	}
+
+    /**
+     * Return a name for this selector to be used as the name for the whole path if not explicitly
+     * specified. In complex selector expressions, this is typically delegated to the first
+     * occurrence of an atomic selector.
+     */
+    @Override
+    public String getName(RDFBackend<Node> nodeRDFBackend) {
+        throw new UnsupportedOperationException("cannot use unions in unnamed field definitions because the name is ambiguous");
+    }
 }
