@@ -26,6 +26,8 @@
 
 
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
@@ -48,6 +50,8 @@ spec = [
                 io:         '2.1',              // Apache Commons IO
                 httpclient: '4.1.2',            // Apache Commons HTTP Client
                 config:     '1.7',              // Apache Commons Configuration
+
+                junit:      '4.10',             // Testing
 
         ]
 ]

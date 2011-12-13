@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 apply plugin:com.smokejumperit.gradle.OneJarPlugin
 
 
@@ -49,6 +51,9 @@ dependencies {
     compile "commons-cli:commons-cli:${spec.versions.cli}"
 
     compile "ch.qos.logback:logback-classic:${spec.versions.logback}"
+
+    testCompile "commons-io:commons-io:${spec.versions.io}"
+
 
 }
 

@@ -52,6 +52,7 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
         super();
         addDefaultNamespaces();
         addDefaultTransformers();
+        addDefaultFunctions();
     }
 
 
