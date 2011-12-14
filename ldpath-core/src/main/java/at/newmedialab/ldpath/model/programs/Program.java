@@ -87,6 +87,15 @@ public class Program<Node> implements LDPathConstruct<Node> {
     public Set<FieldMapping<?,Node>> getFields() {
         return fields;
     }
+    
+    public FieldMapping<?,Node> getField(String name) {
+        for(FieldMapping<?,Node> m : fields) {
+            if(name.equals(m.getFieldName())) {
+                return m;
+            }
+        }
+        return null;
+    }
 
     public void setFields(Set<FieldMapping<?,Node>> fields) {
         this.fields = fields;

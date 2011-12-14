@@ -18,6 +18,8 @@
 
 
 
+
+
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'org.linkedin.spec'
@@ -176,7 +178,9 @@ allprojects {
 
         runtime "ch.qos.logback:logback-classic:${spec.versions.logback}"
 
-        testCompile "junit:junit:${spec.versions.junit}"
+        testCompile "junit:junit-dep:${spec.versions.junit}"
+        testCompile "org.hamcrest:hamcrest-core:${spec.versions.hamcrest}"
+        testCompile "org.hamcrest:hamcrest-library:${spec.versions.hamcrest}"
     }
 
 
