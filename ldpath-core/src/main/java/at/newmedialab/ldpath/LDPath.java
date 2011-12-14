@@ -23,6 +23,8 @@ import at.newmedialab.ldpath.api.transformers.NodeTransformer;
 import at.newmedialab.ldpath.exception.LDPathParseException;
 import at.newmedialab.ldpath.model.fields.FieldMapping;
 import at.newmedialab.ldpath.model.programs.Program;
+import at.newmedialab.ldpath.parser.Configuration;
+import at.newmedialab.ldpath.parser.DefaultConfiguration;
 import at.newmedialab.ldpath.parser.ParseException;
 import at.newmedialab.ldpath.parser.RdfPathParser;
 
@@ -46,14 +48,28 @@ public class LDPath<Node> {
 
     private HashMap<String,NodeTransformer<?,Node>> transformers;
 
+    private Configuration<Node> config;
+
     /**
-     * Initialise a new LDPath instance for querying the backend passed as argument.
+     * Initialise a new LDPath instance for querying the backend passed as argument with the default configuration.
      * @param backend
      */
     public LDPath(RDFBackend<Node> backend) {
+        this(backend,new DefaultConfiguration());
+    }
+
+    /**
+     * Initialise a new LDPath instance for querying the backend passed as argument with a custom configuration
+     * for default functions, transformers and namespaces.
+     *
+     * @param backend
+     * @param config
+     */
+    public LDPath(RDFBackend<Node> backend, Configuration config) {
         this.backend      = backend;
         this.functions    = new HashSet<SelectorFunction<Node>>();
         this.transformers = new HashMap<String, NodeTransformer<?, Node>>();
+        this.config       = config;
     }
 
     /**

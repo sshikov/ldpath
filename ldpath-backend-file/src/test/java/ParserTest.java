@@ -17,9 +17,11 @@
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import at.newmedialab.ldpath.backend.sesame.GenericSesameBackend;
 import at.newmedialab.ldpath.model.programs.Program;
+import at.newmedialab.ldpath.model.selectors.PathSelector;
 import at.newmedialab.ldpath.model.selectors.PropertySelector;
 import at.newmedialab.ldpath.model.selectors.TestingSelector;
 import at.newmedialab.ldpath.model.selectors.UnionSelector;
+import at.newmedialab.ldpath.model.transformers.StringTransformer;
 import at.newmedialab.ldpath.parser.ParseException;
 import at.newmedialab.ldpath.parser.RdfPathParser;
 import com.google.common.collect.ImmutableMap;
@@ -103,6 +105,14 @@ public class ParserTest {
         Assert.assertNotNull(p2.getFilter());
         Assert.assertEquals(8,p2.getNamespaces().size());
 
+        Program<Value> p3 = parseProgram(IOUtils.toString(ParserTest.class.getResource("orf.search")));
+        Assert.assertEquals(18,p3.getFields().size());
+        Assert.assertNull(p3.getBooster());
+        Assert.assertNotNull(p3.getFilter());
+        Assert.assertEquals(5, p3.getNamespaces().size());
+        Assert.assertNotNull(p3.getField("person"));
+        Assert.assertTrue(p3.getField("person").getSelector() instanceof PathSelector);
+        Assert.assertTrue(p3.getField("person").getTransformer() instanceof StringTransformer);
 
     }
 
