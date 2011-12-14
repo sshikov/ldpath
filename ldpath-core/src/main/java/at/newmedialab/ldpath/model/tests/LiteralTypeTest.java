@@ -83,4 +83,22 @@ public class LiteralTypeTest<Node> implements NodeTest<Node> {
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return "^^" + typeUri;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LiteralTypeTest that = (LiteralTypeTest) o;
+
+        if (typeUri != null ? !typeUri.equals(that.typeUri) : that.typeUri != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return typeUri != null ? typeUri.hashCode() : 0;
+    }
 }

@@ -68,4 +68,21 @@ public class StringConstantSelector<Node> implements NodeSelector<Node> {
     public String getName(RDFBackend<Node> nodeRDFBackend) {
         return constant;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StringConstantSelector that = (StringConstantSelector) o;
+
+        if (constant != null ? !constant.equals(that.constant) : that.constant != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return constant != null ? constant.hashCode() : 0;
+    }
 }

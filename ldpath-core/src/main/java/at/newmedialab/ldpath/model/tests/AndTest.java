@@ -60,4 +60,25 @@ public class AndTest<Node> implements NodeTest<Node> {
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return String.format("%s & %s", left.getPathExpression(rdfBackend), right.getPathExpression(rdfBackend));
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AndTest andTest = (AndTest) o;
+
+        if (left != null ? !left.equals(andTest.left) : andTest.left != null) return false;
+        if (right != null ? !right.equals(andTest.right) : andTest.right != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = left != null ? left.hashCode() : 0;
+        result = 31 * result + (right != null ? right.hashCode() : 0);
+        return result;
+    }
 }

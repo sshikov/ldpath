@@ -81,4 +81,25 @@ public class PathEqualityTest<Node> implements NodeTest<Node> {
             return String.format("%s is %s", path.getPathExpression(rdfBackend), rdfBackend.stringValue(node));
         }
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PathEqualityTest that = (PathEqualityTest) o;
+
+        if (node != null ? !node.equals(that.node) : that.node != null) return false;
+        if (path != null ? !path.equals(that.path) : that.path != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = path != null ? path.hashCode() : 0;
+        result = 31 * result + (node != null ? node.hashCode() : 0);
+        return result;
+    }
 }

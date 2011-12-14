@@ -87,4 +87,25 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
     public String getName(RDFBackend<Node> nodeRDFBackend) {
         throw new UnsupportedOperationException("cannot use functions in unnamed field definitions because the name is ambiguous");
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FunctionSelector that = (FunctionSelector) o;
+
+        if (function != null ? !function.equals(that.function) : that.function != null) return false;
+        if (selectors != null ? !selectors.equals(that.selectors) : that.selectors != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = selectors != null ? selectors.hashCode() : 0;
+        result = 31 * result + (function != null ? function.hashCode() : 0);
+        return result;
+    }
 }

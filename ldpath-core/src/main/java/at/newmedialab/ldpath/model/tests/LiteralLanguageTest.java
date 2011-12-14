@@ -79,4 +79,21 @@ public class LiteralLanguageTest<Node> implements NodeTest<Node> {
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return "@" + lang;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LiteralLanguageTest that = (LiteralLanguageTest) o;
+
+        if (lang != null ? !lang.equals(that.lang) : that.lang != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return lang != null ? lang.hashCode() : 0;
+    }
 }

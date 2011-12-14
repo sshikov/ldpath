@@ -59,4 +59,24 @@ public class OrTest<Node> implements NodeTest<Node> {
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return String.format("%s | %s", left.getPathExpression(rdfBackend), right.getPathExpression(rdfBackend));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OrTest orTest = (OrTest) o;
+
+        if (left != null ? !left.equals(orTest.left) : orTest.left != null) return false;
+        if (right != null ? !right.equals(orTest.right) : orTest.right != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = left != null ? left.hashCode() : 0;
+        result = 31 * result + (right != null ? right.hashCode() : 0);
+        return result;
+    }
 }
