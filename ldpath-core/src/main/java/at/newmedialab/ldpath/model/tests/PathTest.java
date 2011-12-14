@@ -74,4 +74,22 @@ public class PathTest<Node> implements NodeTest<Node> {
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
         return path.getPathExpression(rdfBackend);
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PathTest pathTest = (PathTest) o;
+
+        if (path != null ? !path.equals(pathTest.path) : pathTest.path != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return path != null ? path.hashCode() : 0;
+    }
 }

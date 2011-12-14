@@ -64,4 +64,7 @@ public class SelfSelector<Node> implements NodeSelector<Node> {
     public String getName(RDFBackend<Node> nodeRDFBackend) {
         throw new UnsupportedOperationException("cannot use self selections in unnamed field definitions because the name is ambiguous");
     }
+
+
+
 }

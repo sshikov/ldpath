@@ -434,20 +434,41 @@ NodeSelector CompoundSelector() :
 }
 {
     (
-        /* Path Selector */
-        result = PathSelector() |
+        /* Union Selector */
+        result = UnionSelector() |
 
         /* Intersection Selector */
         result = IntersectionSelector() |
 
-        /* Union Selector */
-        result = UnionSelector()
+        /* Path Selector */
+        result = PathSelector()
+
+
     )
     {
         return result;
     }
 }
 
+/**
+ * As path elements, we do not allow arbitrary compound selectors, but we allow all atomic and path selectors.
+ */
+NodeSelector AtomicOrTestingOrPathSelector() :
+{
+    NodeSelector result = null;
+}
+{
+    (
+        /* Path Selector */
+        result = PathSelector() |
+
+        /* Atomic Selector */
+        result = AtomicOrTestingSelector()
+    )
+    {
+        return result;
+    }
+}
 
 NodeSelector AtomicOrTestingSelector() :
 {
@@ -542,7 +563,7 @@ PathSelector PathSelector() :
     NodeSelector right  = null;
 }
 {
-    left = AtomicOrTestingSelector() "/" right = Selector()
+    left = AtomicOrTestingSelector() "/" right = AtomicOrTestingOrPathSelector()
     {
         result = new PathSelector(left,right);
         return result;
@@ -556,7 +577,7 @@ IntersectionSelector IntersectionSelector() :
     NodeSelector right  = null;
 }
 {
-    left = AtomicOrTestingSelector() "&" right = Selector()
+    left = AtomicOrTestingOrPathSelector() "&" right = Selector()
     {
         result = new IntersectionSelector(left,right);
         return result;
@@ -570,7 +591,7 @@ UnionSelector UnionSelector() :
     NodeSelector right  = null;
 }
 {
-    left = AtomicOrTestingSelector() "|" right = Selector()
+    left = AtomicOrTestingOrPathSelector() "|" right = Selector()
     {
         result = new UnionSelector(left,right);
         return result;

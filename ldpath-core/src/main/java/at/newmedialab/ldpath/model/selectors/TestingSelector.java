@@ -81,4 +81,24 @@ public class TestingSelector<Node> implements NodeSelector<Node> {
     public String getName(RDFBackend<Node> nodeRDFBackend) {
         return delegate.getName(nodeRDFBackend);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TestingSelector that = (TestingSelector) o;
+
+        if (delegate != null ? !delegate.equals(that.delegate) : that.delegate != null) return false;
+        if (test != null ? !test.equals(that.test) : that.test != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = delegate != null ? delegate.hashCode() : 0;
+        result = 31 * result + (test != null ? test.hashCode() : 0);
+        return result;
+    }
 }
