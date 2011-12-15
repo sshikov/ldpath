@@ -30,6 +30,8 @@
 
 
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
@@ -38,7 +40,7 @@ spec = [
         projectName: 'LDPath',
 
         versions: [
-                sesame:     '2.6.1',            // RDF API
+                sesame:     '2.6.2',            // RDF API
                 jena:       '2.6.4',            // RDF API
 
                 slf4j:      '1.6.4',            // logging interface
@@ -53,8 +55,8 @@ spec = [
                 httpclient: '4.1.2',            // Apache Commons HTTP Client
                 config:     '1.7',              // Apache Commons Configuration
 
-                junit:      '4.8.2',             // Testing
-                hamcrest:   '1.2',
+                junit:      '4.10',             // Testing
+                hamcrest:   '1.2.1',
 
         ]
 ]
