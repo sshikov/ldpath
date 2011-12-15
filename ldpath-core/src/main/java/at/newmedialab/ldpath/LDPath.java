@@ -95,7 +95,7 @@ public class LDPath<Node> {
      * @throws LDPathParseException when the path passed as argument is not valid
      */
     public Collection<Node> pathQuery(Node context, String path, Map<String, String> namespaces) throws LDPathParseException {
-        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,new StringReader(path));
+        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,config,new StringReader(path));
         for(SelectorFunction<Node> function : functions) {
             parser.registerFunction(function);
         }
@@ -137,7 +137,7 @@ public class LDPath<Node> {
      * @throws LDPathParseException when the path passed as argument is not valid
      */
     public <T> Collection<T> pathTransform(Node context, String path, Map<String, String> namespaces) throws LDPathParseException {
-        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,new StringReader(path));
+        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,config,new StringReader(path));
         for(SelectorFunction<Node> function : functions) {
             parser.registerFunction(function);
         }
@@ -166,7 +166,7 @@ public class LDPath<Node> {
      * @throws LDPathParseException
      */
     public Map<String,Collection<?>> programQuery(Node context, Reader program) throws LDPathParseException {
-        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,program);
+        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,config,program);
         for(SelectorFunction<Node> function : functions) {
             parser.registerFunction(function);
         }
@@ -198,7 +198,7 @@ public class LDPath<Node> {
      * @throws LDPathParseException
      */
     public Program<Node> parseProgram(Reader program) throws LDPathParseException {
-        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,program);
+        RdfPathParser<Node> parser = new RdfPathParser<Node>(backend,config,program);
         for(SelectorFunction<Node> function : functions) {
             parser.registerFunction(function);
         }
