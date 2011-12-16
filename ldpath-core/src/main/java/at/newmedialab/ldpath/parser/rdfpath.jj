@@ -119,8 +119,11 @@ public class RdfPathParser<Node> {
 			namespaces.putAll(config.getNamespaces());
 
             mode = Mode.PROGRAM;
-
-		    return Program();
+            try {
+		        return Program();
+		    } catch(TokenMgrError error){
+		        throw new ParseException("Unable to parse Program: (Message: "+error.getMessage()+")");
+		    }
         }
 
         public NodeSelector<Node> parseSelector(Map<String,String> ctxNamespaces) throws ParseException {
@@ -132,7 +135,11 @@ public class RdfPathParser<Node> {
 
 			mode = Mode.SELECTOR;
 
-		    return Selector();
+            try {
+    		    return Selector();
+            } catch(TokenMgrError error){
+                throw new ParseException("Unable to parse Selector: (Message: "+error.getMessage()+")");
+            }
         }
 
         public <T> FieldMapping<T,Node> parseRule(Map<String,String> ctxNamespaces) throws ParseException {
@@ -144,7 +151,11 @@ public class RdfPathParser<Node> {
 
 			mode = Mode.RULE;
 
-		    return Rule();
+            try {
+	            return Rule();
+            } catch(TokenMgrError error){
+                throw new ParseException("Unable to parse Rule: (Message: "+error.getMessage()+")");
+            }
         }
 
 
