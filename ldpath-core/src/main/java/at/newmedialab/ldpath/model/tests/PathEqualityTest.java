@@ -88,6 +88,7 @@ public class PathEqualityTest<Node> implements NodeTest<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
+        @SuppressWarnings("rawtypes")
         PathEqualityTest that = (PathEqualityTest) o;
 
         if (node != null ? !node.equals(that.node) : that.node != null) return false;

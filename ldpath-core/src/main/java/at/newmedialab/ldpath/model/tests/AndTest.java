@@ -67,6 +67,7 @@ public class AndTest<Node> implements NodeTest<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
+        @SuppressWarnings("rawtypes")
         AndTest andTest = (AndTest) o;
 
         if (left != null ? !left.equals(andTest.left) : andTest.left != null) return false;

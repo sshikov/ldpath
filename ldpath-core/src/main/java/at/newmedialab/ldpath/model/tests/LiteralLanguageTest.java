@@ -85,6 +85,7 @@ public class LiteralLanguageTest<Node> implements NodeTest<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
+        @SuppressWarnings("rawtypes")
         LiteralLanguageTest that = (LiteralLanguageTest) o;
 
         if (lang != null ? !lang.equals(that.lang) : that.lang != null) return false;

@@ -81,6 +81,7 @@ public class PathTest<Node> implements NodeTest<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
+        @SuppressWarnings("rawtypes")
         PathTest pathTest = (PathTest) o;
 
         if (path != null ? !path.equals(pathTest.path) : pathTest.path != null) return false;

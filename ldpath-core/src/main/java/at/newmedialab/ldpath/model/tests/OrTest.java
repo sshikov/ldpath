@@ -65,6 +65,7 @@ public class OrTest<Node> implements NodeTest<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
+        @SuppressWarnings("rawtypes")
         OrTest orTest = (OrTest) o;
 
         if (left != null ? !left.equals(orTest.left) : orTest.left != null) return false;

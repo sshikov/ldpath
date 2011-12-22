@@ -90,6 +90,7 @@ public class LiteralTypeTest<Node> implements NodeTest<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
+        @SuppressWarnings("rawtypes")
         LiteralTypeTest that = (LiteralTypeTest) o;
 
         if (typeUri != null ? !typeUri.equals(that.typeUri) : that.typeUri != null) return false;

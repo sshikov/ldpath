@@ -24,6 +24,7 @@ apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'org.linkedin.spec'
 apply plugin: 'org.linkedin.userConfig'
+apply plugin: 'osgi'
 
 sourceCompatibility = 1.6
 
@@ -75,6 +76,7 @@ repositories {
 
 buildscript {
     repositories {
+        mavenLocal ()
         maven {
             url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
         }

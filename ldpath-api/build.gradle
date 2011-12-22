@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-
+apply plugin: 'osgi'
 
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn:classes) {
@@ -27,6 +27,23 @@ task javadocJar(type: Jar, dependsOn:javadoc) {
     from javadoc.destinationDir
 }
 
+jar { //add OSGI metadata
+    manifest { // the manifest of the default jar is of type OsgiManifest
+        name = 'LD-Path API'
+        instruction 'Export-Package',
+              "at.newmedialab.ldpath.api;version="+version,
+              "at.newmedialab.ldpath.api.backend;version="+version,
+              "at.newmedialab.ldpath.api.functions;version="+version,
+              "at.newmedialab.ldpath.api.selectors;version="+version,
+              "at.newmedialab.ldpath.api.tests;version="+version,
+              "at.newmedialab.ldpath.api.transformers;version="+version
+        instruction 'Bundle-Vendor', 'Salzburg Research'
+        instruction 'Bundle-Category', 'LD-Path'
+        instruction 'Bundle-Description', 'LD Path is a simple path-based query language similar to XPath or SPARQL Property Paths that is particularly well-suited for querying and retrieving resources from the Linked Data Cloud by following RDF links between resources and servers.'
+        instruction 'Bundle-DocURL', 'http://code.google.com/p/ldpath/'
+        instruction 'Bundle-License', 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    }
+}
 // add javadoc/source jar tasks as artifacts
 artifacts {
     archives sourcesJar
