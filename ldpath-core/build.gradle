@@ -15,6 +15,7 @@
  */
 
 
+apply plugin: 'osgi'
 
 /*
 apply plugin:com.smokejumperit.gradle.compiler.JavaccPlugin
@@ -53,14 +54,14 @@ dependencies {
     }
     compile ("net.sourceforge.htmlcleaner:htmlcleaner:${spec.versions.htmlcleaner}") {
         exclude module: 'ant'
-        exclude group: "jdom"
+        exclude group: "org.jdom"
         exclude group: "dom4j"
         exclude group: "xom"
     }
-    compile ("org.jdom:jdom:${spec.versions.jdom}") {
-        exclude group: "jdom"
-        exclude group: "dom4j"
-        exclude group: "xom"
+    compile ("org.jdom:com.springsource.org.jdom:1.1.0") {
+//        exclude group: "jdom"
+//        exclude group: "dom4j"
+//        exclude group: "xom"
     }
 }
 
@@ -81,15 +82,103 @@ artifacts {
     archives javadocJar
 }
 
-
-
-
-jar {
-    manifest {
-        attributes 	'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
+jar { //add OSGI metadata
+    manifest { // the manifest of the default jar is of type OsgiManifest
+        //attributes  'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
+        name = 'LD-Path Implementation Core'
+        instruction 'Export-Package', 
+            "at.newmedialab.ldpath;version="+version,
+            "at.newmedialab.ldpath.exception;version="+version,
+            "at.newmedialab.ldpath.model;version="+version,
+            "at.newmedialab.ldpath.model.backend;version="+version,
+            "at.newmedialab.ldpath.model.fields;version="+version,
+            "at.newmedialab.ldpath.model.functions;version="+version,
+            "at.newmedialab.ldpath.model.programs;version="+version,
+            "at.newmedialab.ldpath.model.selectors;version="+version,
+            "at.newmedialab.ldpath.model.tests;version="+version,
+            "at.newmedialab.ldpath.model.transformers;version="+version,
+            "at.newmedialab.ldpath.parser;version="+version,
+            "at.newmedialab.ldpath.util;version="+version
+        instruction 'Private-Package', 
+            'at.newmedialab.ldpath.model.tests'
+        instruction 'Embed-Dependency',
+            'guava',
+            'htmlcleaner'
+        instruction 'Import-Package', 
+            '!com.google.common.*', //exclude packages of embedded dependencies
+            '!org.htmlcleaner.*', // TODO: I think this could be automated, but no idea how.
+            '*'
+        instruction 'Embed-Transitive', 'true'
+        instruction 'Bundle-Vendor', 'Salzburg Research'
+        instruction 'Bundle-Category', 'LD-Path'
+        instruction 'Bundle-Description', 'Core Implementation of LD Path a simple path-based query language similar to XPath or SPARQL Property Paths that is particularly well-suited for querying and retrieving resources from the Linked Data Cloud by following RDF links between resources and servers.'
+        instruction 'Bundle-DocURL', 'http://code.google.com/p/ldpath/'
+        instruction 'Bundle-License', 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    }
+}
+/*
+ * reads the OSGI instruction "Embed-Dependency" and "Embed-Transitive"
+ * amd stes the "Bundle-ClassPath" instruction as well as copy instraction for
+ * the related artifacts accordingly
+ */
+task processEmbedded << {
+    embedInstruction = jar.manifest.instructions.get("Embed-Dependency")
+    transitive = jar.manifest.instructions.get("Embed-Transitive");
+    if(embedInstruction != null){
+        def includedArtifacts = [] as Set
+        getDependencies(embedInstruction,transitive).each { dependency ->
+            dependency.moduleArtifacts.each { artifact ->
+                includedArtifacts.add(artifact.file)
+            }
+        }
+        jar.manifest.instruction("Bundle-ClassPath",'.') //add the default classpath
+        includedArtifacts.each { artifact -> 
+            jar.from(artifact)
+            jar.manifest.instruction("Bundle-ClassPath",artifact.name)
+        }
     }
 }
 
+/**
+ * Gets the list of ResolvedDependencies for the list of embeded dependency names
+ * @param embededList the list with the dependencies to embed
+ * @param recursive The embed transitive state
+ * @return the list of dependencies. An empty Set if none
+ */
+def getDependencies(embededList, recursive){
+    def dependencies = [] as Set //resolved Dependencies
+    def dependencyMap = [:]; 
+    // This only considers top level resolved dependencies, but other should 
+    // not be embeded anyway.
+    project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies.each { dependency -> 
+        dependencyMap.put(dependency.moduleName,dependency)
+    }
+    embededList.each { embeded -> 
+        dependency = dependencyMap.get(embeded)
+        if(dependency != null){
+            println "dependency "+dependency.name
+            dependencies.add(dependency)
+            if(recursive){
+                dependency.children.each { child -> 
+                    println "  child "+child.name+" Parents: "+child.parents
+                    dependencies.add(child) 
+                }
+            }
+        } else {
+            println "WARNING: dependency "+embeded+" not found"
+        }
+    }
+    return dependencies
+}
+def resourcesForName(names){
+    def includedJarPaths = []
+    if(names != null) {
+        sourceSets.main.runtimeClasspath.each { 
+            file -> if(names.contains(file.name)) includedJarPaths.add(file.path)
+        }
+    }
+    return includedJarPaths
+}
 
 project(':') {
     dependencies {
@@ -105,6 +194,6 @@ task compileJavaCC << {
         org.javacc.parser.Main.mainProgram(args)
     }
 }
-compileJava.dependsOn compileJavaCC
+compileJava.dependsOn compileJavaCC, processEmbedded
 
 
