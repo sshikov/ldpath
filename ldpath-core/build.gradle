@@ -44,7 +44,37 @@ buildscript {
         classpath 'net.java.dev.javacc:javacc:5.0'
     }
 }
-
+install {
+    //TODO: check if this also works with mavenDeployer. If not define 
+    // a closure and add it for both mavenInstaller and mavenDeployer
+    repositories['mavenInstaller'].with { 
+        addFilter('jar') { artifact, file ->
+            println "!! "+artifact.dump()
+            artifact.name ==~ !('.*-bundle')
+        }
+        addFilter('bundle') { artifact, file ->
+            println "!!! "+artifact.attributes['appendix']
+            artifact.name ==~ ('.*-bundle')
+        }
+        pom('bundle').artifactId = "${project.name}-bundle"
+    }
+  }
+//uploadArchives { //This does not work because it is never used by the install task
+//    repositories {
+//        mavenDeployer { //The bundle and the jar need different artifact.names
+//        // mavenInstaller { // also mavenInstaller does not work
+//            addFilter('jar') { artifact, file ->
+//                artifact.appendix == null
+//                //artifact.attributes['appendix'] == null
+//            }
+//            addFilter('bundle') { artifact, file ->
+//                artifact.appendix == 'bundle'
+//                //artifact.attributes['appendix'] == 'bundle'
+//            }
+//            pom('bundle').artifactId = "${project.name}-bundle"
+//        }
+//    }
+//}
 
 dependencies {
     compile project(':ldpath-api')
@@ -67,22 +97,25 @@ dependencies {
 
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn:classes) {
+    appendix = null
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn:javadoc) {
+    appendix = null
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
-
-// add javadoc/source jar tasks as artifacts
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+task plainJar(type: Jar, dependsOn:compileJava) {
+    appendix = null
+    manifest {
+        attributes  'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
+    }
 }
 
-jar { //add OSGI metadata
+jar { //use the default jar for OSGI
+    appendix = 'bundle' //add the appendix osgi
     manifest { // the manifest of the default jar is of type OsgiManifest
         //attributes  'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
         name = 'LD-Path Implementation Core'
@@ -99,8 +132,6 @@ jar { //add OSGI metadata
             "at.newmedialab.ldpath.model.transformers;version="+version,
             "at.newmedialab.ldpath.parser;version="+version,
             "at.newmedialab.ldpath.util;version="+version
-        instruction 'Private-Package', 
-            'at.newmedialab.ldpath.model.tests'
         instruction 'Embed-Dependency',
             'guava',
             'htmlcleaner'
@@ -115,6 +146,14 @@ jar { //add OSGI metadata
         instruction 'Bundle-DocURL', 'http://code.google.com/p/ldpath/'
         instruction 'Bundle-License', 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     }
+}
+
+// add javadoc/source/osgi jar tasks as artifacts
+artifacts {
+    archives plainJar
+    archives sourcesJar
+    archives javadocJar
+    //println artifacts.configurationContainer.each {artifact -> println "!! Artifact: "+artifact+" dump:"+artifact.dump()}
 }
 /*
  * reads the OSGI instruction "Embed-Dependency" and "Embed-Transitive"
@@ -170,15 +209,6 @@ def getDependencies(embededList, recursive){
     }
     return dependencies
 }
-def resourcesForName(names){
-    def includedJarPaths = []
-    if(names != null) {
-        sourceSets.main.runtimeClasspath.each { 
-            file -> if(names.contains(file.name)) includedJarPaths.add(file.path)
-        }
-    }
-    return includedJarPaths
-}
 
 project(':') {
     dependencies {
@@ -195,5 +225,5 @@ task compileJavaCC << {
     }
 }
 compileJava.dependsOn compileJavaCC, processEmbedded
-
+jar.dependsOn plainJar
 
