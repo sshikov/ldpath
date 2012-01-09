@@ -45,36 +45,27 @@ buildscript {
     }
 }
 install {
-    //TODO: check if this also works with mavenDeployer. If not define 
-    // a closure and add it for both mavenInstaller and mavenDeployer
     repositories['mavenInstaller'].with { 
         addFilter('jar') { artifact, file ->
-            println "!! "+artifact.dump()
             artifact.name ==~ !('.*-bundle')
         }
         addFilter('bundle') { artifact, file ->
-            println "!!! "+artifact.attributes['appendix']
             artifact.name ==~ ('.*-bundle')
         }
         pom('bundle').artifactId = "${project.name}-bundle"
     }
   }
-//uploadArchives { //This does not work because it is never used by the install task
-//    repositories {
-//        mavenDeployer { //The bundle and the jar need different artifact.names
-//        // mavenInstaller { // also mavenInstaller does not work
-//            addFilter('jar') { artifact, file ->
-//                artifact.appendix == null
-//                //artifact.attributes['appendix'] == null
-//            }
-//            addFilter('bundle') { artifact, file ->
-//                artifact.appendix == 'bundle'
-//                //artifact.attributes['appendix'] == 'bundle'
-//            }
-//            pom('bundle').artifactId = "${project.name}-bundle"
-//        }
-//    }
-//}
+uploadArchives { //This does not work because it is never used by the install task
+    repositories['mavenDeployer'].with { 
+        addFilter('jar') { artifact, file ->
+            artifact.name ==~ !('.*-bundle')
+        }
+        addFilter('bundle') { artifact, file ->
+            artifact.name ==~ ('.*-bundle')
+        }
+        pom('bundle').artifactId = "${project.name}-bundle"
+    }
+}
 
 dependencies {
     compile project(':ldpath-api')
