@@ -16,6 +16,8 @@
 
 
 
+
+
 apply plugin: 'osgi'
 
 /*
@@ -43,28 +45,6 @@ buildscript {
     }
     dependencies {
         classpath 'net.java.dev.javacc:javacc:5.0'
-    }
-}
-install {
-    repositories['mavenInstaller'].with { 
-        addFilter('jar') { artifact, file ->
-            artifact.name ==~ !('.*-bundle')
-        }
-        addFilter('bundle') { artifact, file ->
-            artifact.name ==~ ('.*-bundle')
-        }
-        pom('bundle').artifactId = "${project.name}-bundle"
-    }
-  }
-uploadArchives { //This does not work because it is never used by the install task
-    repositories['mavenDeployer'].with { 
-        addFilter('jar') { artifact, file ->
-            artifact.name ==~ !('.*-bundle')
-        }
-        addFilter('bundle') { artifact, file ->
-            artifact.name ==~ ('.*-bundle')
-        }
-        pom('bundle').artifactId = "${project.name}-bundle"
     }
 }
 
