@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,6 @@
  */
 
 
-apply plugin: 'osgi'
-
-/*
-apply plugin:com.smokejumperit.gradle.compiler.JavaccPlugin
-apply plugin:com.smokejumperit.gradle.compiler.JJTreePlugin
-
-buildscript {
-    repositories {
-        maven {
-            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
-        }
-    }
-  dependencies {
-        classpath "com.google.guava:guava:10.0.1"
-        classpath 'com.smokejumperit.gradle.compiler:javacc:0.0.3'
-  }
-}
-*/
-
 buildscript {
     repositories {
         maven {
@@ -44,28 +25,7 @@ buildscript {
         classpath 'net.java.dev.javacc:javacc:5.0'
     }
 }
-install {
-    repositories['mavenInstaller'].with { 
-        addFilter('jar') { artifact, file ->
-            artifact.name ==~ !('.*-bundle')
-        }
-        addFilter('bundle') { artifact, file ->
-            artifact.name ==~ ('.*-bundle')
-        }
-        pom('bundle').artifactId = "${project.name}-bundle"
-    }
-  }
-uploadArchives { //This does not work because it is never used by the install task
-    repositories['mavenDeployer'].with { 
-        addFilter('jar') { artifact, file ->
-            artifact.name ==~ !('.*-bundle')
-        }
-        addFilter('bundle') { artifact, file ->
-            artifact.name ==~ ('.*-bundle')
-        }
-        pom('bundle').artifactId = "${project.name}-bundle"
-    }
-}
+
 
 dependencies {
     compile project(':ldpath-api')
@@ -75,131 +35,43 @@ dependencies {
     }
     compile ("net.sourceforge.htmlcleaner:htmlcleaner:${spec.versions.htmlcleaner}") {
         exclude module: 'ant'
-        exclude group: "org.jdom"
+        exclude group: "jdom"
         exclude group: "dom4j"
         exclude group: "xom"
     }
-    compile ("org.jdom:com.springsource.org.jdom:1.1.0") {
-//        exclude group: "jdom"
-//        exclude group: "dom4j"
-//        exclude group: "xom"
+    compile ("org.jdom:jdom:${spec.versions.jdom}") {
+        exclude group: "jdom"
+        exclude group: "dom4j"
+        exclude group: "xom"
     }
 }
 
 // custom tasks for creating source/javadoc jars
-task sourcesJar(type: Jar, dependsOn:classes) {
-    appendix = null
+task sourcesJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn:javadoc) {
-    appendix = null
+task javadocJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
-task plainJar(type: Jar, dependsOn:compileJava) {
-    appendix = null
-    manifest {
-        attributes  'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
-    }
-}
 
-jar { //use the default jar for OSGI
-    appendix = 'bundle' //add the appendix osgi
-    manifest { // the manifest of the default jar is of type OsgiManifest
-        //attributes  'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
-        name = 'LD-Path Implementation Core'
-        instruction 'Export-Package', 
-            "at.newmedialab.ldpath;version="+version,
-            "at.newmedialab.ldpath.exception;version="+version,
-            "at.newmedialab.ldpath.model;version="+version,
-            "at.newmedialab.ldpath.model.backend;version="+version,
-            "at.newmedialab.ldpath.model.fields;version="+version,
-            "at.newmedialab.ldpath.model.functions;version="+version,
-            "at.newmedialab.ldpath.model.programs;version="+version,
-            "at.newmedialab.ldpath.model.selectors;version="+version,
-            "at.newmedialab.ldpath.model.tests;version="+version,
-            "at.newmedialab.ldpath.model.transformers;version="+version,
-            "at.newmedialab.ldpath.parser;version="+version,
-            "at.newmedialab.ldpath.util;version="+version
-        instruction 'Embed-Dependency',
-            'guava',
-            'htmlcleaner'
-        instruction 'Import-Package', 
-            '!com.google.common.*', //exclude packages of embedded dependencies
-            '!org.htmlcleaner.*', // TODO: I think this could be automated, but no idea how.
-            '*'
-        instruction 'Embed-Transitive', 'true'
-        instruction 'Bundle-Vendor', 'Salzburg Research'
-        instruction 'Bundle-Category', 'LD-Path'
-        instruction 'Bundle-Description', 'Core Implementation of LD Path a simple path-based query language similar to XPath or SPARQL Property Paths that is particularly well-suited for querying and retrieving resources from the Linked Data Cloud by following RDF links between resources and servers.'
-        instruction 'Bundle-DocURL', 'http://code.google.com/p/ldpath/'
-        instruction 'Bundle-License', 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    }
-}
-
-// add javadoc/source/osgi jar tasks as artifacts
+// add javadoc/source jar tasks as artifacts
 artifacts {
-    archives plainJar
     archives sourcesJar
     archives javadocJar
-    //println artifacts.configurationContainer.each {artifact -> println "!! Artifact: "+artifact+" dump:"+artifact.dump()}
 }
-/*
- * reads the OSGI instruction "Embed-Dependency" and "Embed-Transitive"
- * amd stes the "Bundle-ClassPath" instruction as well as copy instraction for
- * the related artifacts accordingly
- */
-task processEmbedded << {
-    embedInstruction = jar.manifest.instructions.get("Embed-Dependency")
-    transitive = jar.manifest.instructions.get("Embed-Transitive");
-    if(embedInstruction != null){
-        def includedArtifacts = [] as Set
-        getDependencies(embedInstruction,transitive).each { dependency ->
-            dependency.moduleArtifacts.each { artifact ->
-                includedArtifacts.add(artifact.file)
-            }
-        }
-        jar.manifest.instruction("Bundle-ClassPath",'.') //add the default classpath
-        includedArtifacts.each { artifact -> 
-            jar.from(artifact)
-            jar.manifest.instruction("Bundle-ClassPath",artifact.name)
-        }
+
+
+
+
+jar {
+    manifest {
+        attributes 	'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
     }
 }
 
-/**
- * Gets the list of ResolvedDependencies for the list of embeded dependency names
- * @param embededList the list with the dependencies to embed
- * @param recursive The embed transitive state
- * @return the list of dependencies. An empty Set if none
- */
-def getDependencies(embededList, recursive){
-    def dependencies = [] as Set //resolved Dependencies
-    def dependencyMap = [:]; 
-    // This only considers top level resolved dependencies, but other should 
-    // not be embeded anyway.
-    project.configurations.runtime.resolvedConfiguration.firstLevelModuleDependencies.each { dependency -> 
-        dependencyMap.put(dependency.moduleName,dependency)
-    }
-    embededList.each { embeded -> 
-        dependency = dependencyMap.get(embeded)
-        if(dependency != null){
-            println "dependency "+dependency.name
-            dependencies.add(dependency)
-            if(recursive){
-                dependency.children.each { child -> 
-                    println "  child "+child.name+" Parents: "+child.parents
-                    dependencies.add(child) 
-                }
-            }
-        } else {
-            println "WARNING: dependency "+embeded+" not found"
-        }
-    }
-    return dependencies
-}
 
 project(':') {
     dependencies {
@@ -215,6 +87,6 @@ task compileJavaCC << {
         org.javacc.parser.Main.mainProgram(args)
     }
 }
-compileJava.dependsOn compileJavaCC, processEmbedded
-jar.dependsOn plainJar
+compileJava.dependsOn compileJavaCC
+
 

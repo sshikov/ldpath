@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
-
-
-
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'org.linkedin.spec'
 apply plugin: 'org.linkedin.userConfig'
-apply plugin: 'osgi'
 
 sourceCompatibility = 1.6
 
