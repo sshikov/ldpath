@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,23 @@ dependencies {
 
 
 }
+
+task sourcesJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
 
 project(':') {
     dependencies {
