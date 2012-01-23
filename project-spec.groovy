@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
-        version: '0.9.3',
+        version: '0.9.4',
 
         projectName: 'LDPath',
 
@@ -46,7 +46,7 @@ spec = [
                 slf4j:      '1.6.4',            // logging interface
                 logback:    '1.0.0',            // logging backend
 
-                guava:      '10.0.1',
+                guava:      '11.0.1',
                 jdom:       '1.1.2',
                 htmlcleaner:'2.2',
 
