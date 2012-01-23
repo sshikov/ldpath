@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 include 'ldpath-api'
 include 'ldpath-core'
+include 'ldpath-core-bundle'
 include 'ldpath-backend-sesame'
 include 'ldpath-backend-jena'
 //include 'ldpath-backend-sparql'
