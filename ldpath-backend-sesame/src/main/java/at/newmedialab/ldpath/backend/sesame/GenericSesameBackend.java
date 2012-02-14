@@ -34,6 +34,8 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Generic implementation of a Sesame backend for LDPath. A Sesame repository is passed as argument to the
@@ -50,12 +52,24 @@ public class GenericSesameBackend implements RDFBackend<Value> {
 
     private Repository repository;
 
+    private ExecutorService workers;
+
     /**
      * Initialise a new sesame backend. Repository needs to be set using setRepository.
      */
     protected GenericSesameBackend() {
+        workers = Executors.newFixedThreadPool(4);
     }
 
+    /**
+     * Initialise a new sesame backend using the repository passed as argument.
+     *
+     * @param repository
+     */
+    public GenericSesameBackend(Repository repository) {
+        this.repository = repository;
+        workers = Executors.newFixedThreadPool(4);
+    }
 
     /**
      * Return true if the underlying backend supports the parallel execution of queries.
@@ -68,13 +82,16 @@ public class GenericSesameBackend implements RDFBackend<Value> {
     }
 
     /**
-     * Initialise a new sesame backend using the repository passed as argument.
+     * In case the backend supports threading, this method should return the ExecutorService representing the
+     * thread pool. LDPath lets the backend manage the thread pool to avoid excessive threading.
      *
-     * @param repository
+     * @return
      */
-    public GenericSesameBackend(Repository repository) {
-        this.repository = repository;
+    @Override
+    public ExecutorService getThreadPool() {
+        return workers;
     }
+
 
     public Repository getRepository() {
         return repository;
@@ -466,4 +483,11 @@ public class GenericSesameBackend implements RDFBackend<Value> {
                 "literal ("+getLiteralType(value)+")";
     }
 
+
+
+    @Override
+    protected void finalize() throws Throwable {
+        workers.shutdownNow();
+        super.finalize();
+    }
 }
