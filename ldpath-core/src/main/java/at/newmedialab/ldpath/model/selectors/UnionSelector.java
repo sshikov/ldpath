@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Builds the union of two node selectors. Will eliminate duplicates.
@@ -30,13 +32,13 @@ import java.util.Set;
  */
 public class UnionSelector<Node> implements NodeSelector<Node> {
 
-	private NodeSelector<Node> left;
-	private NodeSelector<Node> right;
+    private NodeSelector<Node> left;
+    private NodeSelector<Node> right;
 
-	public UnionSelector(NodeSelector<Node> left, NodeSelector<Node> right) {
-		this.left = left;
-		this.right = right;
-	}
+    public UnionSelector(NodeSelector<Node> left, NodeSelector<Node> right) {
+        this.left = left;
+        this.right = right;
+    }
 
     /**
      * Apply the selector to the context node passed as argument and return the collection
@@ -46,12 +48,32 @@ public class UnionSelector<Node> implements NodeSelector<Node> {
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
-		Set<Node> result = new HashSet<Node>();
-		result.addAll(left.select(rdfBackend,context));
-		result.addAll(right.select(rdfBackend,context));
-		return result;
-	}
+    public Collection<Node> select(final RDFBackend<Node> rdfBackend, final Node context) {
+        final Set<Node> result = new HashSet<Node>();
+
+        if(rdfBackend.supportsThreading()) {
+            // start thread pool of size 2 and schedule each subselection in a separate thread
+            ExecutorService workers = Executors.newFixedThreadPool(4);
+            workers.submit(new Runnable() {
+                @Override
+                public void run() {
+                    result.addAll(left.select(rdfBackend,context));
+                }
+            });
+            workers.submit(new Runnable() {
+                @Override
+                public void run() {
+                    result.addAll(right.select(rdfBackend,context));
+                }
+            });
+            // wait for thread pool to terminate
+            workers.shutdown();
+        } else {
+            result.addAll(left.select(rdfBackend,context));
+            result.addAll(right.select(rdfBackend,context));
+        }
+        return result;
+    }
 
     /**
      * Return the name of the NodeSelector for registration in the selector registry
@@ -61,8 +83,8 @@ public class UnionSelector<Node> implements NodeSelector<Node> {
      */
     @Override
     public String getPathExpression(RDFBackend<Node> rdfBackend) {
-		return String.format("(%s | %s)", left.getPathExpression(rdfBackend), right.getPathExpression(rdfBackend));
-	}
+        return String.format("(%s | %s)", left.getPathExpression(rdfBackend), right.getPathExpression(rdfBackend));
+    }
 
     /**
      * Return a name for this selector to be used as the name for the whole path if not explicitly

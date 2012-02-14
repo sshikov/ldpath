@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Traverse a path by following several edges in the RDF graph. Each step is separated by a "/".
@@ -46,12 +48,28 @@ public class PathSelector<Node> implements NodeSelector<Node> {
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+    public Collection<Node> select(final RDFBackend<Node> rdfBackend, Node context) {
 		Collection<Node> nodesLeft = left.select(rdfBackend,context);
-		Set<Node> result = new HashSet<Node>();
-		for(Node n : nodesLeft) {
-			result.addAll(right.select(rdfBackend,n));
-		}
+		final Set<Node> result = new HashSet<Node>();
+
+        if(rdfBackend.supportsThreading()) {
+            // start thread pool of size 4 and schedule each subselection in a separate thread
+            ExecutorService workers = Executors.newFixedThreadPool(4);
+            for(final Node n : nodesLeft) {
+                workers.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.addAll(right.select(rdfBackend,n));
+                    }
+                });
+            }
+            // wait for thread pool to terminate
+            workers.shutdown();
+        } else {
+            for(Node n : nodesLeft) {
+                result.addAll(right.select(rdfBackend,n));
+            }
+        }
 		return result;
 	}
 
