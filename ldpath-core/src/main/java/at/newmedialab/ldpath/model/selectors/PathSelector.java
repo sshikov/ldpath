@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Traverse a path by following several edges in the RDF graph. Each step is separated by a "/".
@@ -32,13 +32,13 @@ import java.util.concurrent.Executors;
  */
 public class PathSelector<Node> implements NodeSelector<Node> {
 
-	private NodeSelector left;
-	private NodeSelector right;
+    private NodeSelector left;
+    private NodeSelector right;
 
-	public PathSelector(NodeSelector left, NodeSelector right) {
-		this.left = left;
-		this.right = right;
-	}
+    public PathSelector(NodeSelector left, NodeSelector right) {
+        this.left = left;
+        this.right = right;
+    }
 
     /**
      * Apply the selector to the context node passed as argument and return the collection
@@ -49,34 +49,39 @@ public class PathSelector<Node> implements NodeSelector<Node> {
      */
     @Override
     public Collection<Node> select(final RDFBackend<Node> rdfBackend, Node context) {
-		Collection<Node> nodesLeft = left.select(rdfBackend,context);
-		final Set<Node> result = new HashSet<Node>();
+        Collection<Node> nodesLeft = left.select(rdfBackend,context);
+        final Set<Node> result = new HashSet<Node>();
 
         if(rdfBackend.supportsThreading()) {
             // start thread pool of size 4 and schedule each subselection in a separate thread
-            ExecutorService workers = Executors.newFixedThreadPool(4);
+            ExecutorService workers = rdfBackend.getThreadPool();
+            Set<Future> futures = new HashSet<Future>();
             for(final Node n : nodesLeft) {
-                workers.submit(new Runnable() {
+                futures.add(workers.submit(new Runnable() {
                     @Override
                     public void run() {
                         result.addAll(right.select(rdfBackend,n));
                     }
-                });
+                }));
             }
-            // wait for thread pool to terminate
-            workers.shutdown();
+            // wait for thread pool to finish execution
+            for(Future future : futures) {
+                try {
+                    future.get();
+                } catch (Exception e) { }
+            }
         } else {
             for(Node n : nodesLeft) {
                 result.addAll(right.select(rdfBackend,n));
             }
         }
-		return result;
-	}
+        return result;
+    }
 
-	@Override
-	public String getPathExpression(RDFBackend<Node> backend) {
-		return String.format("%s / %s", left.getPathExpression(backend), right.getPathExpression(backend));
-	}
+    @Override
+    public String getPathExpression(RDFBackend<Node> backend) {
+        return String.format("%s / %s", left.getPathExpression(backend), right.getPathExpression(backend));
+    }
 
     /**
      * Return a name for this selector to be used as the name for the whole path if not explicitly

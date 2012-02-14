@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
 
 /**
  * A generic API for RDF models and triple stores; provides the testing and navigation functions needed for LDPath.
@@ -41,6 +42,12 @@ public interface RDFBackend<Node> {
     public boolean supportsThreading();
 
 
+    /**
+     * In case the backend supports threading, this method should return the ExecutorService representing the
+     * thread pool. LDPath lets the backend manage the thread pool to avoid excessive threading.
+     * @return
+     */
+    public ExecutorService getThreadPool();
 
     /**
      * Test whether the node passed as argument is a literal

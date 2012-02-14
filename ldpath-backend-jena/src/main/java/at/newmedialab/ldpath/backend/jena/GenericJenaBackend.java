@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Add file description here!
@@ -41,7 +42,6 @@ public class GenericJenaBackend implements RDFBackend<RDFNode> {
 
 
     private Model model;
-
 
     public GenericJenaBackend(Model model) {
         this.model = model;
@@ -55,7 +55,19 @@ public class GenericJenaBackend implements RDFBackend<RDFNode> {
      */
     @Override
     public boolean supportsThreading() {
-        return true;
+        return false;
+    }
+
+
+    /**
+     * In case the backend supports threading, this method should return the ExecutorService representing the
+     * thread pool. LDPath lets the backend manage the thread pool to avoid excessive threading.
+     *
+     * @return
+     */
+    @Override
+    public ExecutorService getThreadPool() {
+        return null;
     }
 
     /**

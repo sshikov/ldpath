@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Builds the union of two node selectors. Will eliminate duplicates.
@@ -53,21 +53,24 @@ public class UnionSelector<Node> implements NodeSelector<Node> {
 
         if(rdfBackend.supportsThreading()) {
             // start thread pool of size 2 and schedule each subselection in a separate thread
-            ExecutorService workers = Executors.newFixedThreadPool(4);
-            workers.submit(new Runnable() {
+            ExecutorService workers = rdfBackend.getThreadPool();
+            Future f1 = workers.submit(new Runnable() {
                 @Override
                 public void run() {
                     result.addAll(left.select(rdfBackend,context));
                 }
             });
-            workers.submit(new Runnable() {
+            Future f2 = workers.submit(new Runnable() {
                 @Override
                 public void run() {
                     result.addAll(right.select(rdfBackend,context));
                 }
             });
             // wait for thread pool to terminate
-            workers.shutdown();
+            try {
+                f1.get();
+                f2.get();
+            } catch (Exception ex) {}
         } else {
             result.addAll(left.select(rdfBackend,context));
             result.addAll(right.select(rdfBackend,context));
