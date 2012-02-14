@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,17 @@ public class GenericJenaBackend implements RDFBackend<RDFNode> {
 
     public GenericJenaBackend(Model model) {
         this.model = model;
+    }
+
+
+    /**
+     * Return true if the underlying backend supports the parallel execution of queries.
+     *
+     * @return
+     */
+    @Override
+    public boolean supportsThreading() {
+        return true;
     }
 
     /**
