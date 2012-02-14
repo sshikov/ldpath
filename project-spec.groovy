@@ -34,6 +34,8 @@
 
 
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
@@ -42,7 +44,7 @@ spec = [
         projectName: 'LDPath',
 
         versions: [
-                sesame:     '2.6.2',            // RDF API
+                sesame:     '2.6.3',            // RDF API
                 jena:       '2.6.4',            // RDF API
 
                 slf4j:      '1.6.4',            // logging interface
