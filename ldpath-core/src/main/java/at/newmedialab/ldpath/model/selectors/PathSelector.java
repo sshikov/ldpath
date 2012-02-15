@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Traverse a path by following several edges in the RDF graph. Each step is separated by a "/".
@@ -53,16 +54,21 @@ public class PathSelector<Node> implements NodeSelector<Node> {
         final Set<Node> result = new HashSet<Node>();
 
         if(rdfBackend.supportsThreading()) {
-            // start thread pool of size 4 and schedule each subselection in a separate thread
-            ExecutorService workers = rdfBackend.getThreadPool();
+            // get thread pool and schedule each subselection in a separate thread
+            ThreadPoolExecutor workers = rdfBackend.getThreadPool();
             Set<Future> futures = new HashSet<Future>();
             for(final Node n : nodesLeft) {
-                futures.add(workers.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        result.addAll(right.select(rdfBackend,n));
-                    }
-                }));
+                // start a maximum of 50 active threads; if there are more threads, run the subtask in the current thread
+                if(workers.getActiveCount() < 50) {
+                    futures.add(workers.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            result.addAll(right.select(rdfBackend,n));
+                        }
+                    }));
+                } else {
+                    result.addAll(right.select(rdfBackend,n));
+                }
             }
             // wait for thread pool to finish execution
             for(Future future : futures) {

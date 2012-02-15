@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Add file description here!
@@ -66,7 +67,7 @@ public class GenericJenaBackend implements RDFBackend<RDFNode> {
      * @return
      */
     @Override
-    public ExecutorService getThreadPool() {
+    public ThreadPoolExecutor getThreadPool() {
         return null;
     }
 

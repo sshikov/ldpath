@@ -36,6 +36,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Generic implementation of a Sesame backend for LDPath. A Sesame repository is passed as argument to the
@@ -52,13 +53,13 @@ public class GenericSesameBackend implements RDFBackend<Value> {
 
     private Repository repository;
 
-    private ExecutorService workers;
+    private ThreadPoolExecutor workers;
 
     /**
      * Initialise a new sesame backend. Repository needs to be set using setRepository.
      */
     protected GenericSesameBackend() {
-        workers = Executors.newFixedThreadPool(4);
+        workers = (ThreadPoolExecutor)Executors.newCachedThreadPool();
     }
 
     /**
@@ -68,7 +69,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
      */
     public GenericSesameBackend(Repository repository) {
         this.repository = repository;
-        workers = Executors.newFixedThreadPool(4);
+        workers = (ThreadPoolExecutor)Executors.newFixedThreadPool(4);
     }
 
     /**
@@ -88,7 +89,7 @@ public class GenericSesameBackend implements RDFBackend<Value> {
      * @return
      */
     @Override
-    public ExecutorService getThreadPool() {
+    public ThreadPoolExecutor getThreadPool() {
         return workers;
     }
 
