@@ -790,7 +790,7 @@ Node Node():
     }
 |   literal = <STRLIT>  ("^^" type = Uri() )? {
         try {
-            return backend.createLiteral(literal.image.substring(1, literal.image.length()-1),null,new URI(type));
+            return backend.createLiteral(literal.image.substring(1, literal.image.length()-1),null,type == null ? null : new URI(type));
         } catch(java.net.URISyntaxException ex) {
             throw new ParseException("could not parse type URI "+type+": "+ex.getMessage());
 	    }
