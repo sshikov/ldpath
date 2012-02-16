@@ -18,8 +18,10 @@ package at.newmedialab.ldpath.model.tests;
 
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.tests.NodeTest;
+import at.newmedialab.ldpath.util.Collections;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,13 +51,13 @@ public class LiteralLanguageTest<Node> implements NodeTest<Node> {
      */
     @Override
     public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
-        if (args.length != 1) { throw new IllegalArgumentException("language test only takes one parameter"); }
-        List<Node> nodes = at.newmedialab.ldpath.util.Collections.concat(args);
-        if (nodes.size() != 1) {
+        if (args.length != 1 || args[0].isEmpty()) { 
+            throw new IllegalArgumentException("language test only takes one parameter");
+        }
+        if (args[0].size() != 1) {
             throw new IllegalArgumentException("language test can only be applied to a single node");
         }
-
-        Node node = nodes.get(0);
+        Node node = args[0].iterator().next();
 
         if(rdfBackend.isLiteral(node)) {
             if(lang != null && !lang.toLowerCase().equals("none")) {

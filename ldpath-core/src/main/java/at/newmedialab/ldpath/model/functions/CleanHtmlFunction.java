@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -66,11 +67,10 @@ public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
      */
     @Override
     public Collection<Node> apply(RDFBackend<Node> backend, Collection<Node>... args) throws IllegalArgumentException {
-        List<Node> nodes = Collections.concat(args);
+        List<Node> result = new ArrayList<Node>();
 
-        List<Node> result = new ArrayList<Node>(nodes.size());
-
-        for(Node node : nodes) {
+        for(Iterator<Node> it = Collections.iterator(args);it.hasNext();) {
+            Node node = it.next();
             TagNode tagNode = cleaner.clean(transformer.transform(backend,node));
             try {
                 result.add(backend.createLiteral(new CompactXmlSerializer(cleaner.getProperties()).getAsString(tagNode)));

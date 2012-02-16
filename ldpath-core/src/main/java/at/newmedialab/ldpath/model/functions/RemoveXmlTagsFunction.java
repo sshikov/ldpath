@@ -23,6 +23,7 @@ import at.newmedialab.ldpath.util.Collections;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,11 +43,10 @@ public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
      */
     @Override
     public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
-        List<Node> nodes = Collections.concat(args);
-
-        List<Node> result = new ArrayList<Node>(nodes.size());
-        for (Node n : nodes) {
-            result.add(rdfBackend.createLiteral(doFilter(transformer.transform(rdfBackend, n))));
+        Iterator<Node> it = Collections.iterator(args);
+        List<Node> result = new ArrayList<Node>();
+        while (it.hasNext()) {
+            result.add(rdfBackend.createLiteral(doFilter(transformer.transform(rdfBackend, it.next()))));
         }
 
         return result;
