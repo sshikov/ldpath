@@ -56,9 +56,10 @@ public class PathEqualityTest<Node> implements NodeTest<Node> {
      */
     @Override
     public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
-        if (args.length != 1) { throw new IllegalArgumentException("path equality test only takes one parameter"); }
-        List<Node> nodes = at.newmedialab.ldpath.util.Collections.concat(args);
-        if (nodes.size() != 1) {
+        if (args.length != 1 || args[0].isEmpty()) { 
+            throw new IllegalArgumentException("path equality test only takes one parameter"); 
+        }
+        if (args[0].size() != 1) {
             throw new IllegalArgumentException("path equality test can only be applied to a single node");
         }
 

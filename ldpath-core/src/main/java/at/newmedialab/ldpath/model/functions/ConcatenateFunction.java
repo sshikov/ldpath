@@ -22,6 +22,7 @@ import at.newmedialab.ldpath.model.transformers.StringTransformer;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -43,11 +44,10 @@ public class ConcatenateFunction<Node> implements SelectorFunction<Node> {
      */
     @Override
     public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
-        List<Node> nodes = at.newmedialab.ldpath.util.Collections.concat(args);
-
+        Iterator<Node> it = at.newmedialab.ldpath.util.Collections.iterator(args);
         StringBuilder result = new StringBuilder();
-        for (Node node : nodes) {
-            result.append(transformer.transform(rdfBackend,node));
+        while (it.hasNext()) {
+            result.append(transformer.transform(rdfBackend,it.next()));
         }
 
         return Collections.singleton(rdfBackend.createLiteral(result.toString()));
