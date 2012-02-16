@@ -63,7 +63,7 @@ public class PathEqualityTest<Node> implements NodeTest<Node> {
             throw new IllegalArgumentException("path equality test can only be applied to a single node");
         }
 
-        Node candidate = nodes.iterator().next();
+        Node candidate = args[0].iterator().next();
         return path.select(rdfBackend, candidate).contains(node);
     }
 
