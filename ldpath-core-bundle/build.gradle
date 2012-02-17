@@ -157,4 +157,10 @@ project(':') {
     }
 }
 compileJava.dependsOn processEmbedded
+//ensure that the license is added
+task copyLicense(type:Copy) {
+    from 'LICENSE'
+    into 'build/classes/main/META-INF'
+}
+jar.dependsOn copyLicense
 

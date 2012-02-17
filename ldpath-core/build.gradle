@@ -71,6 +71,12 @@ jar {
         attributes 	'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
     }
 }
+//ensure that the license is added
+task copyLicense(type:Copy) {
+    from 'LICENSE'
+    into 'build/classes/main/META-INF'
+}
+jar.dependsOn copyLicense
 
 
 project(':') {
