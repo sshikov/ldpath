@@ -151,6 +151,37 @@ def getDependencies(embededList, recursive){
     return dependencies
 }
 
+install { //remove test dependencies
+    repositories['mavenInstaller'].with {
+        pom.whenConfigured { pom ->
+            //println "id: "+ pom.artifactId
+            //pom.dependencies.each { dep -> println "dependency: groupId="+ dep.groupId+" | artifactId="+ dep.artifactId + " | scope=" + dep.scope}
+            pom.dependencies.removeAll { dep -> 
+                dep.scope == 'test'} // removes the test scoped ones
+            pom.dependencies.removeAll { dep -> 
+                dep.artifactId == 'log4j-over-slf4j' ||
+                dep.artifactId == 'slf4j-ext' ||
+                dep.artifactId == 'logback-classic' || 
+                dep.artifactId == 'jcl-over-slf4j' }
+            //println "- - -"
+            //pom.dependencies.each { dep -> println "dependency "+ dep}
+         }
+    }
+}
+
+uploadArchives { //remove test dependencies
+    repositories['mavenDeployer'].with {
+        pom.whenConfigured { pom ->
+            pom.dependencies.removeAll { dep -> 
+                dep.scope != 'test'} // removes the test scoped ones
+            pom.dependencies.removeAll { dep -> 
+                dep.artifactId == 'log4j-over-slf4j' ||
+                dep.artifactId == 'slf4j-ext' ||
+                dep.artifactId == 'logback-classic' || 
+                dep.artifactId == 'jcl-over-slf4j' }
+        }
+    }
+}
 project(':') {
     dependencies {
         runtime project('ldpath-core-bundle')
@@ -163,4 +194,3 @@ task copyLicense(type:Copy) {
     into 'build/classes/main/META-INF'
 }
 jar.dependsOn copyLicense
-
