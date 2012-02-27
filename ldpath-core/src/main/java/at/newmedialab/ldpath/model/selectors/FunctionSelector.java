@@ -31,11 +31,11 @@ import java.util.List;
  */
 public class FunctionSelector<Node> implements NodeSelector<Node> {
 
-    private List<NodeSelector> selectors;
+    private List<NodeSelector<Node>> selectors;
     private NodeFunction<Collection<Node>,Node> function;
 
 
-    public FunctionSelector(NodeFunction<Collection<Node>,Node> function, List<NodeSelector> selectors) {
+    public FunctionSelector(NodeFunction<Collection<Node>,Node> function, List<NodeSelector<Node>> selectors) {
         this.function  = function;
         this.selectors = selectors;
     }
@@ -50,7 +50,7 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
     @Override
     public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
         ArrayList<Collection<Node>> args = new ArrayList<Collection<Node>>();
-        for(NodeSelector selector : selectors) {
+        for(NodeSelector<Node> selector : selectors) {
             Collection<Node> param = selector.select(rdfBackend, context);
             args.add(param);
         }
@@ -68,7 +68,7 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
         final StringBuilder format = new StringBuilder();
         format.append(String.format("fn:%s(", function.getPathExpression(backend)));
         boolean first = true;
-        for (NodeSelector ns : selectors) {
+        for (NodeSelector<Node> ns : selectors) {
             if (!first) {
                 format.append(", ");
             }
@@ -94,7 +94,7 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        FunctionSelector that = (FunctionSelector) o;
+        FunctionSelector<Node> that = (FunctionSelector<Node>) o;
 
         if (function != null ? !function.equals(that.function) : that.function != null) return false;
         if (selectors != null ? !selectors.equals(that.selectors) : that.selectors != null) return false;

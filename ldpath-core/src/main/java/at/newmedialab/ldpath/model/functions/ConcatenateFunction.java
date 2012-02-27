@@ -23,7 +23,6 @@ import at.newmedialab.ldpath.model.transformers.StringTransformer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * A node function concatenating a list of nodes interpreted as strings.

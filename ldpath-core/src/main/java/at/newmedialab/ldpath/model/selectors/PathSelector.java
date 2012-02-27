@@ -33,10 +33,10 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class PathSelector<Node> implements NodeSelector<Node> {
 
-    private NodeSelector left;
-    private NodeSelector right;
+    private NodeSelector<Node> left;
+    private NodeSelector<Node> right;
 
-    public PathSelector(NodeSelector left, NodeSelector right) {
+    public PathSelector(NodeSelector<Node> left, NodeSelector<Node> right) {
         this.left = left;
         this.right = right;
     }

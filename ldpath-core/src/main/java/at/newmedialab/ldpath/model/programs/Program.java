@@ -151,7 +151,15 @@ public class Program<Node> implements LDPathConstruct<Node> {
         }
 
         // Field-Definitions
-        for (FieldMapping<?,Node> field : fields) {
+        final ArrayList<FieldMapping<?, Node>> fs = new ArrayList<FieldMapping<?,Node>>(fields);
+        Collections.sort(fs, new Comparator<FieldMapping<?, Node>>() {
+			@Override
+			public final int compare(FieldMapping<?, Node> o1,
+					FieldMapping<?, Node> o2) {
+				return o1.getFieldName().compareTo(o2.getFieldName());
+			}
+		});
+		for (FieldMapping<?,Node> field : fs) {
             sb.append(String.format("  %s%n", field.getPathExpression(backend)));
         }
         String progWithoutNamespace = sb.toString();

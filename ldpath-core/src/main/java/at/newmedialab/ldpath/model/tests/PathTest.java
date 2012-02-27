@@ -16,12 +16,11 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import java.util.Collection;
+
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Tests whether the path given as argument for the constructor yields at least one node when evaluated

@@ -16,14 +16,11 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import java.util.Collection;
+import java.util.Locale;
+
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-import at.newmedialab.ldpath.util.Collections;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Tests if the language of the literal node matches the language configured for the test. If the language of the test

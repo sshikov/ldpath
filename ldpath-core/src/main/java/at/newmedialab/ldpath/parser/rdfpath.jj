@@ -562,9 +562,14 @@ RecursivePathSelector RecursivePathSelector() :
 {
 	"(" delegate = Selector() ")" "+"
 	{
-		result = new RecursivePathSelector(delegate);
+		result = RecursivePathSelector.getPathSelectorPlused(delegate);
 		return result;
-	}
+	} |
+    "(" delegate = Selector() ")" "*"
+    {
+        result = RecursivePathSelector.getPathSelectorStared(delegate);
+        return result;
+    } 
 }
 
 PathSelector PathSelector() :

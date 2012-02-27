@@ -30,10 +30,10 @@ import java.util.Collection;
  */
 public class IntersectionSelector<Node> implements NodeSelector<Node> {
 
-	private NodeSelector left;
-	private NodeSelector right;
+	private NodeSelector<Node> left;
+	private NodeSelector<Node> right;
 
-	public IntersectionSelector(NodeSelector left, NodeSelector right) {
+	public IntersectionSelector(NodeSelector<Node> left, NodeSelector<Node> right) {
 		this.left = left;
 		this.right = right;
 	}
@@ -74,7 +74,7 @@ public class IntersectionSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IntersectionSelector that = (IntersectionSelector) o;
+        IntersectionSelector<Node> that = (IntersectionSelector<Node>) o;
 
         if (left != null ? !left.equals(that.left) : that.left != null) return false;
         if (right != null ? !right.equals(that.right) : that.right != null) return false;

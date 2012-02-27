@@ -127,5 +127,5 @@ task compileJavaCC << {
     }
 }
 compileJava.dependsOn compileJavaCC
-
+eclipseClasspath.dependsOn compileJavaCC
 

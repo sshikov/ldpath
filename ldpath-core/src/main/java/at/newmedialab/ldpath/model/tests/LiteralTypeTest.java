@@ -16,11 +16,10 @@
 
 package at.newmedialab.ldpath.model.tests;
 
+import java.util.Collection;
+
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.tests.NodeTest;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Literal type tests allow to select only literals of a specified type, e.g. to ensure that only decimal values are
