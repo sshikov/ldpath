@@ -82,10 +82,13 @@ jar { //use the default jar for OSGI
             "at.newmedialab.ldpath.util;version="+version
         instruction 'Embed-Dependency',
             'guava',
-            'htmlcleaner'
+            'htmlcleaner',
+            'jdom'
         instruction 'Import-Package',
-            '!com.google.common.*', //exclude packages of embedded dependencies
-            '!org.htmlcleaner.*', // TODO: I think this could be automated, but no idea how.
+        //exclude packages of embedded dependencies
+            '!com.google.common.*', 
+            '!org.htmlcleaner.*',
+            '!org.jdom.*',
             '*'
         instruction 'Embed-Transitive', 'true'
         instruction 'Bundle-Vendor', 'Salzburg Research'
