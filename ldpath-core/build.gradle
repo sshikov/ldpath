@@ -31,18 +31,14 @@ dependencies {
     compile project(':ldpath-api')
 
     compile ("com.google.guava:guava:${spec.versions.guava}") {
-        exclude group: "com.google.code.findbugs"
+        exclude group: "com.google.code.findbugs", module: 'jsr305'
     }
     compile ("net.sourceforge.htmlcleaner:htmlcleaner:${spec.versions.htmlcleaner}") {
-        exclude module: 'ant'
-        exclude group: "jdom"
-        exclude group: "dom4j"
-        exclude group: "xom"
+        exclude group: 'org.apache.ant', module: 'ant'
+        exclude group: "jaxen", module: 'jaxen'
     }
     compile ("org.jdom:jdom:${spec.versions.jdom}") {
-        exclude group: "jdom"
-        exclude group: "dom4j"
-        exclude group: "xom"
+        exclude group: "jaxen", module: 'jaxen'
     }
 }
 
@@ -63,9 +59,6 @@ artifacts {
     archives javadocJar
 }
 
-
-
-
 jar {
     manifest {
         attributes 	'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
@@ -78,6 +71,9 @@ task copyLicense(type:Copy) {
 }
 jar.dependsOn copyLicense
 
+def getExclusions(dependency){
+    configurations.all*.dependencies*.get
+}
 install { //remove test dependencies
     repositories['mavenInstaller'].with {
         pom.whenConfigured { pom ->
@@ -101,7 +97,7 @@ uploadArchives { //remove test dependencies
     repositories['mavenDeployer'].with {
         pom.whenConfigured { pom ->
             pom.dependencies.removeAll { dep ->
-                dep.scope != 'test'} // removes the test scoped ones
+                dep.scope == 'test'} // removes the test scoped ones
             pom.dependencies.removeAll { dep ->
                 dep.artifactId == 'log4j-over-slf4j' ||
                 dep.artifactId == 'slf4j-ext' ||
