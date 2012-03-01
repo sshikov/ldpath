@@ -47,18 +47,23 @@ public class FormatUtils {
       */
      private static final DateFormat[] iso8601InputFormats = new DateFormat[] {
          // yyyy-mm-ddThh...
-         createDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", "UTF"),
-         createDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", null),    // With timezone
-         createDateFormat("yyyy-MM-dd'T'HH:mm:ss", null),     // Without timezone
+         createDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "UTF"), // UTC/Zulu
+         createDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", null),    // With timezone
+         createDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", null),     // Without timezone
+         createDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", "UTF"),     // UTC/Zulu
+         createDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", null),        // With timezone
+         createDateFormat("yyyy-MM-dd'T'HH:mm:ss", null),         // Without timezone
          // yyyy-mm-dd hh...
-         createDateFormat("yyyy-MM-dd' 'HH:mm:ss'Z'", "UTF"), // UTC/Zulu
-         createDateFormat("yyyy-MM-dd' 'HH:mm:ssZ", null),    // With timezone
-         createDateFormat("yyyy-MM-dd' 'HH:mm:ss.SZ", null),    // With timezone
-         createDateFormat("yyyy-MM-dd' 'HH:mm:ss", null),     // Without timezone
-         createDateFormat("EEE MMM dd HH:mm:ss z yyyy", null),     // Word documents
-         createDateFormat("EEE MMM d HH:mm:ss z yyyy", null),     // Word documents
-         createDateFormat("dd.MM.yyyy' 'HH:mm:ss", null),    // German with seconds
-         createDateFormat("dd.MM.yyyy' 'HH:mm", null),       // German without seconds
+         createDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS'Z'", "UTF"), // UTC/Zulu
+         createDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSSZ", null),    // With timezone
+         createDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS", null),     // Without timezone
+         createDateFormat("yyyy-MM-dd' 'HH:mm:ss'Z'", "UTF"),     // UTC/Zulu
+         createDateFormat("yyyy-MM-dd' 'HH:mm:ssZ", null),        // With timezone
+         createDateFormat("yyyy-MM-dd' 'HH:mm:ss", null),         // Without timezone
+         createDateFormat("EEE MMM dd HH:mm:ss z yyyy", null),    // Word documents/java Date.toString()
+         createDateFormat("EEE MMM d HH:mm:ss z yyyy", null),     // Word documents/java Date.toString()
+         createDateFormat("dd.MM.yyyy' 'HH:mm:ss", null),         // German with seconds
+         createDateFormat("dd.MM.yyyy' 'HH:mm", null),            // German without seconds
      };
 
      private static DateFormat createDateFormat(String format, String timezone) {
