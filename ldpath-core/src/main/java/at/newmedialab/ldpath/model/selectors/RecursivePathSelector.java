@@ -54,14 +54,15 @@ public class RecursivePathSelector<Node> implements NodeSelector<Node> {
 	}
 
 	private void subSelect(Node currentContext, int depth, RDFBackend<Node> rdfBackend, Set<Node> resultSet) {
-		Collection<Node> nodesLeft = delegate.select(rdfBackend, currentContext);
-		for (Node n : nodesLeft) {
+		Collection<Node> nextNodes = delegate.select(rdfBackend, currentContext);
+		depth++;
+		for (Node n : nextNodes) {
 			if (!resultSet.contains(n)) {
 				if (depth >= minRecursions){
 					resultSet.add(n);
 				}
 				if (depth < maxRecursions) {
-					subSelect(n, depth +1, rdfBackend, resultSet);
+					subSelect(n, depth, rdfBackend, resultSet);
 				}
 			}
 		}
