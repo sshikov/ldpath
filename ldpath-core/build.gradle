@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 buildscript {
     repositories {
         maven {
@@ -42,6 +41,16 @@ dependencies {
     }
 }
 
+// the configuration of this module (used for the POM and the MANIFEST)
+def pomConfig = [
+    name: "LD-Path Implementation Core",
+    description: "Core Implementation of LD Path a simple path-based query language "
+        + "similar to XPath or SPARQL Property Paths that is particularly well-suited "
+        + "for querying and retrieving resources from the Linked Data Cloud by "
+        + "following RDF links between resources and servers.",
+    packaging: "jar"] as Map;
+
+
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:classes) {
     classifier = 'sources'
@@ -61,7 +70,8 @@ artifacts {
 
 jar {
     manifest {
-        attributes 	'Implementation-Title': 'LD Path Core', 'Implementation-Version': version
+        attributes 	'Implementation-Title': pomConfig['name'], 
+            'Implementation-Version': version
     }
 }
 //ensure that the license is added
@@ -76,34 +86,28 @@ def getExclusions(dependency){
 }
 install { //remove test dependencies
     repositories['mavenInstaller'].with {
-        pom.whenConfigured { pom ->
-            //println "id: "+ pom.artifactId
-            //pom.dependencies.each { dep -> println "dependency: groupId="+ dep.groupId+" | artifactId="+ dep.artifactId + " | scope=" + dep.scope}
-            pom.dependencies.removeAll { dep ->
-                dep.scope == 'test'} // removes the test scoped ones
-            pom.dependencies.removeAll { dep ->
-                dep.artifactId == 'log4j-over-slf4j' ||
-                dep.artifactId == 'slf4j-ext' ||
-                dep.artifactId == 'logback-classic' ||
-                dep.artifactId == 'jcl-over-slf4j' }
-            //pom.dependencies.findAll { dep -> // someCriteria }*.scope == 'runtime'
-            //println "- - -"
-            //pom.dependencies.each { dep -> println "dependency "+ dep}
-         }
+        configurePom(pom,pomConfig)
+        beforeDeployment { MavenDeployment deployment ->
+            println "Pubished Artifacts: "
+            deployment.artifacts.each{ PublishArtifact artifact ->
+                println " > name: " + artifact.name + " | file: " + artifact.file +
+                    " | type: "+artifact.type + " | ext: " + artifact.extension +
+                    " | classifier " + artifact.classifier;
+            }
+            //signing deactivated for now!
+   //            signPom(deployment)
+        }
     }
 }
 
 uploadArchives { //remove test dependencies
     repositories['mavenDeployer'].with {
-        pom.whenConfigured { pom ->
-            pom.dependencies.removeAll { dep ->
-                dep.scope == 'test'} // removes the test scoped ones
-            pom.dependencies.removeAll { dep ->
-                dep.artifactId == 'log4j-over-slf4j' ||
-                dep.artifactId == 'slf4j-ext' ||
-                dep.artifactId == 'logback-classic' ||
-                dep.artifactId == 'jcl-over-slf4j' }
+        beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: 'dummy', password: 'dummy')
         }
+        configurePom(pom,pomConfig)
     }
 }
 

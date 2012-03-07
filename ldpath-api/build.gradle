@@ -16,6 +16,16 @@
 
 apply plugin: 'osgi'
 
+// the configuration of this module (used for the POM and the MANIFEST)
+def pomConfig = [
+    name: "LD-Path API ",
+    description: "LD Path is a simple path-based query language similar to XPath "
+        + "or SPARQL Property Paths that is particularly well-suited for querying "
+        + "and retrieving resources from the Linked Data Cloud by following RDF "
+        + "links between resources and servers.",
+    packaging: "bundle"] as Map;
+
+
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn:classes) {
     classifier = 'sources'
@@ -26,10 +36,15 @@ task javadocJar(type: Jar, dependsOn:javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
 
 jar { //add OSGI metadata
     manifest { // the manifest of the default jar is of type OsgiManifest
-        name = 'LD-Path API'
+        name = pomConfig['name']
         instruction 'Export-Package',
               "at.newmedialab.ldpath.api;version="+version,
               "at.newmedialab.ldpath.api.backend;version="+version,
@@ -39,7 +54,7 @@ jar { //add OSGI metadata
               "at.newmedialab.ldpath.api.transformers;version="+version
         instruction 'Bundle-Vendor', 'Salzburg Research'
         instruction 'Bundle-Category', 'LD-Path'
-        instruction 'Bundle-Description', 'LD Path is a simple path-based query language similar to XPath or SPARQL Property Paths that is particularly well-suited for querying and retrieving resources from the Linked Data Cloud by following RDF links between resources and servers.'
+        instruction 'Bundle-Description', pomConfig['description']
         instruction 'Bundle-DocURL', 'http://code.google.com/p/ldpath/'
         instruction 'Bundle-License', 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     }
@@ -51,37 +66,30 @@ task copyLicense(type:Copy) {
 }
 jar.dependsOn copyLicense
 
-// add javadoc/source jar tasks as artifacts
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
 install { //remove test dependencies
     repositories['mavenInstaller'].with {
-        pom.whenConfigured { pom ->
-            pom.dependencies.removeAll { dep ->
-                dep.scope == 'test'} // removes the test scoped ones
-            pom.dependencies.removeAll { dep -> 
-                dep.artifactId == 'log4j-over-slf4j' ||
-                dep.artifactId == 'slf4j-ext' ||
-                dep.artifactId == 'logback-classic' || 
-                dep.artifactId == 'jcl-over-slf4j' }
-         }
+        configurePom(pom,pomConfig)
+        beforeDeployment { MavenDeployment deployment ->
+            println "Pubished Artifacts: "
+            deployment.artifacts.each{ PublishArtifact artifact ->
+                println " > name: " + artifact.name + " | file: " + artifact.file +
+                    " | type: "+artifact.type + " | ext: " + artifact.extension +
+                    " | classifier " + artifact.classifier;
+            }
+            //signing deactivated for now!
+   //            signPom(deployment)
+        }
     }
 }
 
 uploadArchives { //remove test dependencies and ldpath-core
     repositories['mavenDeployer'].with {
-        pom.whenConfigured { pom ->
-            pom.dependencies.removeAll { dep ->
-                dep.scope == 'test'} // removes the test scoped ones
-            pom.dependencies.removeAll { dep -> 
-                dep.artifactId == 'log4j-over-slf4j' ||
-                dep.artifactId == 'slf4j-ext' ||
-                dep.artifactId == 'logback-classic' || 
-                dep.artifactId == 'jcl-over-slf4j' }
+        beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: 'dummy', password: 'dummy')
         }
+        configurePom(pom,pomConfig)
     }
 }
 
