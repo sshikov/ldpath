@@ -23,7 +23,7 @@ def pomConfig = [
         + "or SPARQL Property Paths that is particularly well-suited for querying "
         + "and retrieving resources from the Linked Data Cloud by following RDF "
         + "links between resources and servers.",
-    packaging: "bundle"] as Map;
+    packaging: "jar"] as Map;
 
 
 // custom tasks for creating source/javadoc jars
