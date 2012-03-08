@@ -13,29 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
@@ -50,13 +27,13 @@ spec = [
                 slf4j:      '1.6.4',            // logging interface
                 logback:    '1.0.0',            // logging backend
 
-                guava:      '11.0.1',
+                guava:      '11.0.2',
                 jdom:       '1.1.2',
                 htmlcleaner:'2.2',
 
                 cli:        '1.2',              // Apache Commons CLI
                 io:         '2.1',              // Apache Commons IO
-                httpclient: '4.1.2',            // Apache Commons HTTP Client
+                httpclient: '4.1.3',            // Apache Commons HTTP Client
                 config:     '1.7',              // Apache Commons Configuration
 
                 junit:      '4.10',             // Testing
