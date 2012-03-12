@@ -675,6 +675,20 @@ FunctionSelector FunctionSelector() :
     Token fName;
 }
 {
+    /* Function-Calls without arguments can skip parenthesis */
+    /* Does not work... why?
+    "fn:" fName = <IDENTIFIER> {
+           uri = namespaces.get("fn") + fName.image;
+           result = new FunctionSelector(getFunction(uri),Collections.emptyList());
+           return result;
+    } | */
+    /* Functions do not need to have arguments */
+    "fn:" fName = <IDENTIFIER> "(" ")" {
+           uri = namespaces.get("fn") + fName.image;
+           result = new FunctionSelector(getFunction(uri),Collections.emptyList());
+           return result;
+    } |
+    /* Sometimes arguments are required */
     "fn:" fName = <IDENTIFIER> "("
             argument = Selector() { arguments.add(argument); }
             ( "," argument = Selector() { arguments.add(argument); } )*
