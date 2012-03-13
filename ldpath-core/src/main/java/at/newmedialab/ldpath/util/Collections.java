@@ -27,18 +27,32 @@ public class Collections {
     }
     /**
      * Returns an iterable over all lists without copying any data
-     * @param lists
-     * @return
+     * @param lists the array with the lists
+     * @return the plain iterator over all elements of the lists
      */
     public static <T> Iterator<T> iterator(final Collection<T>...lists){
+        return iterator(0,lists);
+    }
+    /**
+     * Returns an iterable over all lists starting by the parsed offset.
+     * @param offset the offset of the first entry those elements should be
+     * included in the returned entries
+     * @param lists the array with the lists of elements
+     * @return the plain iterator over all elements of the lists starting from
+     * index offset
+     */
+    public static <T> Iterator<T> iterator(final int offset,final Collection<T>...lists){
+        if(offset < 0){
+            throw new IllegalArgumentException("The parsed Offest MUST NOT be < 0!");
+        }
         if(lists == null){
             return null;
-        } else if( lists.length == 0){
+        } else if( lists.length <= offset){
             return java.util.Collections.EMPTY_LIST.iterator();
         }
         return new Iterator<T>() {
             
-            private int listsIndex = -1;
+            private int listsIndex = offset-1;
             private Iterator<T> it;
             
             @Override
