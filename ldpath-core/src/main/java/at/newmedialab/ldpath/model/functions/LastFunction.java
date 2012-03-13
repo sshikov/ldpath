@@ -39,7 +39,7 @@ public class LastFunction<Node> implements SelectorFunction<Node> {
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
         for (int i = args.length - 1; i >= 0; i--) {
             if (args[i].size() > 0) { return args[i]; }
         }

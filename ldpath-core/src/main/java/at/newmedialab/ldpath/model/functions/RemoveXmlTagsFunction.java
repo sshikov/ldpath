@@ -42,7 +42,7 @@ public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
         Iterator<Node> it = Collections.iterator(args);
         List<Node> result = new ArrayList<Node>();
         while (it.hasNext()) {

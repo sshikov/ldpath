@@ -50,11 +50,11 @@ public class TestingSelector<Node> implements NodeSelector<Node> {
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(final RDFBackend<Node> rdfBackend, Node context) {
+    public Collection<Node> select(final RDFBackend<Node> rdfBackend, final Node context) {
         Predicate<Node> predicate = new Predicate<Node>() {
             @Override
             public boolean apply(Node input) {
-                return test.apply(rdfBackend, Collections.singleton(input));
+                return test.apply(rdfBackend, context, Collections.singleton(input));
             }
         };
 

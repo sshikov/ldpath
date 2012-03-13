@@ -66,7 +66,7 @@ public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> backend, Collection<Node>... args) throws IllegalArgumentException {
+    public Collection<Node> apply(RDFBackend<Node> backend, Node context, Collection<Node>... args) throws IllegalArgumentException {
         List<Node> result = new ArrayList<Node>();
 
         for(Iterator<Node> it = Collections.iterator(args);it.hasNext();) {

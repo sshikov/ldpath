@@ -42,7 +42,7 @@ public class ConcatenateFunction<Node> implements SelectorFunction<Node> {
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
         Iterator<Node> it = at.newmedialab.ldpath.util.Collections.iterator(args);
         StringBuilder result = new StringBuilder();
         while (it.hasNext()) {
