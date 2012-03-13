@@ -67,9 +67,16 @@ public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
      */
     @Override
     public Collection<Node> apply(RDFBackend<Node> backend, Node context, Collection<Node>... args) throws IllegalArgumentException {
+        Iterator<Node> it;
+        if(args.length < 1){
+            log.debug("clean HTML from context {}",context);
+            it = java.util.Collections.singleton(context).iterator();
+        } else {
+            log.debug("clean HTML from parameters");
+            it = Collections.iterator(args);
+        }
         List<Node> result = new ArrayList<Node>();
-
-        for(Iterator<Node> it = Collections.iterator(args);it.hasNext();) {
+        while(it.hasNext()) {
             Node node = it.next();
             TagNode tagNode = cleaner.clean(transformer.transform(backend,node));
             try {
@@ -78,7 +85,6 @@ public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
                 log.warn("I/O error while serializing to string",e);
             }
         }
-
         return result;
     }
 
