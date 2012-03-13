@@ -45,7 +45,7 @@ public class XPathFunction<Node> implements SelectorFunction<Node> {
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
         if (args.length < 1) { throw new IllegalArgumentException("XPath expression is required as first argument."); }
         Set<String> xpaths = new HashSet<String>();
         for (Node xpath : args[0]) {

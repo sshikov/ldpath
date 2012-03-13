@@ -46,8 +46,8 @@ public class AndTest<Node> implements NodeTest<Node> {
      * @return
      */
     @Override
-    public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
-        return left.apply(rdfBackend, args) && right.apply(rdfBackend, args);
+    public Boolean apply(RDFBackend<Node> rdfBackend, Node context,Collection<Node>... args) throws IllegalArgumentException {
+        return left.apply(rdfBackend, context, args) && right.apply(rdfBackend, context, args);
     }
 
     /**
