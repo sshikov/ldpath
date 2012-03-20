@@ -24,6 +24,8 @@ import com.google.common.collect.Collections2;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A node selector that wraps a node test around the selection and delegates the selection to another selector.
@@ -42,15 +44,20 @@ public class TestingSelector<Node> implements NodeSelector<Node> {
         this.test = test;
     }
 
+
     /**
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(final RDFBackend<Node> rdfBackend, final Node context) {
+    public Collection<Node> select(final RDFBackend<Node> rdfBackend, final Node context, List<Node> path, Map<Node, List<Node>> resultPaths) {
         Predicate<Node> predicate = new Predicate<Node>() {
             @Override
             public boolean apply(Node input) {
@@ -58,7 +65,9 @@ public class TestingSelector<Node> implements NodeSelector<Node> {
             }
         };
 
-        return Collections2.filter(delegate.select(rdfBackend,context),predicate);
+        // TODO: maybe the result paths should also include the test?
+
+        return Collections2.filter(delegate.select(rdfBackend,context,path,resultPaths),predicate);
     }
 
     /**

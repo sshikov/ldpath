@@ -63,7 +63,7 @@ public class PathEqualityTest<Node> implements NodeTest<Node> {
         }
 
         Node candidate = args[0].iterator().next();
-        return path.select(rdfBackend, candidate).contains(node);
+        return path.select(rdfBackend, candidate,null,null).contains(node);
     }
 
     /**

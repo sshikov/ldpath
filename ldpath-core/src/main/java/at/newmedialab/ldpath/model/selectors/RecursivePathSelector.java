@@ -18,10 +18,9 @@ package at.newmedialab.ldpath.model.selectors;
 
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
+import com.google.common.collect.ImmutableList;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class RecursivePathSelector<Node> implements NodeSelector<Node> {
 
@@ -34,27 +33,32 @@ public class RecursivePathSelector<Node> implements NodeSelector<Node> {
 		maxRecursions = max;
 	}
 
+
     /**
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context, List<Node> path, Map<Node, List<Node>> resultPaths) {
 		Set<Node> result = new HashSet<Node>();
 
 		if (minRecursions <= 0) {
 			result.add(context);
 		}
-		subSelect(context, 0, rdfBackend, result);
+		subSelect(context, 0, rdfBackend, result,path,resultPaths);
 
 		return result;
 	}
 
-	private void subSelect(Node currentContext, int depth, RDFBackend<Node> rdfBackend, Set<Node> resultSet) {
-		Collection<Node> nextNodes = delegate.select(rdfBackend, currentContext);
+	private void subSelect(Node currentContext, int depth, RDFBackend<Node> rdfBackend, Set<Node> resultSet, List<Node> path, Map<Node, List<Node>> resultPaths) {
+		Collection<Node> nextNodes = delegate.select(rdfBackend, currentContext,path,resultPaths);
 		depth++;
 		for (Node n : nextNodes) {
 			if (!resultSet.contains(n)) {
@@ -62,7 +66,11 @@ public class RecursivePathSelector<Node> implements NodeSelector<Node> {
 					resultSet.add(n);
 				}
 				if (depth < maxRecursions) {
-					subSelect(n, depth, rdfBackend, resultSet);
+                    if(path != null && resultPaths != null) {
+					    subSelect(n, depth, rdfBackend, resultSet, new ImmutableList.Builder<Node>().addAll(path).add(currentContext).build(),resultPaths);
+                    } else {
+                        subSelect(n, depth, rdfBackend, resultSet, null,resultPaths);
+                    }
 				}
 			}
 		}
