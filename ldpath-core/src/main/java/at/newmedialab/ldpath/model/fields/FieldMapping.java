@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ public class FieldMapping<T,Node> implements LDPathConstruct<Node> {
             }
         };
 
-        return Collections2.transform(selector.select(backend,context, (List<Node>) ImmutableList.of(), paths),function);
+        return Collections2.transform(selector.select(backend,context, ImmutableList.of(context), paths),function);
     }
 
     /**
