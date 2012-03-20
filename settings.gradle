@@ -23,12 +23,12 @@
 include 'ldpath-api'
 include 'ldpath-core'
 include 'ldpath-core-bundle'
-include 'ldpath-backend-sesame'
-include 'ldpath-backend-jena'
-//include 'ldpath-backend-sparql'
-include 'ldpath-backend-linkeddata'
-include 'ldpath-backend-file'
 
-include 'ldpath-template'
-include 'ldpath-template-linkeddata'
+//include 'ldpath-backend-sesame'
+//include 'ldpath-backend-jena'
+//include 'ldpath-backend-linkeddata'
+//include 'ldpath-backend-file'
+
+//include 'ldpath-template'
+//include 'ldpath-template-linkeddata'
 
