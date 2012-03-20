@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@ import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import com.google.common.collect.ImmutableList;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A path definition selecting the value of a property. Either a URI enclosed in <> or a namespace prefix and a
@@ -53,7 +56,7 @@ public class PropertySelector<Node> implements NodeSelector<Node> {
 		if(rdfBackend.isURI(context) || rdfBackend.isBlank(context)) {
             if(path != null && resultPaths != null) {
                 Collection<Node> results = rdfBackend.listObjects(context,property);
-                for(Node n :results) {
+                for(Node n : results) {
                     resultPaths.put(n, new ImmutableList.Builder<Node>().addAll(path).add(context).add(n).build());
                 }
                 return results;

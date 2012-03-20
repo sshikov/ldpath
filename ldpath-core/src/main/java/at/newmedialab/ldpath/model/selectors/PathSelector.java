@@ -20,9 +20,6 @@ import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Traverse a path by following several edges in the RDF graph. Each step is separated by a "/".
@@ -44,7 +41,7 @@ public class PathSelector<Node> implements NodeSelector<Node> {
      * of selected nodes in appropriate order.
      *
      * @param context     the node where to start the selection
-     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     * @param path        the path leading to and including the context node in the current evaluation of LDPath; may be null,
      *                    in which case path tracking is disabled
      * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
      *                    if null, path tracking is disabled and the path argument is ignored
@@ -61,16 +58,16 @@ public class PathSelector<Node> implements NodeSelector<Node> {
         Collection<Node> nodesLeft = left.select(rdfBackend,context,path,myResultPaths);
         final Set<Node> result = new HashSet<Node>();
 
-        // new path is the path resulting from selecting the context node in the left selector
-        List<Node> newpath = null;
-        if(myResultPaths.get(context) != null) {
-            newpath = myResultPaths.get(context);
-        }
 
 
 
         for(Node n : nodesLeft) {
-            result.addAll(right.select(rdfBackend,n,newpath,resultPaths));
+            // new path is the path resulting from selecting the context node in the left selector
+            if(myResultPaths != null && myResultPaths.get(n) != null) {
+                result.addAll(right.select(rdfBackend,n,myResultPaths.get(n),resultPaths));
+            } else {
+                result.addAll(right.select(rdfBackend,n,null,null));
+            }
         }
         return result;
     }

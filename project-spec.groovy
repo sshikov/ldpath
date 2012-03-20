@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
@@ -21,7 +23,7 @@ spec = [
         projectName: 'LDPath',
 
         versions: [
-                sesame:     '2.6.3',            // RDF API
+                sesame:     '2.6.4',            // RDF API
                 jena:       '2.6.4',            // RDF API
 
                 slf4j:      '1.6.4',            // logging interface

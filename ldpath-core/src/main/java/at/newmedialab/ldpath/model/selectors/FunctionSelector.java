@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
         if(myResultPaths != null && path != null) {
             // for a function, we include in the result path all paths to all arguments ...
             List<Node> functionPath = new ArrayList<Node>();            
-            for(List<Node> paths : myResultPaths.values()) {
-                for(Node n : paths) {
+            for(List<Node> subpath : myResultPaths.values()) {
+                for(Node n : subpath) {
                     if(!functionPath.contains(n)) {
                         functionPath.add(n);
                     }

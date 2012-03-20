@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public interface NodeSelector<Node> extends LDPathConstruct<Node> {
 	 * of selected nodes in appropriate order.
 	 *
 	 * @param context the node where to start the selection
-     * @param path    the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     * @param path    the path leading to and including the context node in the current evaluation of LDPath; may be null,
      *                in which case path tracking is disabled
      * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
      *                 if null, path tracking is disabled and the path argument is ignored
