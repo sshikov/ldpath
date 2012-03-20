@@ -59,6 +59,11 @@ jar { //add OSGI metadata
         instruction 'Bundle-License', 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     }
 }
+signing {
+    sign configurations.archives
+}
+
+
 //ensure that the license is added
 task copyLicense(type:Copy) {
     from 'LICENSE'
@@ -86,9 +91,6 @@ uploadArchives { //remove test dependencies and ldpath-core
     repositories['mavenDeployer'].with {
         beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
 
-        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-          authentication(userName: 'dummy', password: 'dummy')
-        }
         configurePom(pom,pomConfig)
     }
 }
