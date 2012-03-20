@@ -20,6 +20,8 @@ import at.newmedialab.ldpath.api.LDPathConstruct;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A node selector takes as argument a KiWiNode and returns a collection of selected
@@ -33,9 +35,13 @@ public interface NodeSelector<Node> extends LDPathConstruct<Node> {
 	 * of selected nodes in appropriate order.
 	 *
 	 * @param context the node where to start the selection
+     * @param path    the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                 if null, path tracking is disabled and the path argument is ignored
 	 * @return the collection of selected nodes
 	 */
-	public Collection<Node> select(RDFBackend<Node> backend, Node context);
+	public Collection<Node> select(RDFBackend<Node> backend, Node context, List<Node> path, Map<Node,List<Node>> resultPaths);
 
 
     /**

@@ -56,7 +56,7 @@ public class PathTest<Node> implements NodeTest<Node> {
         Node node = args[0].iterator().next();
 
         if (rdfBackend.isURI(node) || rdfBackend.isBlank(node)) {
-            Collection<Node> testResult = path.select(rdfBackend, node);
+            Collection<Node> testResult = path.select(rdfBackend, node,null,null);
             return testResult.size() > 0;
         } else {
             return false;

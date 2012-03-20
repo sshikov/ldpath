@@ -19,9 +19,7 @@ package at.newmedialab.ldpath.model.selectors;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -45,44 +43,38 @@ public class PathSelector<Node> implements NodeSelector<Node> {
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(final RDFBackend<Node> rdfBackend, Node context) {
-        Collection<Node> nodesLeft = left.select(rdfBackend,context);
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context, List<Node> path, Map<Node, List<Node>> resultPaths) {
+        // a new map for storing the result path for the left selector
+        Map<Node,List<Node>> myResultPaths = null;
+        if(resultPaths != null && path != null) {
+            myResultPaths = new HashMap<Node, List<Node>>();
+        }
+        
+        Collection<Node> nodesLeft = left.select(rdfBackend,context,path,myResultPaths);
         final Set<Node> result = new HashSet<Node>();
 
-        if(rdfBackend.supportsThreading()) {
-            // get thread pool and schedule each subselection in a separate thread
-            ThreadPoolExecutor workers = rdfBackend.getThreadPool();
-            Set<Future> futures = new HashSet<Future>();
-            for(final Node n : nodesLeft) {
-                // start a maximum of 50 active threads; if there are more threads, run the subtask in the current thread
-                if(workers.getActiveCount() < 50) {
-                    futures.add(workers.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            result.addAll(right.select(rdfBackend,n));
-                        }
-                    }));
-                } else {
-                    result.addAll(right.select(rdfBackend,n));
-                }
-            }
-            // wait for thread pool to finish execution
-            for(Future future : futures) {
-                try {
-                    future.get();
-                } catch (Exception e) { }
-            }
-        } else {
-            for(Node n : nodesLeft) {
-                result.addAll(right.select(rdfBackend,n));
-            }
+        // new path is the path resulting from selecting the context node in the left selector
+        List<Node> newpath = null;
+        if(myResultPaths.get(context) != null) {
+            newpath = myResultPaths.get(context);
+        }
+
+
+
+        for(Node n : nodesLeft) {
+            result.addAll(right.select(rdfBackend,n,newpath,resultPaths));
         }
         return result;
     }
+
 
     @Override
     public String getPathExpression(RDFBackend<Node> backend) {

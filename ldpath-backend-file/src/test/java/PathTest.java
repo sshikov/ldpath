@@ -24,6 +24,9 @@ import org.openrdf.model.Value;
 import org.openrdf.repository.RepositoryException;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -47,8 +50,9 @@ public class PathTest {
 
     @Test
     public void simpleResourcePath() throws Exception {
-        
-        Collection<Value> values = ldPath.pathQuery(backend.createURI("http://localhost:8080/LMF/resource/hans_meier"), "foaf:interest", null);
+
+        Map<Value, List<Value>> paths = new HashMap<Value, List<Value>>();
+        Collection<Value> values = ldPath.pathQuery(backend.createURI("http://localhost:8080/LMF/resource/hans_meier"), "foaf:interest", null, paths);
         Assert.assertEquals(4,values.size());
         Assert.assertThat(values,hasItems(
                     backend.createURI("http://rdf.freebase.com/ns/en.software_engineering"),
@@ -56,6 +60,7 @@ public class PathTest {
                     backend.createURI("http://dbpedia.org/resource/Java"),
                     backend.createURI("http://dbpedia.org/resource/Climbing")
                 ));
+
     }
 
     @Test
