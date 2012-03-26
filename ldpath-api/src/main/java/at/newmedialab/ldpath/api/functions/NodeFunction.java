@@ -18,6 +18,7 @@ package at.newmedialab.ldpath.api.functions;
 
 import at.newmedialab.ldpath.api.LDPathConstruct;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
+import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
 import java.util.Collection;
 
@@ -36,9 +37,11 @@ public interface NodeFunction<T,Node> extends LDPathConstruct<Node> {
      * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
      * or the number of arguments is not correct.
      *
+     * @param context the context of the execution. Same as using the 
+     * {@link NodeSelector} '.' as parameter.
      * @param args a nested list of KiWiNodes
      * @return
      */
-    public T apply(RDFBackend<Node> backend, Collection<Node>... args) throws IllegalArgumentException;
+    public T apply(RDFBackend<Node> backend, Node context, Collection<Node>... args) throws IllegalArgumentException;
 
 }

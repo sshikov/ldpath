@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Add file description here!
@@ -38,18 +40,23 @@ public class IntersectionSelector<Node> implements NodeSelector<Node> {
 		this.right = right;
 	}
 
+
     /**
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+    public Collection<Node> select(RDFBackend<Node> nodeRDFBackend, Node context, List<Node> path, Map<Node, List<Node>> resultPaths) {
 		return Sets.intersection(
-				ImmutableSet.copyOf(left.select(rdfBackend,context)),
-				ImmutableSet.copyOf(right.select(rdfBackend,context))
+				ImmutableSet.copyOf(left.select(nodeRDFBackend,context,path,resultPaths)),
+				ImmutableSet.copyOf(right.select(nodeRDFBackend,context,path,resultPaths))
 		);
 	}
 

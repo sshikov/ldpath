@@ -21,6 +21,8 @@ import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Add file description here!
@@ -35,15 +37,20 @@ public class StringConstantSelector<Node> implements NodeSelector<Node> {
 		this.constant = constant;
 	}
 
+
     /**
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context, List<Node> path, Map<Node, List<Node>> resultPaths) {
 		return Collections.singleton(rdfBackend.createLiteral(constant));
 	}
 

@@ -124,6 +124,7 @@ public class Program<Node> implements LDPathConstruct<Node> {
     public void setNamespaces(Map<String, String> namespaces) {
         this.namespaces = namespaces;
     }
+    
     /**
      * Executes this Program on the parsed {@link RDFBackend backend}. 
      * @param context The context of the execution
@@ -138,6 +139,23 @@ public class Program<Node> implements LDPathConstruct<Node> {
         return result;
     }
 
+
+    /**
+     * Executes this Program on the parsed {@link RDFBackend backend}. 
+     * @param context The context of the execution
+     * @return The result
+     */
+    public Map<String,Collection<?>> execute(RDFBackend<Node> backend, Node context, Map<Node, List<Node>> paths) {
+        Map<String,Collection<?>> result = new HashMap<String, Collection<?>>();
+
+        for(FieldMapping<?,Node> mapping : getFields()) {
+            result.put(mapping.getFieldName(),mapping.getValues(backend,context, paths));
+        }
+        return result;
+    }
+
+    
+    
     public String getPathExpression(RDFBackend<Node> backend) {
         StringBuilder sb = new StringBuilder();
         // Filter (?)

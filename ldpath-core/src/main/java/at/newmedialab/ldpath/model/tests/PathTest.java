@@ -45,7 +45,7 @@ public class PathTest<Node> implements NodeTest<Node> {
      * @return
      */
     @Override
-    public Boolean apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+    public Boolean apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
         if (args.length != 1 || args[0].isEmpty()) { 
             throw new IllegalArgumentException("path test only takes one parameter"); 
         }
@@ -56,7 +56,7 @@ public class PathTest<Node> implements NodeTest<Node> {
         Node node = args[0].iterator().next();
 
         if (rdfBackend.isURI(node) || rdfBackend.isBlank(node)) {
-            Collection<Node> testResult = path.select(rdfBackend, node);
+            Collection<Node> testResult = path.select(rdfBackend, node,null,null);
             return testResult.size() > 0;
         } else {
             return false;

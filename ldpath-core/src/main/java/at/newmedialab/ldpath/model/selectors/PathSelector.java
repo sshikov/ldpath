@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.*;
 
 /**
  * Traverse a path by following several edges in the RDF graph. Each step is separated by a "/".
@@ -44,44 +45,37 @@ public class PathSelector<Node> implements NodeSelector<Node> {
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to and including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(final RDFBackend<Node> rdfBackend, Node context) {
-        Collection<Node> nodesLeft = left.select(rdfBackend,context);
+    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context, List<Node> path, Map<Node, List<Node>> resultPaths) {
+        // a new map for storing the result path for the left selector
+        Map<Node,List<Node>> myResultPaths = null;
+        if(resultPaths != null && path != null) {
+            myResultPaths = new HashMap<Node, List<Node>>();
+        }
+        
+        Collection<Node> nodesLeft = left.select(rdfBackend,context,path,myResultPaths);
         final Set<Node> result = new HashSet<Node>();
 
-        if(rdfBackend.supportsThreading()) {
-            // get thread pool and schedule each subselection in a separate thread
-            ThreadPoolExecutor workers = rdfBackend.getThreadPool();
-            Set<Future<?>> futures = new HashSet<Future<?>>();
-            for(final Node n : nodesLeft) {
-                // start a maximum of 50 active threads; if there are more threads, run the subtask in the current thread
-                if(workers.getActiveCount() < 50) {
-                    futures.add(workers.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            result.addAll(right.select(rdfBackend,n));
-                        }
-                    }));
-                } else {
-                    result.addAll(right.select(rdfBackend,n));
-                }
-            }
-            // wait for thread pool to finish execution
-            for(Future<?> future : futures) {
-                try {
-                    future.get();
-                } catch (Exception e) { }
-            }
-        } else {
-            for(Node n : nodesLeft) {
-                result.addAll(right.select(rdfBackend,n));
+        
+        
+        for(Node n : nodesLeft) {
+            // new path is the path resulting from selecting the context node in the left selector
+            if(myResultPaths != null && myResultPaths.get(n) != null) {
+                result.addAll(right.select(rdfBackend,n,myResultPaths.get(n),resultPaths));
+            } else {
+                result.addAll(right.select(rdfBackend,n,null,null));
             }
         }
         return result;
     }
+
 
     @Override
     public String getPathExpression(RDFBackend<Node> backend) {

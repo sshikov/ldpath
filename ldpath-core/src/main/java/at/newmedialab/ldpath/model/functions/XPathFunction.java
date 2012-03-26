@@ -26,12 +26,16 @@ import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 
 public class XPathFunction<Node> implements SelectorFunction<Node> {
+    
+    private static final Logger log = LoggerFactory.getLogger(XPathFunction.class);
 
     private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
@@ -45,7 +49,7 @@ public class XPathFunction<Node> implements SelectorFunction<Node> {
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
+    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
         if (args.length < 1) { throw new IllegalArgumentException("XPath expression is required as first argument."); }
         Set<String> xpaths = new HashSet<String>();
         for (Node xpath : args[0]) {
@@ -55,20 +59,23 @@ public class XPathFunction<Node> implements SelectorFunction<Node> {
                 throw new IllegalArgumentException("First argument must not contain anything else than String-Literals!");
             }
         }
-
+        Iterator<Node> it;
+        if(args.length < 2){
+            log.debug("Use context {} to execute xpaths {}",context,xpaths);
+            it = Collections.singleton(context).iterator();
+        } else {
+            log.debug("execute xpaths {} on parsed parameters",xpaths);
+            it = at.newmedialab.ldpath.util.Collections.iterator(1,args);
+        }
         List<Node> result = new ArrayList<Node>();
-        for (int i = 1; i < args.length; i++) {
-            for (Node n : args[i]) {
-                try {
-                    for (String r : doFilter(transformer.transform(rdfBackend,n), xpaths)) {
-                        result.add(rdfBackend.createLiteral(r));
-                    }
-                //} catch (ParsingException e) {
-                    // Ignoring ParsingeException -- not all Nodes transform
-                    // into valid XML and those are silently ignored.
-                } catch (IOException e) {
-                    // This should never happen, since validation is turned off.
+        while (it.hasNext()) {
+            Node n = it.next();
+            try {
+                for (String r : doFilter(transformer.transform(rdfBackend,n), xpaths)) {
+                    result.add(rdfBackend.createLiteral(r));
                 }
+            } catch (IOException e) {
+                // This should never happen, since validation is turned off.
             }
         }
 
