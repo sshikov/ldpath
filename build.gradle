@@ -84,8 +84,8 @@ subprojects {
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: "http://devel.kiwi-project.eu:8080/nexus/content/repositories/releases/") {
-                        authentication(userName: userConfig.maven.nexusUser, password: userConfig.maven.nexusPass)
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                        authentication(userName: userConfig.maven.sonatypeUser, password: userConfig.maven.sonatypePass)
                 }
                 snapshotRepository(url: "http://devel.kiwi-project.eu:8080/nexus/content/repositories/snapshots/") {
                         authentication(userName: userConfig.maven.nexusUser, password: userConfig.maven.nexusPass)

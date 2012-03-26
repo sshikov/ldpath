@@ -53,9 +53,6 @@ sourceSets {
         }
     }
 }
-//signing {
-//    sign configurations.archives
-//}
 
 jar { //use the default jar for OSGI
     manifest { // the manifest of the default jar is of type OsgiManifest
@@ -109,6 +106,9 @@ artifacts {
     archives jar
     archives sourcesJar
     archives javadocJar
+}
+signing {
+    sign configurations.archives
 }
 
 /*
@@ -187,9 +187,6 @@ uploadArchives { //remove test dependencies
     repositories['mavenDeployer'].with {
         beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
 
-        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-          authentication(userName: 'dummy', password: 'dummy')
-        }
         configurePom(pom,pomConfig)
     }
 }

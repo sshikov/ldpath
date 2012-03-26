@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.functions.NodeFunction;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Add file description here!
@@ -44,18 +42,47 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(RDFBackend<Node> rdfBackend, Node context) {
+    public Collection<Node> select(RDFBackend<Node> nodeRDFBackend, Node context, List<Node> path, Map<Node, List<Node>> resultPaths) {
         ArrayList<Collection<Node>> args = new ArrayList<Collection<Node>>();
+
+        // for a function, we include in the result path all paths to all arguments, so we create a new map to collect the paths
+        Map<Node, List<Node>> myResultPaths = null;
+        if(resultPaths != null && path != null) {
+            myResultPaths = new HashMap<Node, List<Node>>();
+        }
+        
         for(NodeSelector<Node> selector : selectors) {
-            Collection<Node> param = selector.select(rdfBackend, context);
+            Collection<Node> param = selector.select(nodeRDFBackend, context, path, myResultPaths);
             args.add(param);
         }
-        return function.apply(rdfBackend, args.toArray(new Collection[0]));
+        Collection<Node> result = function.apply(nodeRDFBackend, context, args.toArray(new Collection[0]));
+        if(myResultPaths != null && path != null) {
+            // for a function, we include in the result path all paths to all arguments ...
+            List<Node> functionPath = new ArrayList<Node>();            
+            for(List<Node> subpath : myResultPaths.values()) {
+                for(Node n : subpath) {
+                    if(!functionPath.contains(n)) {
+                        functionPath.add(n);
+                    }
+                }
+            }
+            
+            for(Node n : result) {
+                resultPaths.put(n,functionPath);
+            }
+        }
+        return result;
     }
+
+
 
     /**
      * Return the name of the NodeSelector for registration in the selector registry

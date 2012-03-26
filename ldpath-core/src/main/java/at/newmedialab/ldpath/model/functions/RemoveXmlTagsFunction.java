@@ -27,7 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
+    
+    private final static Logger log = LoggerFactory.getLogger(RemoveXmlTagsFunction.class);
 
     private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
@@ -42,14 +47,20 @@ public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Collection<Node>... args) throws IllegalArgumentException {
-        Iterator<Node> it = Collections.iterator(args);
-        List<Node> result = new ArrayList<Node>();
-        while (it.hasNext()) {
-            result.add(rdfBackend.createLiteral(doFilter(transformer.transform(rdfBackend, it.next()))));
+    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
+        if(args.length < 1){
+            log.debug("remove XML tags from context {}",context);
+            return java.util.Collections.singleton(
+                rdfBackend.createLiteral(doFilter(transformer.transform(rdfBackend, context))));
+        } else {
+            log.debug("remove XML tags from parameters");
+            Iterator<Node> it = Collections.iterator(args);
+            List<Node> result = new ArrayList<Node>();
+            while (it.hasNext()) {
+                result.add(rdfBackend.createLiteral(doFilter(transformer.transform(rdfBackend, it.next()))));
+            }
+            return result;
         }
-
-        return result;
     }
 
     private String doFilter(String in) {

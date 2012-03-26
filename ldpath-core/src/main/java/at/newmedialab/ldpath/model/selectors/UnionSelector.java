@@ -19,9 +19,7 @@ package at.newmedialab.ldpath.model.selectors;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.selectors.NodeSelector;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -40,41 +38,24 @@ public class UnionSelector<Node> implements NodeSelector<Node> {
         this.right = right;
     }
 
+
     /**
      * Apply the selector to the context node passed as argument and return the collection
      * of selected nodes in appropriate order.
      *
-     * @param context the node where to start the selection
+     * @param context     the node where to start the selection
+     * @param path        the path leading to but not including the context node in the current evaluation of LDPath; may be null,
+     *                    in which case path tracking is disabled
+     * @param resultPaths a map where each of the result nodes maps to a path leading to the result node in the LDPath evaluation;
+     *                    if null, path tracking is disabled and the path argument is ignored
      * @return the collection of selected nodes
      */
     @Override
-    public Collection<Node> select(final RDFBackend<Node> rdfBackend, final Node context) {
+    public Collection<Node> select(final RDFBackend<Node> rdfBackend, final Node context, final List<Node> path, final Map<Node, List<Node>> resultPaths) {
         final Set<Node> result = new HashSet<Node>();
 
-        if(rdfBackend.supportsThreading()) {
-            // start thread pool of size 2 and schedule each subselection in a separate thread
-            ExecutorService workers = rdfBackend.getThreadPool();
-            Future<?> f1 = workers.submit(new Runnable() {
-                @Override
-                public void run() {
-                    result.addAll(left.select(rdfBackend,context));
-                }
-            });
-            Future<?> f2 = workers.submit(new Runnable() {
-                @Override
-                public void run() {
-                    result.addAll(right.select(rdfBackend,context));
-                }
-            });
-            // wait for thread pool to terminate
-            try {
-                f1.get();
-                f2.get();
-            } catch (Exception ex) {}
-        } else {
-            result.addAll(left.select(rdfBackend,context));
-            result.addAll(right.select(rdfBackend,context));
-        }
+        result.addAll(left.select(rdfBackend,context,path,resultPaths));
+        result.addAll(right.select(rdfBackend,context,path,resultPaths));
         return result;
     }
 
