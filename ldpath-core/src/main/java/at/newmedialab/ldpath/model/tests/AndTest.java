@@ -26,7 +26,7 @@ import java.util.Collection;
  * <p/>
  * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class AndTest<Node> implements NodeTest<Node> {
+public class AndTest<Node> implements ComplexTest<Node> {
 
     private NodeTest<Node> left;
     private NodeTest<Node> right;
