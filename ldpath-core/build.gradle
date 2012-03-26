@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) 2012 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath 'net.java.dev.javacc:javacc:5.0'
+    }
+}
+
+
+dependencies {
+    compile project(':ldpath-api')
+
+    compile ("com.google.guava:guava:${spec.versions.guava}") {
+        exclude group: "com.google.code.findbugs", module: 'jsr305'
+    }
+    compile ("net.sourceforge.htmlcleaner:htmlcleaner:${spec.versions.htmlcleaner}") {
+        exclude group: 'org.apache.ant', module: 'ant'
+        exclude group: "jaxen", module: 'jaxen'
+    }
+    compile ("org.jdom:jdom:${spec.versions.jdom}") {
+        exclude group: "jaxen", module: 'jaxen'
+    }
+}
+
+// the configuration of this module (used for the POM and the MANIFEST)
+def pomConfig = [
+    name: "LD-Path Implementation Core",
+    description: "Core Implementation of LD Path a simple path-based query language "
+        + "similar to XPath or SPARQL Property Paths that is particularly well-suited "
+        + "for querying and retrieving resources from the Linked Data Cloud by "
+        + "following RDF links between resources and servers.",
+    packaging: "jar"] as Map;
+
+
+// custom tasks for creating source/javadoc jars
+task sourcesJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+jar {
+    manifest {
+        attributes 	'Implementation-Title': pomConfig['name'], 
+            'Implementation-Version': version
+    }
+}
+//ensure that the license is added
+task copyLicense(type:Copy) {
+    from 'LICENSE'
+    into 'build/classes/main/META-INF'
+}
+jar.dependsOn copyLicense
+
+def getExclusions(dependency){
+    configurations.all*.dependencies*.get
+}
+install { //remove test dependencies
+    repositories['mavenInstaller'].with {
+        configurePom(pom,pomConfig)
+        beforeDeployment { MavenDeployment deployment ->
+            println "Pubished Artifacts: "
+            deployment.artifacts.each{ PublishArtifact artifact ->
+                println " > name: " + artifact.name + " | file: " + artifact.file +
+                    " | type: "+artifact.type + " | ext: " + artifact.extension +
+                    " | classifier " + artifact.classifier;
+            }
+            //signing deactivated for now!
+   //            signPom(deployment)
+        }
+    }
+}
+
+uploadArchives { //remove test dependencies
+    repositories['mavenDeployer'].with {
+        beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: 'dummy', password: 'dummy')
+        }
+        configurePom(pom,pomConfig)
+    }
+}
+
+
+project(':') {
+    dependencies {
+        runtime project('ldpath-core')
+        testCompile project('ldpath-core')
+    }
+}
+
+task compileJavaCC << {
+    basePath = sourceSets.main.java.srcDirs.each { dir ->
+        println dir
+        String[] args = ["-STATIC=false","-OUTPUT_DIRECTORY:$dir/at/newmedialab/ldpath/parser","$dir/at/newmedialab/ldpath/parser/rdfpath.jj"]
+        org.javacc.parser.Main.mainProgram(args)
+    }
+}
+compileJava.dependsOn compileJavaCC
+eclipseClasspath.dependsOn compileJavaCC
+

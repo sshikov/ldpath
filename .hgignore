@@ -1,0 +1,20 @@
+syntax: glob
+.gradle
+build
+*.iml
+ParseException.java
+RdfPathParser.java
+RdfPathParserConstants.java
+RdfPathParserTokenManager.java
+SimpleCharStream.java
+Token.java
+TokenMgrError.java
+LDPath.ipr
+LDPath.iws
+userConfig.properties
+*.class
+out
+syntax: regexp
+.project
+.classpath
+.settings
