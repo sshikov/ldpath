@@ -26,7 +26,7 @@ import java.util.Collection;
  * <p/>
  * Author: Sebastian Schaffert <sebastian.schaffert@salzburgresearch.at>
  */
-public class OrTest<Node> implements NodeTest<Node> {
+public class OrTest<Node> implements ComplexTest<Node> {
 
     private NodeTest<Node> left;
     private NodeTest<Node> right;

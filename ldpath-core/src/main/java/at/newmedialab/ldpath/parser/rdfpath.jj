@@ -720,7 +720,8 @@ NodeTest NodeTest() :
 }
 {
     (
-        result = AndTest()
+        result = NotTest()
+    |   result = AndTest()
     |   result = OrTest()
     |   result = AtomicNodeTest()
     )
@@ -763,6 +764,16 @@ LiteralTypeTest LiteralTypeTest():
 {
     "^^" type = Uri() {
         return new LiteralTypeTest(type);
+    }
+}
+
+NotTest NotTest() :
+{
+    NodeTest delegate;
+}
+{
+    "!" delegate = NodeTest() {
+        return new NotTest(delegate);
     }
 }
 
