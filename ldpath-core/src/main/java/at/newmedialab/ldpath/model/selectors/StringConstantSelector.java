@@ -74,7 +74,8 @@ public class StringConstantSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        StringConstantSelector that = (StringConstantSelector) o;
+        @SuppressWarnings("rawtypes")
+		StringConstantSelector that = (StringConstantSelector) o;
 
         if (constant != null ? !constant.equals(that.constant) : that.constant != null) return false;
 

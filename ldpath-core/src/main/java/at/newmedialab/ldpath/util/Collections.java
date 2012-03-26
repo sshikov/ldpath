@@ -1,6 +1,5 @@
 package at.newmedialab.ldpath.util;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,7 +33,7 @@ public class Collections {
         if(lists == null){
             return null;
         } else if( lists.length == 0){
-            return java.util.Collections.EMPTY_LIST.iterator();
+            return java.util.Collections.<T>emptyList().iterator();
         }
         return new Iterator<T>() {
             

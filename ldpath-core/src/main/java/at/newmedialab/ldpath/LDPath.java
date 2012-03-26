@@ -55,7 +55,7 @@ public class LDPath<Node> {
      * @param backend
      */
     public LDPath(RDFBackend<Node> backend) {
-        this(backend,new DefaultConfiguration());
+        this(backend,new DefaultConfiguration<Node>());
     }
 
     /**
@@ -65,7 +65,7 @@ public class LDPath<Node> {
      * @param backend
      * @param config
      */
-    public LDPath(RDFBackend<Node> backend, Configuration config) {
+    public LDPath(RDFBackend<Node> backend, Configuration<Node> config) {
         this.backend      = backend;
         this.functions    = new HashSet<SelectorFunction<Node>>();
         this.transformers = new HashMap<String, NodeTransformer<?, Node>>();

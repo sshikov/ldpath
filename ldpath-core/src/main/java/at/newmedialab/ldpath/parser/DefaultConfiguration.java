@@ -63,32 +63,32 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
     }
 
     private void addDefaultTransformers() {
-        addTransformer(Constants.NS_XSD + "decimal", new BigDecimalTransformer());
-        addTransformer(Constants.NS_XSD + "integer", new BigIntegerTransformer());
-        addTransformer(Constants.NS_XSD + "long", new LongTransformer());
-        addTransformer(Constants.NS_XSD + "int", new IntTransformer());
-        addTransformer(Constants.NS_XSD + "short", new ShortTransformer());
-        addTransformer(Constants.NS_XSD + "byte", new ByteTransformer());
-        addTransformer(Constants.NS_XSD + "double", new DoubleTransformer());
-        addTransformer(Constants.NS_XSD + "float", new FloatTransformer());
-        addTransformer(Constants.NS_XSD + "dateTime", new DateTimeTransformer());
-        addTransformer(Constants.NS_XSD + "date", new DateTransformer());
-        addTransformer(Constants.NS_XSD + "time", new TimeTransformer());
-        addTransformer(Constants.NS_XSD + "boolean", new BooleanTransformer());
-        addTransformer(Constants.NS_XSD + "anyURI", new StringTransformer());
-        addTransformer(Constants.NS_XSD + "string", new StringTransformer());
-        addTransformer(Constants.NS_XSD + "duration", new DurationTransformer());
+        addTransformer(Constants.NS_XSD + "decimal", new BigDecimalTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "integer", new BigIntegerTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "long", new LongTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "int", new IntTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "short", new ShortTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "byte", new ByteTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "double", new DoubleTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "float", new FloatTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "dateTime", new DateTimeTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "date", new DateTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "time", new TimeTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "boolean", new BooleanTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "anyURI", new StringTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "string", new StringTransformer<Node>());
+        addTransformer(Constants.NS_XSD + "duration", new DurationTransformer<Node>());
 
     }
 
     private void addDefaultFunctions() {
-        addFunction(new ConcatenateFunction());
-        addFunction(new FirstFunction());
-        addFunction(new LastFunction());
-        addFunction(new XPathFunction());
-        addFunction(new RemoveXmlTagsFunction());
-        addFunction(new CleanHtmlFunction());
-        addFunction(new SortFunction());
+        addFunction(new ConcatenateFunction<Node>());
+        addFunction(new FirstFunction<Node>());
+        addFunction(new LastFunction<Node>());
+        addFunction(new XPathFunction<Node>());
+        addFunction(new RemoveXmlTagsFunction<Node>());
+        addFunction(new CleanHtmlFunction<Node>());
+        addFunction(new SortFunction<Node>());
 
     }
 

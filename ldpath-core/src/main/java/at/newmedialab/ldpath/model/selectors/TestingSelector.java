@@ -87,7 +87,8 @@ public class TestingSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TestingSelector that = (TestingSelector) o;
+        @SuppressWarnings("rawtypes")
+		TestingSelector that = (TestingSelector) o;
 
         if (delegate != null ? !delegate.equals(that.delegate) : that.delegate != null) return false;
         if (test != null ? !test.equals(that.test) : that.test != null) return false;

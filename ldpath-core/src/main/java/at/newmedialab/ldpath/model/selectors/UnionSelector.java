@@ -54,13 +54,13 @@ public class UnionSelector<Node> implements NodeSelector<Node> {
         if(rdfBackend.supportsThreading()) {
             // start thread pool of size 2 and schedule each subselection in a separate thread
             ExecutorService workers = rdfBackend.getThreadPool();
-            Future f1 = workers.submit(new Runnable() {
+            Future<?> f1 = workers.submit(new Runnable() {
                 @Override
                 public void run() {
                     result.addAll(left.select(rdfBackend,context));
                 }
             });
-            Future f2 = workers.submit(new Runnable() {
+            Future<?> f2 = workers.submit(new Runnable() {
                 @Override
                 public void run() {
                     result.addAll(right.select(rdfBackend,context));
@@ -105,7 +105,8 @@ public class UnionSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UnionSelector that = (UnionSelector) o;
+        @SuppressWarnings("rawtypes")
+		UnionSelector that = (UnionSelector) o;
 
         if (left != null ? !left.equals(that.left) : that.left != null) return false;
         if (right != null ? !right.equals(that.right) : that.right != null) return false;

@@ -82,7 +82,8 @@ public class PropertySelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PropertySelector that = (PropertySelector) o;
+        @SuppressWarnings("rawtypes")
+		PropertySelector that = (PropertySelector) o;
 
         if (property != null ? !property.equals(that.property) : that.property != null) return false;
 

@@ -153,7 +153,8 @@ public class RecursivePathSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        RecursivePathSelector<Node> that = (RecursivePathSelector<Node>) o;
+        @SuppressWarnings("unchecked")
+		RecursivePathSelector<Node> that = (RecursivePathSelector<Node>) o;
 
         if (delegate != null ? !delegate.equals(that.delegate) : that.delegate != null) return false;
 

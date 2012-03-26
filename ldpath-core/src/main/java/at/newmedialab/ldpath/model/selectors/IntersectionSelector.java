@@ -74,7 +74,8 @@ public class IntersectionSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IntersectionSelector<Node> that = (IntersectionSelector<Node>) o;
+        @SuppressWarnings("unchecked")
+		IntersectionSelector<Node> that = (IntersectionSelector<Node>) o;
 
         if (left != null ? !left.equals(that.left) : that.left != null) return false;
         if (right != null ? !right.equals(that.right) : that.right != null) return false;

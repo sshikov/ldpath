@@ -22,7 +22,6 @@ import at.newmedialab.ldpath.api.selectors.NodeSelector;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -56,7 +55,7 @@ public class PathSelector<Node> implements NodeSelector<Node> {
         if(rdfBackend.supportsThreading()) {
             // get thread pool and schedule each subselection in a separate thread
             ThreadPoolExecutor workers = rdfBackend.getThreadPool();
-            Set<Future> futures = new HashSet<Future>();
+            Set<Future<?>> futures = new HashSet<Future<?>>();
             for(final Node n : nodesLeft) {
                 // start a maximum of 50 active threads; if there are more threads, run the subtask in the current thread
                 if(workers.getActiveCount() < 50) {
@@ -71,7 +70,7 @@ public class PathSelector<Node> implements NodeSelector<Node> {
                 }
             }
             // wait for thread pool to finish execution
-            for(Future future : futures) {
+            for(Future<?> future : futures) {
                 try {
                     future.get();
                 } catch (Exception e) { }
@@ -104,7 +103,8 @@ public class PathSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PathSelector that = (PathSelector) o;
+        @SuppressWarnings("rawtypes")
+		PathSelector that = (PathSelector) o;
 
         if (left != null ? !left.equals(that.left) : that.left != null) return false;
         if (right != null ? !right.equals(that.right) : that.right != null) return false;

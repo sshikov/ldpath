@@ -94,7 +94,8 @@ public class FunctionSelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        FunctionSelector<Node> that = (FunctionSelector<Node>) o;
+        @SuppressWarnings("unchecked")
+		FunctionSelector<Node> that = (FunctionSelector<Node>) o;
 
         if (function != null ? !function.equals(that.function) : that.function != null) return false;
         if (selectors != null ? !selectors.equals(that.selectors) : that.selectors != null) return false;

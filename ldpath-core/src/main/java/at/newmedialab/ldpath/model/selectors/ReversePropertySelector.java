@@ -77,7 +77,8 @@ public class ReversePropertySelector<Node> implements NodeSelector<Node> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ReversePropertySelector that = (ReversePropertySelector) o;
+        @SuppressWarnings("rawtypes")
+		ReversePropertySelector that = (ReversePropertySelector) o;
 
         if (property != null ? !property.equals(that.property) : that.property != null) return false;
 
