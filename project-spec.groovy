@@ -15,10 +15,12 @@
  */
 
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
-        version: '0.9.7',
+        version: '0.9.8',
 
         projectName: 'LDPath',
 
@@ -30,8 +32,8 @@ spec = [
                 logback:    '1.0.0',            // logging backend
 
                 guava:      '11.0.2',
-                jdom:       '1.1.2',
-                htmlcleaner:'2.2',
+                jdom:       '2.0.1',
+                jsoup:      '1.6.2',             // HTML parsing
 
                 cli:        '1.2',              // Apache Commons CLI
                 io:         '2.1',              // Apache Commons IO
