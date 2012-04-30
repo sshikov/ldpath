@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ package at.newmedialab.ldpath.model.functions;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.model.transformers.StringTransformer;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Text;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.*;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.sax.XMLReaders;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,12 +85,12 @@ public class XPathFunction<Node> implements SelectorFunction<Node> {
     private LinkedList<String> doFilter(String in, Set<String> xpaths) throws IOException {
         LinkedList<String> result = new LinkedList<String>();
         try {
-            Document doc = new SAXBuilder(false).build(new StringReader(in));
+            Document doc = new SAXBuilder(XMLReaders.NONVALIDATING).build(new StringReader(in));
             XMLOutputter out = new XMLOutputter();
 
             for (String xp : xpaths) {
-                List<?> nodes = XPath.selectNodes(doc,xp);
-                for (Object node : nodes) {
+                XPathExpression<Content> xpath = XPathFactory.instance().compile(xp, Filters.content());
+                for (Content node : xpath.evaluate(doc)) {
                     if(node instanceof Element)
                         result.add(out.outputString((Element) node));
                     else if(node instanceof Text)

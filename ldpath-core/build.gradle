@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+
 buildscript {
     repositories {
         maven {
@@ -32,13 +34,10 @@ dependencies {
     compile ("com.google.guava:guava:${spec.versions.guava}") {
         exclude group: "com.google.code.findbugs", module: 'jsr305'
     }
-    compile ("net.sourceforge.htmlcleaner:htmlcleaner:${spec.versions.htmlcleaner}") {
-        exclude group: 'org.apache.ant', module: 'ant'
-        exclude group: "jaxen", module: 'jaxen'
-    }
-    compile ("org.jdom:jdom:${spec.versions.jdom}") {
-        exclude group: "jaxen", module: 'jaxen'
-    }
+
+    compile "org.jsoup:jsoup:${spec.versions.jsoup}"
+    compile "org.jdom:jdom:${spec.versions.jdom}"
+
 }
 
 // the configuration of this module (used for the POM and the MANIFEST)

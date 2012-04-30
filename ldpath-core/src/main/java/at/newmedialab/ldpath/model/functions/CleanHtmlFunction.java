@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,11 @@ import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.model.transformers.StringTransformer;
 import at.newmedialab.ldpath.util.Collections;
-import org.htmlcleaner.CleanerProperties;
-import org.htmlcleaner.CompactXmlSerializer;
-import org.htmlcleaner.HtmlCleaner;
-import org.htmlcleaner.TagNode;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -40,21 +37,11 @@ import java.util.List;
  */
 public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
 
-    private HtmlCleaner cleaner;
-
     private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
     private Logger log = LoggerFactory.getLogger(CleanHtmlFunction.class);
 
     public CleanHtmlFunction() {
-        this.cleaner = new HtmlCleaner();
-        CleanerProperties p = cleaner.getProperties();
-        p.setOmitComments(true);
-        p.setTranslateSpecialEntities(true);
-        p.setTransResCharsToNCR(true);
-
-        // remove all tags that contain uninteresting content
-        p.setPruneTags("style,script,form,object,audio,video");
     }
 
     /**
@@ -78,12 +65,8 @@ public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
         List<Node> result = new ArrayList<Node>();
         while(it.hasNext()) {
             Node node = it.next();
-            TagNode tagNode = cleaner.clean(transformer.transform(backend,node));
-            try {
-                result.add(backend.createLiteral(new CompactXmlSerializer(cleaner.getProperties()).getAsString(tagNode)));
-            } catch (IOException e) {
-                log.warn("I/O error while serializing to string",e);
-            }
+            String cleaned = Jsoup.clean(transformer.transform(backend, node), Whitelist.basic());
+            result.add(backend.createLiteral(cleaned));
         }
         return result;
     }
