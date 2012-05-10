@@ -1,0 +1,104 @@
+/*
+ * Copyright (c) 2012 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
+
+
+apply plugin:com.smokejumperit.gradle.OneJarPlugin
+
+
+buildscript {
+    repositories {
+        maven {
+            url "http://devel.kiwi-project.eu:8080/nexus/content/groups/public/"
+        }
+    }
+    dependencies {
+        classpath 'com.smokejumperit:gradle-plugins:0.8.2'
+    }
+}
+
+task sourcesJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: org.gradle.api.tasks.bundling.Jar, dependsOn:javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+
+dependencies {
+
+    compile project(":ldpath-api")
+    compile project(":ldpath-core")
+    compile project(":ldpath-backend-sesame")
+
+    compile "commons-io:commons-io:${spec.versions.io}"
+    compile "commons-cli:commons-cli:${spec.versions.cli}"
+
+    /* Apache Commons Configuration (used for storing KiWi configuration) */
+    compile ("commons-configuration:commons-configuration:${spec.versions.config}") {
+        exclude module: "commons-beanutils"
+        exclude module: "commons-logging"
+    }
+
+    compile "ch.qos.logback:logback-classic:${spec.versions.logback}"
+
+    compile ("org.apache.httpcomponents:httpclient:${spec.versions.httpclient}") {
+        exclude module: "commons-logging"     // covered by SLF4J
+    }
+
+    compile "org.openrdf.sesame:sesame-repository-sail:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-repository-event:${spec.versions.sesame}"
+
+    compile "org.openrdf.sesame:sesame-sail-api:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-sail-memory:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-sail-nativerdf:${spec.versions.sesame}"
+
+    compile "org.openrdf.sesame:sesame-rio-api:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-rio-rdfxml:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-rio-trix:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-rio-turtle:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-rio-n3:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-rio-ntriples:${spec.versions.sesame}"
+    compile "org.openrdf.sesame:sesame-rio-trig:${spec.versions.sesame}"
+
+    // persistent cache
+    compile 'org.fusesource.jdbm:jdbm:2.0.1'
+}
+
+project(':') {
+    dependencies {
+        runtime project('ldpath-backend-linkeddata')
+        testCompile project('ldpath-backend-linkeddata')
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'at.newmedialab.ldpath.backend.linkeddata.LDQuery'
+    }
+}
+
