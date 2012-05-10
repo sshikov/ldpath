@@ -34,6 +34,7 @@ import at.newmedialab.ldpath.model.transformers.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Collections;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("all")
 public class RdfPathParser<Node> {
 
-        private enum Mode { RULE, SELECTOR, PROGRAM };
+        private enum Mode { RULE, SELECTOR, TEST, PROGRAM, PREFIX };
 
 
         private static final Logger log = LoggerFactory.getLogger(RdfPathParser.class);
@@ -126,6 +127,29 @@ public class RdfPathParser<Node> {
 		    }
         }
 
+        public Entry<String, String> parsePrefix() throws ParseException {
+            namespaces.clear();
+            namespaces.putAll(config.getNamespaces());
+            mode = Mode.PREFIX;
+            try {
+                return Namespace();
+            } catch (TokenMgrError error) {
+                throw new ParseException("Unable to parse Prefix: (Message: "+ error.getMessage()+")");
+            }
+        }
+
+        public Map<String, String> parsePrefixes() throws ParseException {
+            namespaces.clear();
+            namespaces.putAll(config.getNamespaces());
+            mode = Mode.PREFIX;
+            try {
+                return Namespaces();
+            } catch (TokenMgrError error) {
+                throw new ParseException("Unable to parse Prefixes: (Message: "+ error.getMessage()+")");
+            }
+        }
+
+
         public NodeSelector<Node> parseSelector(Map<String,String> ctxNamespaces) throws ParseException {
 			namespaces.clear();
 			namespaces.putAll(config.getNamespaces());
@@ -139,6 +163,20 @@ public class RdfPathParser<Node> {
     		    return Selector();
             } catch(TokenMgrError error){
                 throw new ParseException("Unable to parse Selector: (Message: "+error.getMessage()+")");
+            }
+        }
+        
+        public NodeTest<Node> parseTest(Map<String, String> ctxNamespaces) throws ParseException {
+            namespaces.clear();
+            namespaces.putAll(config.getNamespaces());
+            if (ctxNamespaces != null) {
+                namespaces.putAll(ctxNamespaces);
+            }
+            mode = Mode.TEST;
+            try {
+                return NodeTest();
+            } catch (TokenMgrError error) {
+                throw new ParseException("Unable to parse Test: (Message: "+ error.getMessage()+")");
             }
         }
 
@@ -236,6 +274,28 @@ public class RdfPathParser<Node> {
         private void registerFunction(Map<String, SelectorFunction<Node>> register, final SelectorFunction<Node> function) {
             register.put(Constants.NS_LMF_FUNCS + function.getPathExpression(backend), function);
         }
+        
+        private class Namespace implements Entry<String, String> {
+            private String key, val;
+            public Namespace(String key, String val) {
+                this.key = key;
+                this.val = val;
+            }
+            @Override
+            public String getKey() {
+                return key;
+            }
+            @Override
+            public String getValue() {
+                return val;
+            }
+            @Override
+            public String setValue(String value) {
+                String oV = val;
+                val = value;
+                return oV;
+            }
+        }
 
 }
 PARSER_END(RdfPathParser)
@@ -279,24 +339,51 @@ TOKEN :
     < #URICHAR: ["a"-"z","A"-"Z","0"-"9",";","/","?",":","@","&","=","+","$",".","-","_","!","~","*","'","%"] >
 }
 
+Map<String, String> Namespaces() :
+{
+    HashMap<String, String> ns = new HashMap<String, String>();
+    Entry<String, String> namespace = null;
+}
+{
+  (
+     namespace = Namespace() {
+       ns.put(namespace.getKey(), namespace.getValue());
+     }
+  )+
+  {
+    return ns;
+  }   
+}
 
+Entry<String, String> Namespace() :
+{
+    Token id = null;
+    Token uri;
+}
+{
+  ( 
+    "@prefix" id = <IDENTIFIER> ":" "<" uri = <URI> ">" (";")? {
+    }
+  ) { return new Namespace(id.image, uri.image); }
+}
 
 Program Program() :
 {
     Program<Node> program = new Program();
     NodeTest<Node> filter = null;
+    Map<String, String> nss = null;
     FieldMapping<?,Node> rule;
-    Token prefix = null;
-    Token uri;
     NodeSelector<Node> boostSelector;
 }
 {
   (
-    "@prefix" prefix = <IDENTIFIER> ":" "<" uri = <URI> ">" ";" {
-        program.addNamespace(prefix.image, uri.image );
-        namespaces.put(prefix.image,uri.image);
+    nss = Namespaces() {
+        namespaces.putAll(nss);
+        for (String k : nss.keySet()) {
+            program.addNamespace(k, nss.get(k));
+        }
     }
-  )*
+  )?
 
   (
     "@filter" filter = NodeTest() ";" {
