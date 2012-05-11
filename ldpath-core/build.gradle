@@ -38,6 +38,7 @@ dependencies {
     compile "org.jsoup:jsoup:${spec.versions.jsoup}"
     compile "org.jdom:jdom:${spec.versions.jdom}"
 
+	testCompile "commons-io:commons-io:${spec.versions.io}"
 }
 
 // the configuration of this module (used for the POM and the MANIFEST)
