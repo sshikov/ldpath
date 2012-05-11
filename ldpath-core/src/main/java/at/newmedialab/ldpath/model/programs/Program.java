@@ -72,8 +72,8 @@ public class Program<Node> implements LDPathConstruct<Node> {
     private Set<FieldMapping<?,Node>> fields;
 
     public Program() {
-        namespaces = new HashMap<String, String>();
-        fields = new HashSet<FieldMapping<?,Node>>();
+        namespaces = new LinkedHashMap<String, String>();
+        fields = new LinkedHashSet<FieldMapping<?,Node>>();
     }
 
     public void addNamespace(String prefix, String uri) {
@@ -122,7 +122,7 @@ public class Program<Node> implements LDPathConstruct<Node> {
     }
 
     public void setNamespaces(Map<String, String> namespaces) {
-        this.namespaces = namespaces;
+        this.namespaces = new LinkedHashMap<String, String>(namespaces);
     }
     
     /**
@@ -169,21 +169,12 @@ public class Program<Node> implements LDPathConstruct<Node> {
         }
 
         // Field-Definitions
-        final ArrayList<FieldMapping<?, Node>> fs = new ArrayList<FieldMapping<?,Node>>(fields);
-        Collections.sort(fs, new Comparator<FieldMapping<?, Node>>() {
-			@Override
-			public final int compare(FieldMapping<?, Node> o1,
-					FieldMapping<?, Node> o2) {
-				return o1.getFieldName().compareTo(o2.getFieldName());
-			}
-		});
-		for (FieldMapping<?,Node> field : fs) {
+		for (FieldMapping<?,Node> field : fields) {
             sb.append(String.format("  %s%n", field.getPathExpression(backend)));
         }
         String progWithoutNamespace = sb.toString();
 
         // Definded Namespaces (reverse sorted, to give longer prefixes precedence over shorter)
-        final StringBuilder prefixes = new StringBuilder();
         final TreeSet<Entry<String, String>> sortedNamespaces = new TreeSet<Entry<String,String>>(new Comparator<Entry<String, String>>() {
             @Override
             public int compare(Entry<String, String> e1, Entry<String, String> e2) {
@@ -194,8 +185,8 @@ public class Program<Node> implements LDPathConstruct<Node> {
         for (Entry<String, String> ns : sortedNamespaces) {
             progWithoutNamespace = progWithoutNamespace.replaceAll("<" + Pattern.quote(ns.getValue()) + "([^>]*)>", Matcher.quoteReplacement(ns.getKey())
                     + ":$1");
-            prefixes.append(String.format("@prefix %s : <%s> ;%n", ns.getKey(), ns.getValue()));
         }
+        
 
         // Also resolve default namespaces...
         for (Entry<String, String> ns : DEFAULT_NAMESPACES.entrySet()) {
@@ -204,6 +195,10 @@ public class Program<Node> implements LDPathConstruct<Node> {
                         Matcher.quoteReplacement(ns.getKey()) + ":$1");
             }
         }
+        final StringBuilder prefixes = new StringBuilder();
+        for (Entry<String, String> ns : namespaces.entrySet()) {
+        	prefixes.append(String.format("@prefix %s : <%s> ;%n", ns.getKey(), ns.getValue()));
+		}
 
         return prefixes.append(progWithoutNamespace).toString();
     }
