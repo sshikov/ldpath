@@ -17,10 +17,12 @@
 
 
 
+
+
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
-        version: '0.9.8',
+        version: '0.9.9',
 
         projectName: 'LDPath',
 
@@ -31,7 +33,7 @@ spec = [
                 slf4j:      '1.6.4',            // logging interface
                 logback:    '1.0.0',            // logging backend
 
-                guava:      '11.0.2',
+                guava:      '12.0',
                 jdom:       '2.0.1',
                 jsoup:      '1.6.2',             // HTML parsing
 
