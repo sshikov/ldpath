@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import at.newmedialab.ldpath.parser.DefaultConfiguration;
 import at.newmedialab.ldpath.parser.ParseException;
 import at.newmedialab.ldpath.parser.RdfPathParser;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -266,6 +267,15 @@ public class LDPath<Node> {
      */
     public void registerFunction(SelectorFunction<Node> function) {
         functions.add(function);
+    }
+
+    /**
+     * Return the collection of selector functions registered with this LDPath instance.
+     *
+     * @return
+     */
+    public Set<SelectorFunction<Node>> getFunctions() {
+        return ImmutableSet.copyOf(functions);
     }
 
     /**
