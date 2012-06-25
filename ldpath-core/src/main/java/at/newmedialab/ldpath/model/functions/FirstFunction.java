@@ -57,4 +57,26 @@ public class FirstFunction<Node> implements SelectorFunction<Node> {
     public String getPathExpression(RDFBackend<Node> backend) {
         return "first";
     }
+
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "fn:first(nodes : NodeList) : Node";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Selects the first node in the argument list.";
+    }
 }

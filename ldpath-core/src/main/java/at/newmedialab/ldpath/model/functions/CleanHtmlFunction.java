@@ -81,4 +81,26 @@ public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
     public String getPathExpression(RDFBackend<Node> backend) {
         return "cleanHtml";
     }
+
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "fn:cleanHtml(content: LiteralList) : LiteralList";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Function to clean up HTML and remove all script and style elements from the content. Can be used in-path, using the current context nodes as argument.";
+    }
 }

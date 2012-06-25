@@ -82,6 +82,27 @@ public class PathEqualityTest<Node> implements NodeTest<Node> {
         }
     }
 
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "nodes is nodes :: (NodeList,NodeList) -> Boolean";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Tests whether the two node lists intersect";
+    }
 
     @Override
     public boolean equals(Object o) {

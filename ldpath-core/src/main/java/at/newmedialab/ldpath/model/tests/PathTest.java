@@ -75,6 +75,27 @@ public class PathTest<Node> implements NodeTest<Node> {
         return path.getPathExpression(rdfBackend);
     }
 
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "nodes :: NodeList -> Boolean";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Tests whether the node list is non-empty";
+    }
 
     @Override
     public boolean equals(Object o) {

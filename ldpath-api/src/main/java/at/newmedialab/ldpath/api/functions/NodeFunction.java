@@ -44,4 +44,17 @@ public interface NodeFunction<T,Node> extends LDPathConstruct<Node> {
      */
     public T apply(RDFBackend<Node> backend, Node context, Collection<Node>... args) throws IllegalArgumentException;
 
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     * @return
+     */
+    public String getSignature();
+
+    /**
+     * A short human-readable description of what the node function does.
+     * @return
+     */
+    public String getDescription();
 }

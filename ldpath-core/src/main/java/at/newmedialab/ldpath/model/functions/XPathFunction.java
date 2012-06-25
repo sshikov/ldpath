@@ -114,4 +114,27 @@ public class XPathFunction<Node> implements SelectorFunction<Node> {
     public String getPathExpression(RDFBackend<Node> backend) {
         return "xpath";
     }
+
+
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "fn:xpath(xpath: String [, nodes: XMLLiteralList]) : LiteralList";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Evaluate an XPath expression on either the value of the context node or the values of the nodes passed as arguments.";
+    }
 }

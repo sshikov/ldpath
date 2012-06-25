@@ -22,7 +22,7 @@
 spec = [
         name: 'ldpath',
         group: 'at.newmedialab.ldpath',
-        version: '0.9.9',
+        version: '0.9.10',
 
         projectName: 'LDPath',
 
@@ -35,7 +35,7 @@ spec = [
 
                 guava:      '12.0',
                 jdom:       '2.0.1',
-                jsoup:      '1.6.2',             // HTML parsing
+                jsoup:      '1.6.4a-LMF',             // HTML parsing
 
                 cli:        '1.2',              // Apache Commons CLI
                 io:         '2.1',              // Apache Commons IO

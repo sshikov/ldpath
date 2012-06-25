@@ -133,4 +133,26 @@ public class SortFunction<Node> implements SelectorFunction<Node> {
     }
 
 
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "fn:sort(nodes : NodeList [, (\"string\"|\"number\"|\"date\") [, (\"asc\"|\"desc\") ] ]) : NodeList ";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Sort the node list passed as first argument. The second argument can be used to determine the " +
+               "sort method, the third argument to determine the sort direction.";
+    }
 }

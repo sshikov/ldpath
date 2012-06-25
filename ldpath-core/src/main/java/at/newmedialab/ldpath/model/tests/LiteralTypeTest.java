@@ -84,6 +84,27 @@ public class LiteralTypeTest<Node> implements NodeTest<Node> {
         return "^^" + typeUri;
     }
 
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "nodes [^^typeUri] :: (NodeList, URI) -> Boolean";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Tests the types of the nodes passed as argument";
+    }
 
     @Override
     public boolean equals(Object o) {
