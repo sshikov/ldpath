@@ -288,4 +288,12 @@ public class LDPath<Node> {
     public void registerTransformer(String typeUri, NodeTransformer<?,Node> transformer) {
         transformers.put(typeUri,transformer);
     }
+
+    /**
+     * Return the configuration underlying this LDPath instance.
+     * @return
+     */
+    public Configuration<Node> getConfig() {
+        return config;
+    }
 }
