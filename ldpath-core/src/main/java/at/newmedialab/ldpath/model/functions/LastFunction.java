@@ -56,4 +56,26 @@ public class LastFunction<Node> implements SelectorFunction<Node> {
     public String getPathExpression(RDFBackend<Node> backend) {
         return "last";
     }
+
+    /**
+     * A string describing the signature of this node function, e.g. "fn:content(uris : Nodes) : Nodes". The
+     * syntax for representing the signature can be chosen by the implementer. This method is for informational
+     * purposes only.
+     *
+     * @return
+     */
+    @Override
+    public String getSignature() {
+        return "fn:last(nodes : NodeList) : Node";
+    }
+
+    /**
+     * A short human-readable description of what the node function does.
+     *
+     * @return
+     */
+    @Override
+    public String getDescription() {
+        return "Returns the last element in the node list.";
+    }
 }
