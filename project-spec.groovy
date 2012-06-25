@@ -27,20 +27,20 @@ spec = [
         projectName: 'LDPath',
 
         versions: [
-                sesame:     '2.6.4',            // RDF API
+                sesame:     '2.6.5',            // RDF API
                 jena:       '2.6.4',            // RDF API
 
                 slf4j:      '1.6.4',            // logging interface
                 logback:    '1.0.0',            // logging backend
 
                 guava:      '12.0',
-                jdom:       '2.0.1',
+                jdom:       '2.0.2',
                 jsoup:      '1.6.4a-LMF',             // HTML parsing
 
                 cli:        '1.2',              // Apache Commons CLI
-                io:         '2.1',              // Apache Commons IO
-                httpclient: '4.1.3',            // Apache Commons HTTP Client
-                config:     '1.7',              // Apache Commons Configuration
+                io:         '2.4',              // Apache Commons IO
+                httpclient: '4.2',            // Apache Commons HTTP Client
+                config:     '1.8',              // Apache Commons Configuration
 
                 junit:      '4.10',             // Testing
                 hamcrest:   '1.2.1',
