@@ -28,6 +28,7 @@ import at.newmedialab.ldpath.parser.DefaultConfiguration;
 import at.newmedialab.ldpath.parser.ParseException;
 import at.newmedialab.ldpath.parser.RdfPathParser;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.Reader;
@@ -288,6 +289,11 @@ public class LDPath<Node> {
     public void registerTransformer(String typeUri, NodeTransformer<?,Node> transformer) {
         transformers.put(typeUri,transformer);
     }
+    
+    public Map<String, NodeTransformer<?,Node>> getTransformers() {
+    	return ImmutableMap.copyOf(transformers);
+    }
+
 
     /**
      * Return the configuration underlying this LDPath instance.
