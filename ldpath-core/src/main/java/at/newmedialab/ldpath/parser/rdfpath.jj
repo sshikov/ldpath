@@ -807,13 +807,24 @@ NodeTest NodeTest() :
 }
 {
     (
-        result = NotTest()
+        result = GroupedTest()
+    |   result = NotTest()
     |   result = AndTest()
     |   result = OrTest()
     |   result = AtomicNodeTest()
     )
     {
         return result;
+    }
+}
+
+NodeTest GroupedTest() :
+{
+    NodeTest delegate;
+}
+{
+    "(" delegate = NodeTest() ")" {
+       return delegate;
     }
 }
 
