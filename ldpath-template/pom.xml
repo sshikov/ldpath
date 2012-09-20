@@ -55,6 +55,16 @@
                             at.newmedialab.ldpath.template.model;version=${project.version},
                             at.newmedialab.ldpath.template.util;version=${project.version}
                         </Export-Package>
+                        <Embed-Dependency>freemarker;scope=compile</Embed-Dependency>
+                        <Import-Package>
+                            !org.python.*,!javax.servlet.*,!javax.el.*,!org.dom4j.*,
+                            !org.zeroturnaround.javarebel.*,!org.jaxen.*,
+                            !org.jdom.*,!com.sun.org.apache.*,!org.apache.xpath.*,
+                            !org.apache.tools.*,!org.w3c.dom.*,!org.mozilla.javascript.*,
+                            !org.apache.log.*,!org.apache.xml.utils.*,!org.apache.log4j.*,
+                            !org.apache.commons.logging.*,
+                            *
+                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>
