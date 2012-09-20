@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>at.newmedialab.ldpath</groupId>
+        <artifactId>ldpath-parent</artifactId>
+        <version>0.9.11-SNAPSHOT</version>
+    </parent>
+
+    <groupId>at.newmedialab.ldpath</groupId>
+    <artifactId>ldpath-api</artifactId>
+    <version>0.9.11-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Name>LDPath API</Bundle-Name>
+                        <!-- Enable this for including your enhancement chain configuration -->
+                        <!-- <Install-Path>config</Install-Path> -->
+						<Export-Package>
+                            at.newmedialab.ldpath.api;version=${project.version},
+                            at.newmedialab.ldpath.api.backend;version=${project.version},
+                            at.newmedialab.ldpath.api.functions;version=${project.version},
+                            at.newmedialab.ldpath.api.selectors;version=${project.version},
+                            at.newmedialab.ldpath.api.tests;version=${project.version},
+                            at.newmedialab.ldpath.api.transformers;version=${project.version}
+                        </Export-Package>
+                     </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-scr-scrdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <service.vendor>Salzburg Research</service.vendor>
+                            </properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.3.7</version>
+                    <inherited>true</inherited>
+                    <configuration>
+                        <instructions>
+                            <Bundle-DocURL>http://code.google.com/p/ldpath/</Bundle-DocURL>
+                            <Bundle-Vendor>Salzburg Research</Bundle-Vendor>
+                            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                            <_versionpolicy>$${version;===;${@}}</_versionpolicy>
+                        </instructions>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-scr-plugin</artifactId>
+                    <version>1.7.4</version>
+                    <executions>
+                        <execution>
+                            <id>generate-scr-scrdescriptor</id>
+                            <goals>
+                                <goal>scr</goal>
+                            </goals>
+                            <configuration>
+                                <properties>
+                                    <service.vendor>Salzburg Research</service.vendor>
+                                </properties>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+
+</project>

@@ -70,7 +70,7 @@ public class NamespaceDirective implements TemplateDirectiveModel {
         Map<String,String> namespaces;
         if(namespacesWrapped == null) {
             namespaces = new HashMap<String, String>();
-            namespacesWrapped = new TemplateWrapperModel<Map<String, String>>(new HashMap<String, String>());
+            namespacesWrapped = new TemplateWrapperModel<Map<String, String>>(namespaces);
             env.setGlobalVariable("namespaces",namespacesWrapped);
         } else {
             namespaces = namespacesWrapped.getAdaptedObject(Map.class);

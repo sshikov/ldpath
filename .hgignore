@@ -14,6 +14,14 @@ LDPath.iws
 userConfig.properties
 *.class
 out
+ldpath-backend-file/target
+ldpath-api/target
+ldpath-template/target
+ldpath-backend-jena/target
+ldpath-backend-linkeddata/target
+ldpath-core/target
+ldpath-backend-sesame/target
+ldpath-template-linkeddata/target
 syntax: regexp
 .project
 .classpath
