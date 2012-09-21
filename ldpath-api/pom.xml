@@ -5,12 +5,12 @@
     <parent>
         <groupId>at.newmedialab.ldpath</groupId>
         <artifactId>ldpath-parent</artifactId>
-        <version>0.9.12</version>
+        <version>0.9.13-SNAPSHOT</version>
     </parent>
 
     <groupId>at.newmedialab.ldpath</groupId>
     <artifactId>ldpath-api</artifactId>
-    <version>0.9.12</version>
+    <version>0.9.13-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
 
