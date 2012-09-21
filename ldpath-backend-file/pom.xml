@@ -5,12 +5,12 @@
     <parent>
         <groupId>at.newmedialab.ldpath</groupId>
         <artifactId>ldpath-parent</artifactId>
-        <version>0.9.11</version>
+        <version>0.9.12-SNAPSHOT</version>
     </parent>
 
     <groupId>at.newmedialab.ldpath</groupId>
     <artifactId>ldpath-backend-file</artifactId>
-    <version>0.9.11</version>
+    <version>0.9.12-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
