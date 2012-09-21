@@ -22,6 +22,9 @@ ldpath-backend-linkeddata/target
 ldpath-core/target
 ldpath-backend-sesame/target
 ldpath-template-linkeddata/target
+release.properties
+pom.xml.releaseBackup
+target
 syntax: regexp
 .project
 .classpath
