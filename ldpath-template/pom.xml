@@ -55,6 +55,7 @@
                             at.newmedialab.ldpath.template.model;version=${project.version},
                             at.newmedialab.ldpath.template.util;version=${project.version}
                         </Export-Package>
+                        <!--
                         <_exportcontents>freemarker.*;version="2.3.19"</_exportcontents>
                         <Embed-Dependency>freemarker;scope=compile</Embed-Dependency>
                         <Import-Package>
@@ -76,6 +77,7 @@
                             org.w3c.dom.traversal;resolution:=optional,
                             *
                         </Import-Package>
+                        -->
                     </instructions>
                 </configuration>
             </plugin>
