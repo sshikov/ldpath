@@ -234,6 +234,8 @@
         <module>ldpath-template</module>
         <module>ldpath-template-linkeddata</module>
         <module>ldpath-backend-jena</module>
+        <module>ldpath-functions-xml</module>
+        <module>ldpath-functions-html</module>
         <!--
         <module>ldpath-backend-sparql</module>
         -->

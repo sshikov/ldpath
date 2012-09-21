@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Salzburg Research.
+ * Copyright (c) 2012 Salzburg Research.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,52 +19,57 @@ package at.newmedialab.ldpath.model.functions;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.model.transformers.StringTransformer;
+import at.newmedialab.ldpath.parser.DefaultConfiguration;
 import at.newmedialab.ldpath.util.Collections;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
-    
-    private final static Logger log = LoggerFactory.getLogger(RemoveXmlTagsFunction.class);
+/**
+ * Function to clean up HTML and remove all script and style elements from the content.
+ * <p/>
+ * Author: Sebastian Schaffert
+ */
+public class CleanHtmlFunction<Node> implements SelectorFunction<Node> {
 
     private final StringTransformer<Node> transformer = new StringTransformer<Node>();
 
-    private static Pattern XML_TAG = Pattern.compile("<(\"[^\"]*\"|'[^']*'|[^>])*>", Pattern.MULTILINE);
+    private Logger log = LoggerFactory.getLogger(CleanHtmlFunction.class);
+
+    public CleanHtmlFunction() {
+    }
 
     /**
      * Apply the function to the list of nodes passed as arguments and return the result as type T.
      * Throws IllegalArgumentException if the function cannot be applied to the nodes passed as argument
      * or the number of arguments is not correct.
      *
-     * @param args a nested list of KiWiNodes
+     * @param args a list of KiWiNodes
      * @return
      */
     @Override
-    public Collection<Node> apply(RDFBackend<Node> rdfBackend, Node context, Collection<Node>... args) throws IllegalArgumentException {
+    public Collection<Node> apply(RDFBackend<Node> backend, Node context, Collection<Node>... args) throws IllegalArgumentException {
+        Iterator<Node> it;
         if(args.length < 1){
-            log.debug("remove XML tags from context {}",context);
-            return java.util.Collections.singleton(
-                rdfBackend.createLiteral(doFilter(transformer.transform(rdfBackend, context))));
+            log.debug("clean HTML from context {}",context);
+            it = java.util.Collections.singleton(context).iterator();
         } else {
-            log.debug("remove XML tags from parameters");
-            Iterator<Node> it = Collections.iterator(args);
-            List<Node> result = new ArrayList<Node>();
-            while (it.hasNext()) {
-                result.add(rdfBackend.createLiteral(doFilter(transformer.transform(rdfBackend, it.next()))));
-            }
-            return result;
+            log.debug("clean HTML from parameters");
+            it = Collections.iterator(args);
         }
-    }
-
-    private String doFilter(String in) {
-        return XML_TAG.matcher(in).replaceAll("");
+        List<Node> result = new ArrayList<Node>();
+        while(it.hasNext()) {
+            Node node = it.next();
+            String cleaned = Jsoup.clean(transformer.transform(backend, node), Whitelist.basic());
+            result.add(backend.createLiteral(cleaned));
+        }
+        return result;
     }
 
     /**
@@ -75,8 +80,7 @@ public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
      */
     @Override
     public String getPathExpression(RDFBackend<Node> backend) {
-        return "removeTags";
-
+        return "cleanHtml";
     }
 
     /**
@@ -88,7 +92,7 @@ public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
      */
     @Override
     public String getSignature() {
-        return "fn:removeTags(content: LiteralList) : LiteralList";
+        return "fn:cleanHtml(content: LiteralList) : LiteralList";
     }
 
     /**
@@ -98,6 +102,6 @@ public class RemoveXmlTagsFunction<Node> implements SelectorFunction<Node> {
      */
     @Override
     public String getDescription() {
-        return "Function to remove all XML or HTML tags from the content. Can be used in-path, using the current context nodes as argument.";
+        return "Function to clean up HTML and remove all script and style elements from the content. Can be used in-path, using the current context nodes as argument.";
     }
 }

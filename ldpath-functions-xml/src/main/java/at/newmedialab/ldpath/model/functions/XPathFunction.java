@@ -19,6 +19,7 @@ package at.newmedialab.ldpath.model.functions;
 import at.newmedialab.ldpath.api.backend.RDFBackend;
 import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.model.transformers.StringTransformer;
+import at.newmedialab.ldpath.parser.DefaultConfiguration;
 import org.jdom2.*;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
