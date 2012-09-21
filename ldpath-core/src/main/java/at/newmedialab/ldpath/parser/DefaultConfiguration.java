@@ -20,10 +20,15 @@ import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.model.Constants;
 import at.newmedialab.ldpath.model.functions.*;
 import at.newmedialab.ldpath.model.transformers.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 /**
  * Add file description here!
@@ -31,6 +36,11 @@ import java.util.Map;
  * Author: Sebastian Schaffert
  */
 public class DefaultConfiguration<Node> extends Configuration<Node> {
+
+    private static Logger log = LoggerFactory.getLogger(DefaultConfiguration.class);
+
+    private static ServiceLoader<SelectorFunction> functionLoader = ServiceLoader.load(SelectorFunction.class);
+
 
     public static final Map<String, String> DEFAULT_NAMESPACES;
     static {
@@ -45,6 +55,14 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
         defNS.put("lmf", "http://www.newmedialab.at/lmf/types/1.0/");
         defNS.put("fn", "http://www.newmedialab.at/lmf/functions/1.0/");
         DEFAULT_NAMESPACES = Collections.unmodifiableMap(defNS);
+    }
+
+    public static final Set<Class> DEFAULT_FUNCTIONS = new HashSet<Class>();
+    static {
+        DEFAULT_FUNCTIONS.add(ConcatenateFunction.class);
+        DEFAULT_FUNCTIONS.add(FirstFunction.class);
+        DEFAULT_FUNCTIONS.add(LastFunction.class);
+        DEFAULT_FUNCTIONS.add(SortFunction.class);
     }
 
 
@@ -82,14 +100,11 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
     }
 
     private void addDefaultFunctions() {
-        addFunction(new ConcatenateFunction<Node>());
-        addFunction(new FirstFunction<Node>());
-        addFunction(new LastFunction<Node>());
-        addFunction(new XPathFunction<Node>());
-        addFunction(new RemoveXmlTagsFunction<Node>());
-        addFunction(new CleanHtmlFunction<Node>());
-        addFunction(new SortFunction<Node>());
 
+        for(SelectorFunction f : functionLoader) {
+            log.info("registering LDPath function: {}",f.getSignature());
+            addFunction(f);
+        }
     }
 
     private void addFunction(SelectorFunction<Node> function) {

@@ -1,75 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>at.newmedialab.ldpath</groupId>
         <artifactId>ldpath-parent</artifactId>
+        <groupId>at.newmedialab.ldpath</groupId>
         <version>0.9.13-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <groupId>at.newmedialab.ldpath</groupId>
-    <artifactId>ldpath-core</artifactId>
-    <version>0.9.13-SNAPSHOT</version>
-    <packaging>bundle</packaging>
+    <artifactId>ldpath-functions-html</artifactId>
+
+
+    <description>LDPath Functions for HTML content.</description>
 
     <dependencies>
-
         <dependency>
             <groupId>at.newmedialab.ldpath</groupId>
-            <artifactId>ldpath-api</artifactId>
+            <artifactId>ldpath-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.3</version>
         </dependency>
-
-
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <scope>test</scope>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1.3-LMF</version>
         </dependency>
-    </dependencies>
 
+    </dependencies>
 
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>javacc-maven-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <id>javacc</id>
-                        <goals>
-                            <goal>javacc</goal>
-                        </goals>
-                        <configuration>
-                            <lookAhead>2147483647</lookAhead>
-                            <isStatic>false</isStatic>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-Name>LDPath Core</Bundle-Name>
+                        <Bundle-Name>LDPath Functions: HTML</Bundle-Name>
                         <!-- Enable this for including your enhancement chain configuration -->
                         <!-- <Install-Path>config</Install-Path> -->
                         <Export-Package>
-                            at.newmedialab.ldpath;version=${project.version},
-                            at.newmedialab.ldpath.exception;version=${project.version},
                             at.newmedialab.ldpath.model.*;version=${project.version},
-                            at.newmedialab.ldpath.util;version=${project.version}
-                            at.newmedialab.ldpath.parser;version=${project.version}
                         </Export-Package>
+                        <Import-Package>
+                            !nu.xom.*,!org.dom4j.*,!org.dom4j.io.*,*
+                        </Import-Package>
+                        <Embed-Dependency>jsoup;scope=compile</Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
                         <_include>src/main/resources/META-INF/MANIFEST.MF</_include>
                     </instructions>
                 </configuration>
@@ -96,6 +79,7 @@
                 <artifactId>maven-gpg-plugin</artifactId>
             </plugin>
         </plugins>
+
     </build>
 
 </project>
