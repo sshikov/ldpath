@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>at.newmedialab.ldpath</groupId>
+    <artifactId>ldpath-parent</artifactId>
+    <version>0.9.13-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>ldpath-functions-math</artifactId>
+  <packaging>bundle</packaging>
+  
+  <description>Math-Functions for ldpath</description>
+  
+      <dependencies>
+        <dependency>
+            <groupId>at.newmedialab.ldpath</groupId>
+            <artifactId>ldpath-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Name>LDPath Functions: Math</Bundle-Name>
+                        <!-- Enable this for including your enhancement chain configuration -->
+                        <!-- <Install-Path>config</Install-Path> -->
+                        <Export-Package>
+                            at.newmedialab.ldpath.model.*;version=${project.version},
+                        </Export-Package>
+                        <_include>src/main/resources/META-INF/MANIFEST.MF</_include>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-scr-scrdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <service.vendor>Salzburg Research</service.vendor>
+                            </properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>
