@@ -18,6 +18,9 @@ package at.newmedialab.ldpath.parser;
 
 import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.api.transformers.NodeTransformer;
+import at.newmedialab.ldpath.model.tests.TestFunction;
+import at.newmedialab.ldpath.model.tests.functions.EqualTest;
+
 import com.google.common.collect.ImmutableMap;
 
 import java.util.HashMap;
@@ -45,11 +48,17 @@ public class Configuration<Node> {
      * A map from function URIs (e.g. LMF functions) to LDPath selector function instances
      */
     protected Map<String, SelectorFunction<Node>> functions;
+    
+    /**
+     * A map from function URIs (e.g. LMF functions) to LDPath test function instances
+     */
+    protected Map<String, TestFunction<Node>> testFunctions;
 
     public Configuration() {
         namespaces   = new HashMap<String,String>();
         transformers = new HashMap<String, NodeTransformer<?, Node>>();
         functions    = new HashMap<String, SelectorFunction<Node>>();
+        testFunctions = new HashMap<String, TestFunction<Node>>();
     }
 
     /**
@@ -78,6 +87,15 @@ public class Configuration<Node> {
     public Map<String, SelectorFunction<Node>> getFunctions() {
         return ImmutableMap.copyOf(functions);
     }
+    
+    /**
+     * Return an immutable map of the registered function tests.
+     * 
+     * @return an {@link ImmutableMap} of the registered {@link TestFunction}s.
+     */
+    public Map<String, TestFunction<Node>> getTestFunctions() {
+		return ImmutableMap.copyOf(testFunctions);
+	}
 
     /**
      * Add a namespace prefix to URI mapping to this configuration.
@@ -129,7 +147,39 @@ public class Configuration<Node> {
     public void removeFunction(String uri) {
         functions.remove(uri);
     }
+    
+    /**
+     * Add a mapping from an URI to a {@link TestFunction} inplementation to the configuration.
+     * Registered test functions will be available under their URIs during program parsing.
+     * Function calls are not thread safe and the order of function calls in not predictable; 
+     * they should therefore not hold any state.
+     * <p/>
+     * Example:<br/>
+     * <code>fn:eq(...)</code> is a mapping from http://www.newmedialab.at/lmf/functions/1.0/eq to an instance
+     * of {@link EqualTest}
+     * <p/>
+     * Note that currently you can only use the http://www.newmedialab.at/lmf/functions/1.0/ namespace for
+     * registering functions.
+     * 
+     * @param uri   the URI under which to register the selector function as a string
+     * @param test  an instance of the test function implementation for this URI
+     */
+    public void addTestFunction(String uri, TestFunction<Node> test) {
+        if(!uri.startsWith("http://www.newmedialab.at/lmf/functions/1.0/")) {
+            throw new IllegalArgumentException("namespaces other than http://www.newmedialab.at/lmf/functions/1.0/ are currently not supported");
+        }
+        testFunctions.put(uri,test);
+    }
 
+    /**
+     * Remove the test function registered under the given URI.
+     *
+     * @param uri a string representing the URI under which the test function has been registered.
+     */
+    public void removeTestFunction(String uri) {
+        testFunctions.remove(uri);
+    }
+    
     /**
      * Add a mapping from a type URI to a {@link NodeTransformer}. The values of fields with a
      * type specification with this URI will be transformed to other Java types using this transformer.
