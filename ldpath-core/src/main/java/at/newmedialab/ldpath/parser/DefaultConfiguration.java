@@ -19,6 +19,7 @@ package at.newmedialab.ldpath.parser;
 import at.newmedialab.ldpath.api.functions.SelectorFunction;
 import at.newmedialab.ldpath.model.Constants;
 import at.newmedialab.ldpath.model.functions.*;
+import at.newmedialab.ldpath.model.tests.TestFunction;
 import at.newmedialab.ldpath.model.transformers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,8 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
 
     private static ServiceLoader<SelectorFunction> functionLoader = ServiceLoader.load(SelectorFunction.class);
 
-
+    private static ServiceLoader<TestFunction> testLoader = ServiceLoader.load(TestFunction.class);
+    
     public static final Map<String, String> DEFAULT_NAMESPACES;
     static {
         HashMap<String, String> defNS = new HashMap<String, String>();
@@ -71,6 +73,7 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
         addDefaultNamespaces();
         addDefaultTransformers();
         addDefaultFunctions();
+        addDefaultTestFunctions();
     }
 
 
@@ -100,7 +103,6 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
     }
 
     private void addDefaultFunctions() {
-
         for(SelectorFunction f : functionLoader) {
             log.info("registering LDPath function: {}",f.getSignature());
             addFunction(f);
@@ -110,4 +112,16 @@ public class DefaultConfiguration<Node> extends Configuration<Node> {
     private void addFunction(SelectorFunction<Node> function) {
         addFunction(Constants.NS_LMF_FUNCS + function.getPathExpression(null), function);
     }
+    
+    private void addDefaultTestFunctions() {
+        for(TestFunction t : testLoader) {
+            log.info("registering LDPath function test: {}",t.getSignature());
+            addTestFunction(t);
+        }
+    }
+
+    private void addTestFunction(TestFunction<Node> test) {
+        addTestFunction(Constants.NS_LMF_FUNCS + test.getLocalName(), test);
+    }
+
 }
