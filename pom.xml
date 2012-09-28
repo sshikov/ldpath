@@ -30,7 +30,7 @@
 
     <name>LDPath</name>
     <description>A path-based query language for RDF and Linked Data.</description>
-    <url>https://bitbucket.org/srfgkmt/sesame-tools</url>
+    <url>https://code.google.com/p/ldpath/</url>
 
     <inceptionYear>2012</inceptionYear>
     <licenses>
@@ -51,6 +51,11 @@
         <developer>
             <name>Rupert Westenthaler</name>
             <email>rwesten@apache.org</email>
+            <organization>Salzburg Research</organization>
+        </developer>
+        <developer>
+            <name>Jakob Frank</name>
+            <email>jakob.frank@salzburgresearch.at</email>
             <organization>Salzburg Research</organization>
         </developer>
     </developers>
@@ -222,6 +227,17 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+        	<plugin>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-compiler-plugin</artifactId>
+        		<version>2.5.1</version>
+       		    <configuration>
+       				<source>1.6</source>
+       				<target>1.6</target>
+   				</configuration>
+        	</plugin>
+        </plugins>
     </build>
 
 
@@ -236,6 +252,8 @@
         <module>ldpath-backend-jena</module>
         <module>ldpath-functions-xml</module>
         <module>ldpath-functions-html</module>
+        <module>ldpath-functions-math</module>
+        <module>ldpath-functions-date</module>
         <!--
         <module>ldpath-backend-sparql</module>
         -->
