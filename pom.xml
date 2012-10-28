@@ -78,7 +78,7 @@
     <properties>
         <sesameVersion>2.6.9</sesameVersion>
         <jenaVersion>2.7.3</jenaVersion>
-        <sl4jVersion>1.7.xi20</sl4jVersion>
+        <sl4jVersion>1.7.2</sl4jVersion>
         <logbackVersion>1.0.7</logbackVersion>
         <jacksonVersion>1.9.10</jacksonVersion>
     </properties>
