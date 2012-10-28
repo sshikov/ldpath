@@ -78,9 +78,9 @@
     <properties>
         <sesameVersion>2.6.9</sesameVersion>
         <jenaVersion>2.7.3</jenaVersion>
-        <sl4jVersion>1.7.0</sl4jVersion>
+        <sl4jVersion>1.7.xi20</sl4jVersion>
         <logbackVersion>1.0.7</logbackVersion>
-        <jacksonVersion>1.9.9</jacksonVersion>
+        <jacksonVersion>1.9.10</jacksonVersion>
     </properties>
 
     <repositories>
@@ -181,17 +181,15 @@
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>1.4</version>
                     <!-- uncomment for release deployment -->
-<!--
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                        </execution>
-                    </executions>
--->
+                                        <executions>
+                                            <execution>
+                                                <id>sign-artifacts</id>
+                                                <phase>verify</phase>
+                                                <goals>
+                                                    <goal>sign</goal>
+                                                </goals>
+                                            </execution>
+                                        </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
